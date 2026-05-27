@@ -1,0 +1,8 @@
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1500" fill="#EDE1D0"/>
+  <circle cx="600" cy="610" r="320" fill="#FFFDF8" fill-opacity=".52"/>
+  <path d="M0 1180C180 1090 315 1165 445 1230C575 1295 720 1345 900 1240C1025 1167 1115 1160 1200 1192V1500H0V1180Z" fill="#D8C39F" fill-opacity=".42"/>
+  <path d="M185 230C332 120 505 91 667 145C812 193 940 302 1015 454" stroke="#B9955B" stroke-width="4" stroke-opacity=".38"/>
+  <text x="600" y="710" text-anchor="middle" fill="#7C6A57" font-family="Georgia, serif" font-size="58">Wedding Photo</text>
+  <text x="600" y="780" text-anchor="middle" fill="#9A866C" font-family="serif" font-size="34">cover.jpg로 교체하세요</text>
+</svg>

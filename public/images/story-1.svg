@@ -1,0 +1,8 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" fill="#F7F3ED"/>
+  <rect x="135" y="95" width="930" height="710" fill="#EFE8DF"/>
+  <circle cx="590" cy="390" r="190" fill="#FFFDF8" fill-opacity=".7"/>
+  <path d="M130 670C270 620 410 675 548 700C723 732 815 636 1068 690V805H130V670Z" fill="#D8C8AF" fill-opacity=".72"/>
+  <text x="600" y="430" text-anchor="middle" fill="#716357" font-family="Georgia, serif" font-size="48">Our Story</text>
+  <text x="600" y="488" text-anchor="middle" fill="#9A8A79" font-family="serif" font-size="30">story-1.jpg로 교체하세요</text>
+</svg>

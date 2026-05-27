@@ -1,0 +1,5 @@
+<svg width="900" height="1200" viewBox="0 0 900 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="1200" fill="#EEE4D6"/>
+  <path d="M450 170C610 310 710 450 710 610C710 796 590 930 450 1010C310 930 190 796 190 610C190 450 290 310 450 170Z" fill="#FFFDF8" fill-opacity=".52"/>
+  <text x="450" y="625" text-anchor="middle" fill="#8B7B6B" font-family="Georgia, serif" font-size="46">Gallery 4</text>
+</svg>

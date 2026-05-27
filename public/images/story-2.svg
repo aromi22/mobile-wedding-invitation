@@ -1,0 +1,8 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" fill="#F8F5F0"/>
+  <rect x="100" y="80" width="1000" height="740" fill="#E8DED1"/>
+  <path d="M420 215C565 120 748 142 870 260C995 382 1008 585 906 700C790 832 562 807 430 674C292 535 274 310 420 215Z" fill="#FFFDF8" fill-opacity=".58"/>
+  <path d="M120 625C285 545 455 628 606 668C795 718 916 602 1080 650V820H120V625Z" fill="#CDBA9D" fill-opacity=".48"/>
+  <text x="600" y="445" text-anchor="middle" fill="#716357" font-family="Georgia, serif" font-size="48">Together</text>
+  <text x="600" y="503" text-anchor="middle" fill="#9A8A79" font-family="serif" font-size="30">story-2.jpg로 교체하세요</text>
+</svg>
