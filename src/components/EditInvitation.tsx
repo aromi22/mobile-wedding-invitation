@@ -15,6 +15,9 @@ import { WeddingInvitation } from "@/components/WeddingInvitation";
 import { saveInvitation } from "@/lib/invitations";
 
 const STORAGE_KEY = "mobile-wedding-editor-v1";
+const COVER_IMAGE_MAX_SIZE = 1600;
+const GALLERY_IMAGE_MAX_SIZE = 1400;
+const IMAGE_EXPORT_QUALITY = 0.78;
 
 const MUSIC_OPTIONS: Array<WeddingMusic | null> = [
   null,
@@ -375,6 +378,52 @@ function fileToDataUrl(file: File) {
   });
 }
 
+function loadImageFromFile(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("이미지를 불러오지 못했습니다."));
+    };
+    image.src = objectUrl;
+  });
+}
+
+async function compressImageFile(file: File, maxSize: number) {
+  if (!file.type.startsWith("image/")) {
+    return fileToDataUrl(file);
+  }
+
+  try {
+    const image = await loadImageFromFile(file);
+    const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      return fileToDataUrl(file);
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+    context.fillStyle = "#fffaf3";
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+
+    return canvas.toDataURL("image/jpeg", IMAGE_EXPORT_QUALITY);
+  } catch {
+    return fileToDataUrl(file);
+  }
+}
+
 function FileField({
   label,
   onSelect,
@@ -623,7 +672,13 @@ export function EditInvitation() {
       return;
     }
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    } catch {
+      setSaveMessage(
+        "사진 용량이 커서 이 기기에는 임시저장을 못 했어요. 저장 버튼을 눌러 서버에 저장해 주세요.",
+      );
+    }
   }, [draft, isLoaded]);
 
   const preview = useMemo(() => draft, [draft]);
@@ -709,17 +764,24 @@ export function EditInvitation() {
       return;
     }
 
-    const dataUrl = await fileToDataUrl(file);
+    setSaveMessage("사진을 모바일에 맞게 줄이는 중이에요.");
+    const dataUrl = await compressImageFile(file, COVER_IMAGE_MAX_SIZE);
     update((current) => {
       current.photos.cover.src = dataUrl;
       current.photos.cover.alt = file.name;
       return current;
     });
+    setSaveMessage("메인 사진을 바꿨어요.");
   }
 
   async function appendGalleryFiles(files: FileList) {
     const selectedFiles = Array.from(files);
-    const dataUrls = await Promise.all(selectedFiles.map((file) => fileToDataUrl(file)));
+    setSaveMessage("갤러리 사진을 모바일에 맞게 줄이는 중이에요.");
+    const dataUrls: string[] = [];
+
+    for (const file of selectedFiles) {
+      dataUrls.push(await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE));
+    }
 
     update((current) => {
       const newPhotos = dataUrls.map((src, index) => ({
@@ -731,6 +793,7 @@ export function EditInvitation() {
       setGalleryText(current.photos.gallery.map((photo) => photo.src).join("\n"));
       return current;
     });
+    setSaveMessage("갤러리 사진을 추가했어요.");
   }
 
   function updateAccount(index: number, account: WeddingAccount) {
