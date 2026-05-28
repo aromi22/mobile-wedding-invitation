@@ -64,7 +64,6 @@ function safeSlugPart(value: string) {
 }
 
 export function createInvitationSlug(data: WeddingData) {
-  const names = safeSlugPart(`${data.couple.groom.name}-${data.couple.bride.name}`) || "wedding";
   const date = `${data.event.year}${String(data.event.month).padStart(2, "0")}${String(
     data.event.day,
   ).padStart(2, "0")}`;
@@ -73,7 +72,7 @@ export function createInvitationSlug(data: WeddingData) {
       ? crypto.randomUUID().slice(0, 8)
       : String(Date.now()).slice(-8);
 
-  return `${names}-${date}-${suffix}`;
+  return `wedding-${date}-${suffix}`;
 }
 
 export function createEditSecret() {
