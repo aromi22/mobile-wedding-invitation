@@ -3,6 +3,7 @@ create extension if not exists "pgcrypto";
 create table if not exists public.invitations (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
+  edit_secret text,
   groom_name text not null,
   bride_name text not null,
   wedding_date date,
@@ -23,6 +24,16 @@ create table if not exists public.invitations (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.invitations
+add column if not exists edit_secret text;
+
+update public.invitations
+set edit_secret = encode(gen_random_bytes(24), 'hex')
+where edit_secret is null;
+
+alter table public.invitations
+alter column edit_secret set not null;
 
 create or replace function public.set_updated_at()
 returns trigger as $$
@@ -50,10 +61,21 @@ on public.invitations for insert
 with check (true);
 
 drop policy if exists "Anyone can update invitations" on public.invitations;
-create policy "Anyone can update invitations"
+drop policy if exists "Update invitations with edit secret" on public.invitations;
+create policy "Update invitations with edit secret"
 on public.invitations for update
-using (true)
-with check (true);
+using (
+  edit_secret = nullif(
+    current_setting('request.headers', true)::json ->> 'x-edit-secret',
+    ''
+  )
+)
+with check (
+  edit_secret = nullif(
+    current_setting('request.headers', true)::json ->> 'x-edit-secret',
+    ''
+  )
+);
 
 insert into storage.buckets (id, name, public)
 values ('wedding-images', 'wedding-images', true)

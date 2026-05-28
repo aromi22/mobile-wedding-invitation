@@ -12,7 +12,7 @@ import type {
   WeddingTimelineItem,
 } from "@/types/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
-import { saveInvitation } from "@/lib/invitations";
+import { getInvitationForEdit, invitationRowToWeddingData, saveInvitation } from "@/lib/invitations";
 
 const STORAGE_KEY = "mobile-wedding-editor-v1";
 const COVER_IMAGE_MAX_SIZE = 1600;
@@ -639,7 +639,7 @@ function ParentNameFields({
   );
 }
 
-export function EditInvitation() {
+export function EditInvitation({ slug }: { slug?: string }) {
   const [draft, setDraft] = useState<WeddingData>(wedding);
   const [dateValue, setDateValue] = useState(getDateInputValue(wedding));
   const [galleryText, setGalleryText] = useState(
@@ -649,8 +649,53 @@ export function EditInvitation() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [shareUrl, setShareUrl] = useState("");
+  const [editUrl, setEditUrl] = useState("");
+  const [currentSlug, setCurrentSlug] = useState(slug ?? "");
+  const [editSecret, setEditSecret] = useState("");
 
   useEffect(() => {
+    const loadEditableInvitation = async (targetSlug: string, targetSecret: string) => {
+      setSaveMessage("저장된 청첩장을 불러오는 중이에요.");
+
+      try {
+        const row = await getInvitationForEdit(targetSlug, targetSecret);
+
+        if (!row) {
+          setSaveMessage("편집 링크를 확인하지 못했어요. 주소와 비밀코드를 다시 확인해 주세요.");
+          return;
+        }
+
+        const parsed = normalizeWeddingData(invitationRowToWeddingData(row));
+        setDraft(parsed);
+        setDateValue(getDateInputValue(parsed));
+        setGalleryText(parsed.photos.gallery.map((photo) => photo.src).join("\n"));
+        setCurrentSlug(row.slug);
+        setEditSecret(targetSecret);
+        setShareUrl(`${window.location.origin}/w/${row.slug}`);
+        setEditUrl(`${window.location.origin}/edit/${row.slug}?key=${targetSecret}`);
+        setSaveMessage("저장된 청첩장을 불러왔어요. 수정 후 다시 저장할 수 있어요.");
+      } catch (error) {
+        setSaveMessage(
+          error instanceof Error ? error.message : "청첩장을 불러오는 중 문제가 생겼어요.",
+        );
+      }
+    };
+
+    if (slug) {
+      const params = new URLSearchParams(window.location.search);
+      const targetSecret = params.get("key") ?? params.get("secret") ?? "";
+
+      if (!targetSecret) {
+        setSaveMessage("편집용 비밀코드가 없어요. 고객용 편집 링크 전체로 다시 접속해 주세요.");
+        setCurrentSlug(slug);
+        setIsLoaded(true);
+        return;
+      }
+
+      void loadEditableInvitation(slug, targetSecret).finally(() => setIsLoaded(true));
+      return;
+    }
+
     const saved = window.localStorage.getItem(STORAGE_KEY);
 
     if (saved) {
@@ -665,7 +710,7 @@ export function EditInvitation() {
     }
 
     setIsLoaded(true);
-  }, []);
+  }, [slug]);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -888,6 +933,9 @@ export function EditInvitation() {
     setGalleryText(wedding.photos.gallery.map((photo) => photo.src).join("\n"));
     setSaveMessage("");
     setShareUrl("");
+    setEditUrl("");
+    setCurrentSlug("");
+    setEditSecret("");
     window.localStorage.removeItem(STORAGE_KEY);
   }
 
@@ -896,12 +944,20 @@ export function EditInvitation() {
     setSaveMessage("청첩장을 저장하고 있어요.");
 
     try {
-      const saved = await saveInvitation(draft);
-      const nextData = saved.design_settings;
+      const saved = await saveInvitation(draft, {
+        slug: currentSlug || undefined,
+        editSecret: editSecret || undefined,
+      });
+      const nextData = saved.row.design_settings;
+      const nextShareUrl = `${window.location.origin}/w/${saved.row.slug}`;
+      const nextEditUrl = `${window.location.origin}/edit/${saved.row.slug}?key=${saved.editSecret}`;
 
       setDraft(nextData);
       setGalleryText(nextData.photos.gallery.map((photo) => photo.src).join("\n"));
-      setShareUrl(`${window.location.origin}/w/${saved.slug}`);
+      setCurrentSlug(saved.row.slug);
+      setEditSecret(saved.editSecret);
+      setShareUrl(nextShareUrl);
+      setEditUrl(nextEditUrl);
       setSaveMessage("저장 완료! 아래 공유 링크가 생성됐어요.");
     } catch (error) {
       setSaveMessage(
@@ -942,14 +998,35 @@ export function EditInvitation() {
               <div className="mt-4 rounded-md border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#806b4f]">
                 <p>{saveMessage}</p>
                 {shareUrl ? (
-                  <a
-                    href={shareUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 block break-all font-semibold text-[#2f2a25] underline underline-offset-4"
-                  >
-                    {shareUrl}
-                  </a>
+                  <div className="mt-3 grid gap-2">
+                    <span className="text-xs font-semibold text-[#b29467]">보기 링크</span>
+                    <a
+                      href={shareUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block break-all font-semibold text-[#2f2a25] underline underline-offset-4"
+                    >
+                      {shareUrl}
+                    </a>
+                  </div>
+                ) : null}
+                {editUrl ? (
+                  <div className="mt-3 grid gap-2 rounded-md border border-[#eadfcd] bg-[#fffaf3] p-3">
+                    <span className="text-xs font-semibold text-[#b29467]">
+                      고객용 편집 링크
+                    </span>
+                    <a
+                      href={editUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block break-all font-semibold text-[#2f2a25] underline underline-offset-4"
+                    >
+                      {editUrl}
+                    </a>
+                    <p className="text-xs leading-5 text-[#8a7a6a]">
+                      이 링크는 비밀코드가 들어간 관리용 주소라 고객에게만 전달해 주세요.
+                    </p>
+                  </div>
                 ) : null}
               </div>
             ) : null}

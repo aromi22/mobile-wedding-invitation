@@ -5,6 +5,7 @@ import { supabaseFetch, uploadPublicFile } from "@/lib/supabase";
 export type InvitationRow = {
   id?: string;
   slug: string;
+  edit_secret?: string;
   groom_name: string;
   bride_name: string;
   wedding_date: string;
@@ -28,6 +29,30 @@ export type InvitationRow = {
   updated_at?: string;
 };
 
+const INVITATION_PUBLIC_COLUMNS = [
+  "id",
+  "slug",
+  "groom_name",
+  "bride_name",
+  "wedding_date",
+  "wedding_time",
+  "venue_name",
+  "venue_address",
+  "invitation_text",
+  "family_info",
+  "design_settings",
+  "cover_image_url",
+  "gallery_images",
+  "music_url",
+  "qa_items",
+  "story_items",
+  "account_info",
+  "rsvp_enabled",
+  "guestbook_enabled",
+  "created_at",
+  "updated_at",
+].join(",");
+
 function safeSlugPart(value: string) {
   return value
     .trim()
@@ -50,9 +75,22 @@ export function createInvitationSlug(data: WeddingData) {
   return `${names}-${date}-${suffix}`;
 }
 
-export function weddingDataToInvitationRow(data: WeddingData, slug: string): InvitationRow {
+export function createEditSecret() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID().replace(/-/g, "");
+  }
+
+  return `${Date.now()}${Math.random().toString(36).slice(2)}`;
+}
+
+export function weddingDataToInvitationRow(
+  data: WeddingData,
+  slug: string,
+  editSecret?: string,
+): InvitationRow {
   return {
     slug,
+    ...(editSecret ? { edit_secret: editSecret } : {}),
     groom_name: data.couple.groom.name,
     bride_name: data.couple.bride.name,
     wedding_date: `${data.event.year}-${String(data.event.month).padStart(2, "0")}-${String(
@@ -133,27 +171,73 @@ export async function uploadInvitationImages(data: WeddingData, slug: string): P
   return next;
 }
 
-export async function saveInvitation(data: WeddingData, slug = createInvitationSlug(data)) {
+export async function saveInvitation(
+  data: WeddingData,
+  options: { slug?: string; editSecret?: string } = {},
+) {
+  const slug = options.slug ?? createInvitationSlug(data);
+  const editSecret = options.editSecret ?? createEditSecret();
   const uploadedData = await uploadInvitationImages(data, slug);
-  const row = weddingDataToInvitationRow(uploadedData, slug);
+  const row = weddingDataToInvitationRow(
+    uploadedData,
+    slug,
+    options.slug ? undefined : editSecret,
+  );
+
+  if (options.slug) {
+    const rows = await supabaseFetch<InvitationRow[]>(
+      `/rest/v1/invitations?slug=eq.${encodeURIComponent(slug)}&select=${INVITATION_PUBLIC_COLUMNS}`,
+      {
+        method: "PATCH",
+        body: row,
+        headers: {
+          Prefer: "return=representation",
+          "x-edit-secret": editSecret,
+        },
+      },
+    );
+
+    if (!rows[0]) {
+      throw new Error("편집 권한을 확인하지 못했어요. 고객용 편집 링크가 맞는지 확인해 주세요.");
+    }
+
+    return { row: rows[0], editSecret };
+  }
 
   const rows = await supabaseFetch<InvitationRow[]>(
-    "/rest/v1/invitations?on_conflict=slug",
+    `/rest/v1/invitations?select=${INVITATION_PUBLIC_COLUMNS}`,
     {
       method: "POST",
       body: row,
       headers: {
-        Prefer: "resolution=merge-duplicates,return=representation",
+        Prefer: "return=representation",
       },
     },
   );
 
-  return rows[0];
+  return { row: rows[0], editSecret };
 }
 
 export async function getInvitationBySlug(slug: string) {
   const rows = await supabaseFetch<InvitationRow[]>(
-    `/rest/v1/invitations?slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`,
+    `/rest/v1/invitations?slug=eq.${encodeURIComponent(
+      slug,
+    )}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
+  );
+
+  return rows[0] ?? null;
+}
+
+export async function getInvitationForEdit(slug: string, editSecret: string) {
+  const rows = await supabaseFetch<InvitationRow[]>(
+    `/rest/v1/invitations?slug=eq.${encodeURIComponent(
+      slug,
+    )}&edit_secret=eq.${encodeURIComponent(editSecret)}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
+    {
+      headers: {
+        "x-edit-secret": editSecret,
+      },
+    },
   );
 
   return rows[0] ?? null;
