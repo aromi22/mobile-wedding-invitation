@@ -175,16 +175,16 @@ function FamilyLine({ person, data }: { person: Person; data: WeddingData }) {
 
 function Divider({ label }: { label?: string }) {
   return (
-    <div className="mx-auto flex w-full max-w-[18rem] items-center gap-3 px-8">
-      <span className="h-px flex-1 bg-[#e7dfd4]" />
+    <div className="mx-auto flex w-full max-w-[18rem] items-center gap-3 px-8 text-[#9f0012]">
+      <span className="h-px flex-1 bg-[#9f0012]/35" />
       {label ? (
-        <span className="font-display text-[0.68rem] uppercase tracking-[0.34em] text-[#b2925c]">
+        <span className="font-hand text-xl font-bold leading-none text-[#9f0012]">
           {label}
         </span>
       ) : (
-        <span className="h-1.5 w-1.5 rotate-45 border border-[#d0b98e]" />
+        <span className="kitsch-heart fill relative block scale-75" />
       )}
-      <span className="h-px flex-1 bg-[#e7dfd4]" />
+      <span className="h-px flex-1 bg-[#9f0012]/35" />
     </div>
   );
 }
@@ -201,15 +201,15 @@ function Section({
   className?: string;
 }) {
   return (
-    <section className={`px-7 py-16 text-center ${className}`}>
+    <section className={`relative px-7 py-16 text-center ${className}`}>
       {label ? (
-        <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#b29467]">
+        <p className="font-hand reveal text-2xl font-bold leading-none text-[#9f0012]">
           {label}
         </p>
       ) : null}
       {title ? (
         <h2
-          className="reveal mt-3 text-[1.48rem] font-medium leading-snug text-[#2f2a25]"
+          className="kitsch-title kitsch-scribble reveal mt-3 text-[2.15rem] leading-snug"
           style={revealDelay(1)}
         >
           {title}
@@ -240,13 +240,18 @@ function Cover({ data }: { data: WeddingData }) {
   const letteringKey = `${hero.letteringText}-${hero.letteringFont}-${hero.letteringColor}-${hero.letteringTop}-${hero.letteringDuration}`;
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-white text-center">
-      <div className="relative h-[73vh] min-h-[31rem] w-full overflow-hidden">
-        <InvitationImage photo={data.photos.cover} priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/45" />
-        <div className="cover-reveal absolute inset-x-7 top-7 border-t border-white/75 pt-5">
-          <p className="font-display text-[0.68rem] uppercase tracking-[0.46em] text-white">
-            Wedding Invitation
+    <section className="kitsch-paper relative min-h-screen overflow-hidden text-center">
+      <div className="relative mx-6 mt-8 h-[73vh] min-h-[31rem] overflow-hidden rounded-[1.45rem] border border-[#9f0012]/20 bg-[#fff8e8] p-4 shadow-[0_18px_38px_rgba(74,34,36,0.12)]">
+        <div className="photo-sticker relative h-[68%] -rotate-2 overflow-hidden rounded-[1rem]">
+          <InvitationImage photo={data.photos.cover} priority />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#fff8e8]/85" />
+        <span className="kitsch-heart fill left-8 top-[18%]" />
+        <span className="kitsch-heart right-9 top-[28%] scale-75" />
+        <span className="kitsch-heart fill bottom-[28%] left-9 scale-[0.62]" />
+        <div className="cover-reveal absolute inset-x-7 top-7 pt-5">
+          <p className="font-hand text-3xl font-bold leading-none text-[#9f0012]">
+            We are getting married!
           </p>
         </div>
         <div className="cover-reveal cover-reveal-delay-1 absolute inset-x-0 px-4" style={scriptWrapStyle}>
@@ -255,35 +260,35 @@ function Cover({ data }: { data: WeddingData }) {
           </p>
         </div>
         <div className="cover-reveal cover-reveal-delay-2 absolute inset-x-8 -translate-y-1/2" style={mainTextStyle}>
-          <p className="mx-auto mt-2 max-w-[15rem] text-sm leading-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.32)]">
+          <p className="mx-auto mt-2 max-w-[15rem] rounded-full bg-[#9f0012] px-5 py-2 font-hand text-2xl font-bold leading-none text-white shadow-[0_10px_20px_rgba(159,0,18,0.18)]">
             {hero.mainText}
           </p>
         </div>
       </div>
 
       <div className="px-7 pb-10 pt-8">
-        <h1 className="cover-reveal cover-reveal-delay-3 font-display flex items-center justify-center gap-2 text-[2.05rem] leading-none text-[#2f2a25]">
+        <h1 className="cover-reveal cover-reveal-delay-3 font-hand flex items-center justify-center gap-2 text-[2.45rem] font-bold leading-none text-[#9f0012]">
           <span className="whitespace-nowrap">{groom.name}</span>
-          <span className="text-xl text-[#b29467]">{coupleSeparator(data)}</span>
+          <span className="text-2xl text-[#9f0012]">{coupleSeparator(data)}</span>
           <span className="whitespace-nowrap">{bride.name}</span>
         </h1>
-        <p className="cover-reveal cover-reveal-delay-4 mt-3 text-[0.68rem] uppercase tracking-[0.22em] text-[#a4968a]">
+        <p className="cover-reveal cover-reveal-delay-4 mt-3 text-[0.68rem] uppercase tracking-[0.22em] text-[#7b5045]">
           {groom.englishName} · {bride.englishName}
         </p>
         {hero.showEventInfo ? (
           <>
-            <p className="cover-reveal cover-reveal-delay-5 mt-5 text-[0.82rem] tracking-[0.22em] text-[#7d7167]">
+            <p className="cover-reveal cover-reveal-delay-5 mx-auto mt-5 inline-flex rounded-full border border-[#9f0012]/35 px-4 py-2 text-[0.82rem] tracking-[0.18em] text-[#9f0012]">
               {data.event.calendarText}
             </p>
-            <p className="cover-reveal cover-reveal-delay-5 mt-2 text-sm text-[#7d7167]">
+            <p className="cover-reveal cover-reveal-delay-5 mt-3 text-sm text-[#6d4a42]">
               {data.event.venue}
             </p>
           </>
         ) : null}
         {hero.showScrollHint ? (
-          <div className="cover-reveal cover-reveal-delay-6 mx-auto mt-8 flex w-7 flex-col items-center gap-1.5 text-[#b29467]">
+          <div className="cover-reveal cover-reveal-delay-6 mx-auto mt-8 flex w-7 flex-col items-center gap-1.5 text-[#9f0012]">
             <span className="text-[0.62rem] tracking-[0.28em]">SCROLL</span>
-            <span className="h-8 w-px bg-[#d0b98e]" />
+            <span className="h-8 w-px bg-[#9f0012]/45" />
           </div>
         ) : null}
       </div>
@@ -294,13 +299,13 @@ function Cover({ data }: { data: WeddingData }) {
 function InvitationMessage({ data }: { data: WeddingData }) {
   return (
     <Section label="Invitation" title="소중한 분들을 초대합니다">
-      <div className="mx-auto mb-9 h-9 w-px bg-[#e2d7c8]" />
+      <div className="mx-auto mb-9 h-9 w-px bg-[#9f0012]/35" />
       <p className="mx-auto max-w-[17rem] whitespace-pre-line break-keep text-center text-[1.02rem] leading-9 text-[#403a34]">
         {data.message.opening}
       </p>
       <div className="mx-auto my-10 max-w-[19rem]">
         <div
-          className={`relative mx-auto max-w-[17rem] overflow-hidden bg-[#f1ebe3] shadow-[0_18px_38px_rgba(56,46,36,0.08)] ${photoAspectClass(
+          className={`photo-sticker relative mx-auto max-w-[17rem] rotate-2 overflow-hidden ${photoAspectClass(
             data.photos.intro.ratio,
           )}`}
         >
@@ -316,18 +321,20 @@ function InvitationMessage({ data }: { data: WeddingData }) {
 
 function StorySection({ data }: { data: WeddingData }) {
   return (
-    <section className="bg-[#fafafa] px-7 py-16 text-center">
-      <p className="font-display text-[0.68rem] uppercase tracking-[0.36em] text-[#b29467]">
+    <section className="kitsch-red-band relative px-7 py-16 text-center">
+      <span className="kitsch-heart left-8 top-10 scale-75 brightness-0 invert" />
+      <span className="kitsch-heart fill bottom-10 right-8 scale-90 brightness-0 invert" />
+      <p className="font-hand text-3xl font-bold leading-none text-[#fff8e8]">
         Our Story
       </p>
-      <h2 className="mt-3 text-[1.48rem] font-medium text-[#2f2a25]">
+      <h2 className="font-hand mt-3 text-[2.1rem] font-bold text-[#fff8e8]">
         우리들의 이야기
       </h2>
       <div className="mx-auto mt-10 max-w-[22rem] space-y-14">
         {data.stories.map((story, index) => (
           <article key={story.title} className="reveal text-center" style={revealDelay(index)}>
             <div
-              className={`relative overflow-hidden bg-[#eee7de] shadow-[0_18px_36px_rgba(53,44,35,0.08)] ${photoAspectClass(
+              className={`photo-sticker relative overflow-hidden ${index % 2 === 0 ? "-rotate-2" : "rotate-2"} ${photoAspectClass(
                 story.ratio ?? "portrait",
               )} ${
                 index % 2 === 0 ? "rounded-t-[7rem]" : "rounded-b-[7rem]"
@@ -338,13 +345,13 @@ function StorySection({ data }: { data: WeddingData }) {
                 sizes="430px"
               />
             </div>
-            <p className="mt-7 font-display text-[0.7rem] uppercase tracking-[0.32em] text-[#b29467]">
+            <p className="mt-7 font-hand text-2xl font-bold text-[#fff8e8]">
               Story {index + 1}
             </p>
-            <h3 className="mt-2 text-xl font-medium text-[#2f2a25]">
+            <h3 className="mt-2 text-xl font-medium text-[#fff8e8]">
               {story.title}
             </h3>
-            <p className="mx-auto mt-5 max-w-[18rem] whitespace-pre-line break-keep text-center text-sm leading-7 text-[#746a61]">
+            <p className="mx-auto mt-5 max-w-[18rem] whitespace-pre-line break-keep text-center text-sm leading-7 text-[#fff8e8]/85">
               {story.body}
             </p>
           </article>
@@ -489,14 +496,14 @@ function CalendarSection({ data }: { data: WeddingData }) {
     <Section label="Wedding Day" title={data.event.dateText}>
       <div className="mx-auto max-w-[19rem]">
         <div className="reveal mb-5 flex items-end justify-center gap-3">
-          <span className="font-display text-5xl text-[#b29467]">
+          <span className="font-hand text-6xl font-bold text-[#9f0012]">
             {String(data.event.month).padStart(2, "0")}
           </span>
-          <span className="pb-1 text-sm tracking-[0.2em] text-[#7c6e62]">
+          <span className="pb-1 text-sm tracking-[0.2em] text-[#7c4b45]">
             {data.event.year}
           </span>
         </div>
-        <div className="reveal grid grid-cols-7 gap-y-3 text-xs text-[#9a8a79]" style={revealDelay(1)}>
+        <div className="reveal grid grid-cols-7 gap-y-3 border-y border-[#9f0012]/30 py-4 text-xs text-[#7c4b45]" style={revealDelay(1)}>
           {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
             <span key={`${day}-${index}`}>{day}</span>
           ))}
@@ -505,7 +512,7 @@ function CalendarSection({ data }: { data: WeddingData }) {
               key={`${day ?? "empty"}-${index}`}
               className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full ${
                 day === data.event.day
-                  ? "bg-[#b29467] text-white shadow-[0_8px_18px_rgba(178,148,103,0.26)]"
+                  ? "bg-[#9f0012] text-white shadow-[0_8px_18px_rgba(159,0,18,0.24)]"
                   : "text-[#5f5349]"
               }`}
             >
@@ -526,7 +533,7 @@ function LocationSection({ data }: { data: WeddingData }) {
     <Section label="Location" title="예식 장소 안내" className="pt-10">
       <div className="space-y-5">
         <div
-          className={`reveal relative overflow-hidden bg-[#f1ebe3] shadow-[0_18px_38px_rgba(56,46,36,0.08)] ${photoAspectClass(
+          className={`photo-sticker reveal relative -rotate-2 overflow-hidden ${photoAspectClass(
             data.photos.venue.ratio,
           )}`}
         >
@@ -542,7 +549,7 @@ function LocationSection({ data }: { data: WeddingData }) {
           href={data.event.mapUrl}
           target="_blank"
           rel="noreferrer"
-          className="reveal inline-flex w-full items-center justify-center rounded-full bg-[#2f2a25] px-6 py-4 text-sm font-semibold text-white shadow-[0_16px_35px_rgba(61,52,44,0.16)]"
+          className="reveal inline-flex w-full items-center justify-center rounded-none bg-[#9f0012] px-6 py-4 font-hand text-2xl font-bold text-white shadow-[0_16px_35px_rgba(159,0,18,0.2)]"
           style={revealDelay(2)}
         >
           지도 보기
@@ -563,9 +570,9 @@ function GallerySection({ data }: { data: WeddingData }) {
             key={photo.src}
             type="button"
             onClick={() => setSelectedImage(photo.src)}
-            className={`reveal relative overflow-hidden bg-[#f3eee8] p-1 shadow-[0_14px_32px_rgba(50,42,34,0.07)] ${
+            className={`photo-sticker reveal relative overflow-hidden transition duration-300 hover:rotate-0 active:scale-[1.02] ${
               index === 0
-                ? "col-span-2 aspect-[3/4.2]"
+                ? "col-span-2 aspect-[3/4.2] -rotate-1"
                 : photoAspectClass(photo.ratio)
             }`}
             style={revealDelay(index, 85)}
@@ -619,7 +626,7 @@ function AccountRow({ account }: { account: WeddingAccount }) {
     <div className="reveal border-b border-[#eee7de] py-5 text-left last:border-b-0">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-[#b29467]">{account.label}</p>
+          <p className="font-hand text-2xl font-bold leading-none text-[#9f0012]">{account.label}</p>
           <p className="mt-2 text-base font-medium text-[#332b24]">
             {account.bank} {account.number}
           </p>
@@ -630,7 +637,7 @@ function AccountRow({ account }: { account: WeddingAccount }) {
         <button
           type="button"
           onClick={copyAccount}
-          className="shrink-0 rounded-full border border-[#dfd2bf] px-3 py-2 text-xs font-medium text-[#867052]"
+          className="shrink-0 rounded-full border border-[#9f0012]/35 px-3 py-2 text-xs font-medium text-[#9f0012]"
         >
           복사
         </button>
@@ -682,14 +689,14 @@ function ActionSection({ data }: { data: WeddingData }) {
           href={data.rsvp.url}
           target="_blank"
           rel="noreferrer"
-          className="reveal flex w-full items-center justify-center rounded-full bg-[#b29467] px-6 py-4 text-sm font-semibold text-white shadow-[0_18px_38px_rgba(178,148,103,0.22)]"
+          className="reveal flex w-full items-center justify-center rounded-full bg-[#9f0012] px-6 py-4 font-hand text-2xl font-bold text-white shadow-[0_18px_38px_rgba(159,0,18,0.24)]"
         >
           {data.rsvp.label}
         </a>
         <button
           type="button"
           onClick={copyLink}
-          className="reveal w-full rounded-full border border-[#dfd2bf] bg-white px-6 py-4 text-sm font-semibold text-[#806b4f]"
+          className="reveal w-full rounded-full border border-[#9f0012]/35 bg-[#fff8e8] px-6 py-4 font-hand text-2xl font-bold text-[#9f0012]"
           style={revealDelay(1)}
         >
           링크 복사하기
@@ -706,7 +713,7 @@ function Footer({ data }: { data: WeddingData }) {
       <p className="mx-auto mt-8 max-w-[18rem] break-keep text-sm leading-7 text-[#76695e]">
         {data.message.footer}
       </p>
-      <p className="mt-8 font-display text-2xl text-[#b29467]">Thank you</p>
+      <p className="font-hand mt-8 text-4xl font-bold text-[#9f0012]">Thank you</p>
     </footer>
   );
 }
@@ -758,7 +765,7 @@ export function WeddingInvitation({ data }: { data: WeddingData }) {
   useScrollReveal(revealKey);
 
   return (
-    <main className="relative mx-auto min-h-screen max-w-[430px] overflow-hidden bg-white text-[#332b24] shadow-[0_0_80px_rgba(91,70,42,0.12)]">
+    <main className="kitsch-paper relative mx-auto min-h-screen max-w-[430px] overflow-hidden text-[#4a2224] shadow-[0_0_80px_rgba(91,70,42,0.12)]">
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
         <span className="ambient-petal ambient-petal-1" />
         <span className="ambient-petal ambient-petal-2" />

@@ -1,6 +1,7 @@
 @import url("https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduModu/subsets/GangwonEduModu-dynamic-subset.css");
 @import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -9,8 +10,12 @@
   --ink: #332b24;
   --muted: #7c6e62;
   --gold: #b29467;
+  --kitsch-red: #9f0012;
+  --kitsch-cream: #fff8e8;
+  --kitsch-ink: #4a2224;
   --font-serif-kr: "GangwonEdu Modu", "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
   --font-display: "GangwonEdu Modu", Georgia, "Times New Roman", serif;
+  --font-hand: "Caveat", "Segoe Print", "GangwonEdu Modu", cursive;
 }
 
 * {
@@ -61,6 +66,109 @@ button {
 
 .font-display {
   font-family: var(--font-display);
+}
+
+.font-hand {
+  font-family: var(--font-hand);
+}
+
+.kitsch-paper {
+  background:
+    radial-gradient(circle at 22% 12%, rgba(255, 255, 255, 0.8), transparent 11rem),
+    radial-gradient(circle at 80% 34%, rgba(152, 0, 18, 0.08), transparent 10rem),
+    linear-gradient(180deg, #fffaf0 0%, #fff4dd 100%);
+}
+
+.kitsch-paper::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.42;
+  background-image:
+    linear-gradient(rgba(119, 48, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(119, 48, 42, 0.025) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.kitsch-card {
+  position: relative;
+  border: 1.5px solid rgba(159, 0, 18, 0.18);
+  border-radius: 1.45rem;
+  background: rgba(255, 250, 238, 0.9);
+  box-shadow: 0 18px 38px rgba(74, 34, 36, 0.1);
+}
+
+.kitsch-title {
+  color: var(--kitsch-red);
+  font-family: var(--font-hand);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.kitsch-scribble {
+  position: relative;
+  display: inline-block;
+}
+
+.kitsch-scribble::after {
+  position: absolute;
+  left: 5%;
+  right: 3%;
+  bottom: -0.16em;
+  height: 0.18em;
+  border-bottom: 2px solid currentColor;
+  border-radius: 50%;
+  content: "";
+  transform: rotate(-1.5deg);
+}
+
+.kitsch-heart {
+  position: absolute;
+  width: 1.2rem;
+  height: 1.08rem;
+  transform: rotate(-14deg);
+}
+
+.kitsch-heart::before,
+.kitsch-heart::after {
+  position: absolute;
+  width: 0.72rem;
+  height: 1.05rem;
+  border: 2px solid var(--kitsch-red);
+  border-bottom: 0;
+  border-radius: 0.72rem 0.72rem 0 0;
+  content: "";
+}
+
+.kitsch-heart::before {
+  left: 0.37rem;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+}
+
+.kitsch-heart::after {
+  left: 0;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
+}
+
+.kitsch-heart.fill::before,
+.kitsch-heart.fill::after {
+  background: var(--kitsch-red);
+}
+
+.photo-sticker {
+  border: 0.5rem solid #fffaf0;
+  background: #fffaf0;
+  box-shadow: 0 14px 28px rgba(64, 21, 21, 0.16);
+}
+
+.kitsch-red-band {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.12), transparent 9rem),
+    linear-gradient(180deg, #a00013 0%, #85000f 100%);
+  color: #fffaf0;
 }
 
 .cover-script {
