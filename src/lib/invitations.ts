@@ -6,6 +6,7 @@ export type InvitationRow = {
   id?: string;
   slug: string;
   edit_secret?: string;
+  edit_secret_hash?: string;
   groom_name: string;
   bride_name: string;
   wedding_date: string;
@@ -232,7 +233,7 @@ export async function getInvitationForEdit(slug: string, editSecret: string) {
   const rows = await supabaseFetch<InvitationRow[]>(
     `/rest/v1/invitations?slug=eq.${encodeURIComponent(
       slug,
-    )}&edit_secret=eq.${encodeURIComponent(editSecret)}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
+    )}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
     {
       headers: {
         "x-edit-secret": editSecret,
