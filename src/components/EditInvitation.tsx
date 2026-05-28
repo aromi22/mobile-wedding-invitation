@@ -652,6 +652,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
   const [editUrl, setEditUrl] = useState("");
   const [currentSlug, setCurrentSlug] = useState(slug ?? "");
   const [editSecret, setEditSecret] = useState("");
+  const isCustomerEditPage = Boolean(slug);
 
   useEffect(() => {
     const loadEditableInvitation = async (targetSlug: string, targetSecret: string) => {
@@ -672,7 +673,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
         setCurrentSlug(row.slug);
         setEditSecret(targetSecret);
         setShareUrl(`${window.location.origin}/w/${row.slug}`);
-        setEditUrl(`${window.location.origin}/edit/${row.slug}?key=${targetSecret}`);
+        setEditUrl("");
         setSaveMessage("저장된 청첩장을 불러왔어요. 수정 후 다시 저장할 수 있어요.");
       } catch (error) {
         setSaveMessage(
@@ -957,7 +958,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
       setCurrentSlug(saved.row.slug);
       setEditSecret(saved.editSecret);
       setShareUrl(nextShareUrl);
-      setEditUrl(nextEditUrl);
+      setEditUrl(isCustomerEditPage ? "" : nextEditUrl);
       setSaveMessage("저장 완료! 아래 공유 링크가 생성됐어요.");
     } catch (error) {
       setSaveMessage(
