@@ -315,7 +315,7 @@ function ChildPhotoLayer({
 }) {
   return (
     <div
-      className="absolute overflow-hidden bg-[#f6f2ec]"
+      className="absolute z-20 overflow-hidden bg-[#f6f2ec]"
       style={style}
       aria-hidden={!photo?.src}
     >
@@ -365,7 +365,7 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
             <InvitationImage
               photo={illustration}
               sizes="430px"
-              className="object-contain mix-blend-multiply"
+              className="object-contain"
             />
           </div>
         </div>
