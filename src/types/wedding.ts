@@ -117,6 +117,9 @@ export type WeddingData = {
     cover: WeddingPhoto;
     intro: WeddingPhoto;
     venue: WeddingPhoto;
+    childhoodIllustration: WeddingPhoto;
+    groomChildPhoto: WeddingPhoto;
+    brideChildPhoto: WeddingPhoto;
     gallery: WeddingPhoto[];
   };
   hero: WeddingHeroSettings;

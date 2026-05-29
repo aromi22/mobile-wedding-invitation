@@ -125,6 +125,12 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
     cover: { ...merged.photos.cover, ...source.photos?.cover },
     intro: { ...merged.photos.intro, ...source.photos?.intro },
     venue: { ...merged.photos.venue, ...source.photos?.venue },
+    childhoodIllustration: {
+      ...merged.photos.childhoodIllustration,
+      ...source.photos?.childhoodIllustration,
+    },
+    groomChildPhoto: { ...merged.photos.groomChildPhoto, ...source.photos?.groomChildPhoto },
+    brideChildPhoto: { ...merged.photos.brideChildPhoto, ...source.photos?.brideChildPhoto },
     gallery: source.photos?.gallery?.length ? source.photos.gallery : merged.photos.gallery,
   };
   merged.hero = {
@@ -824,6 +830,25 @@ export function EditInvitation({ slug }: { slug?: string }) {
     setSaveMessage("메인 사진을 바꿨어요.");
   }
 
+  async function updateChildPhotoFile(side: "groom" | "bride", files: FileList) {
+    const file = files[0];
+
+    if (!file) {
+      return;
+    }
+
+    setSaveMessage("어릴 적 사진을 모바일에 맞게 줄이는 중이에요.");
+    const dataUrl = await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE);
+    update((current) => {
+      const photo = side === "groom" ? current.photos.groomChildPhoto : current.photos.brideChildPhoto;
+      photo.src = dataUrl;
+      photo.alt = file.name;
+      photo.ratio = "portrait";
+      return current;
+    });
+    setSaveMessage("어릴 적 사진이 바뀌었어요.");
+  }
+
   async function appendGalleryFiles(files: FileList) {
     const selectedFiles = Array.from(files);
     setSaveMessage("갤러리 사진을 모바일에 맞게 줄이는 중이에요.");
@@ -1057,6 +1082,45 @@ export function EditInvitation({ slug }: { slug?: string }) {
                     })
                   }
                 />
+                <div className="grid gap-3 rounded-lg border border-[#eadfcd] bg-[#fbf8f2] p-3">
+                  <p className="text-sm font-semibold text-[#332b24]">
+                    액자 일러스트 어릴 적 사진
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-3">
+                      <FileField
+                        label="신랑 어릴 적 사진 첨부"
+                        onSelect={(files) => updateChildPhotoFile("groom", files)}
+                      />
+                      <Field
+                        label="신랑 어릴 적 사진 URL"
+                        value={draft.photos.groomChildPhoto?.src ?? ""}
+                        onChange={(value) =>
+                          update((current) => {
+                            current.photos.groomChildPhoto.src = value;
+                            return current;
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-3">
+                      <FileField
+                        label="신부 어릴 적 사진 첨부"
+                        onSelect={(files) => updateChildPhotoFile("bride", files)}
+                      />
+                      <Field
+                        label="신부 어릴 적 사진 URL"
+                        value={draft.photos.brideChildPhoto?.src ?? ""}
+                        onChange={(value) =>
+                          update((current) => {
+                            current.photos.brideChildPhoto.src = value;
+                            return current;
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 

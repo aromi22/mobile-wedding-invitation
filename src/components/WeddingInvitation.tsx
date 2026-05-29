@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import type { WeddingAccount, WeddingData, WeddingPhoto } from "@/types/wedding";
 
 type Person = WeddingData["couple"]["groom"];
@@ -10,6 +11,21 @@ const LETTERING_FONTS = {
   "segoe-print": '"Segoe Print", "Freestyle Script", "French Script MT", "Great Vibes", cursive',
   "freestyle-script": '"Freestyle Script", "French Script MT", "Great Vibes", cursive',
 };
+
+const CHILD_PHOTO_FRAME_CONFIG = {
+  groom: {
+    top: "8.8%",
+    left: "15.8%",
+    width: "25.8%",
+    height: "25.1%",
+  },
+  bride: {
+    top: "15.2%",
+    left: "60.7%",
+    width: "23.2%",
+    height: "25.1%",
+  },
+} satisfies Record<string, CSSProperties>;
 
 function photoAspectClass(ratio: WeddingPhoto["ratio"]) {
   if (ratio === "portrait") {
@@ -257,7 +273,7 @@ function Cover({ data }: { data: WeddingData }) {
 
           <p
             key={`${hero.letteringText}-${hero.letteringFont}-${letteringColor}`}
-            className="cover-script mx-auto mt-8 max-w-[17.5rem] whitespace-nowrap text-[clamp(2rem,9vw,2.72rem)] leading-none opacity-80"
+            className="cover-script mx-auto mt-7 max-w-[17rem] whitespace-nowrap text-[clamp(1.28rem,5.6vw,1.72rem)] leading-none opacity-75"
             style={letteringStyle}
           >
             {hero.letteringText}
@@ -285,6 +301,66 @@ function Cover({ data }: { data: WeddingData }) {
             <span className="h-7 w-px bg-[#2f2924]/18" />
           </div>
         ) : null}
+      </div>
+    </section>
+  );
+}
+
+function ChildPhotoLayer({
+  photo,
+  style,
+}: {
+  photo?: WeddingPhoto;
+  style: CSSProperties;
+}) {
+  return (
+    <div
+      className="absolute overflow-hidden bg-[#f6f2ec]"
+      style={style}
+      aria-hidden={!photo?.src}
+    >
+      {photo?.src ? (
+        <InvitationImage
+          photo={photo}
+          sizes="160px"
+          className="object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.96),rgba(238,231,222,0.72))] text-[0.52rem] uppercase tracking-[0.16em] text-[#9a8c7d]">
+          Photo
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChildhoodFrameSection({ data }: { data: WeddingData }) {
+  const illustration = data.photos.childhoodIllustration ?? {
+    src: "/images/childhood-frame-illustration.png",
+    alt: "신랑 신부 어릴 적 사진을 넣는 액자 일러스트",
+    ratio: "portrait" as const,
+  };
+
+  return (
+    <section className="relative bg-[#fffdf9] px-5 pb-14 pt-4 text-center">
+      <div className="reveal mx-auto max-w-[24rem]">
+        <div className="relative mx-auto aspect-[4/5] w-full overflow-hidden">
+          <ChildPhotoLayer
+            photo={data.photos.groomChildPhoto}
+            style={CHILD_PHOTO_FRAME_CONFIG.groom}
+          />
+          <ChildPhotoLayer
+            photo={data.photos.brideChildPhoto}
+            style={CHILD_PHOTO_FRAME_CONFIG.bride}
+          />
+          <div className="pointer-events-none absolute inset-0 z-10">
+            <InvitationImage
+              photo={illustration}
+              sizes="430px"
+              className="object-contain"
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -766,6 +842,7 @@ export function WeddingInvitation({ data }: { data: WeddingData }) {
         <span className="ambient-glow ambient-glow-1" />
       </div>
       <Cover data={data} />
+      <ChildhoodFrameSection data={data} />
       <InvitationMessage data={data} />
       {data.storyStyle.type === "default" ? <StorySection data={data} /> : null}
       <QASection data={data} />

@@ -119,6 +119,10 @@ export function weddingDataToInvitationRow(
 export function invitationRowToWeddingData(row: InvitationRow): WeddingData {
   const data = structuredClone(row.design_settings ?? wedding);
 
+  data.photos = {
+    ...wedding.photos,
+    ...data.photos,
+  };
   data.couple.groom.name = row.groom_name || data.couple.groom.name;
   data.couple.bride.name = row.bride_name || data.couple.bride.name;
   data.event.venue = row.venue_name || data.event.venue;
@@ -161,6 +165,20 @@ export async function uploadInvitationImages(data: WeddingData, slug: string): P
   const next = structuredClone(data);
 
   next.photos.cover.src = await uploadDataUrlImage(next.photos.cover.src, slug, "cover");
+  if (next.photos.groomChildPhoto?.src) {
+    next.photos.groomChildPhoto.src = await uploadDataUrlImage(
+      next.photos.groomChildPhoto.src,
+      slug,
+      "groom-child",
+    );
+  }
+  if (next.photos.brideChildPhoto?.src) {
+    next.photos.brideChildPhoto.src = await uploadDataUrlImage(
+      next.photos.brideChildPhoto.src,
+      slug,
+      "bride-child",
+    );
+  }
   next.photos.gallery = await Promise.all(
     next.photos.gallery.map(async (photo, index) => ({
       ...photo,

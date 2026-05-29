@@ -88,6 +88,21 @@ export const wedding: WeddingData = {
       alt: "예식 정보 전후에 보여줄 사진",
       ratio: "landscape",
     },
+    childhoodIllustration: {
+      src: "/images/childhood-frame-illustration.png",
+      alt: "신랑 신부 어릴 적 사진을 넣는 액자 일러스트",
+      ratio: "portrait",
+    },
+    groomChildPhoto: {
+      src: "",
+      alt: "신랑 어릴 적 사진",
+      ratio: "portrait",
+    },
+    brideChildPhoto: {
+      src: "",
+      alt: "신부 어릴 적 사진",
+      ratio: "portrait",
+    },
     gallery: [
       {
         src: "/images/do (3).jpg",
