@@ -843,9 +843,18 @@ export function EditInvitation({ slug }: { slug?: string }) {
       photo.src = dataUrl;
       photo.alt = file.name;
       photo.ratio = "portrait";
+      photo.scale = photo.scale ?? 1;
       return current;
     });
     setSaveMessage("어릴 적 사진이 바뀌었어요.");
+  }
+
+  function updateChildPhotoScale(side: "groom" | "bride", scale: number) {
+    update((current) => {
+      const photo = side === "groom" ? current.photos.groomChildPhoto : current.photos.brideChildPhoto;
+      photo.scale = scale;
+      return current;
+    });
   }
 
   async function appendGalleryFiles(files: FileList) {
@@ -1097,9 +1106,20 @@ export function EditInvitation({ slug }: { slug?: string }) {
                         onChange={(value) =>
                           update((current) => {
                             current.photos.groomChildPhoto.src = value;
+                            current.photos.groomChildPhoto.scale =
+                              current.photos.groomChildPhoto.scale ?? 1;
                             return current;
                           })
                         }
+                      />
+                      <RangeField
+                        label="신랑 사진 확대"
+                        value={draft.photos.groomChildPhoto?.scale ?? 1}
+                        min={1}
+                        max={2.4}
+                        step={0.05}
+                        suffix="x"
+                        onChange={(value) => updateChildPhotoScale("groom", value)}
                       />
                     </div>
                     <div className="grid gap-3">
@@ -1113,9 +1133,20 @@ export function EditInvitation({ slug }: { slug?: string }) {
                         onChange={(value) =>
                           update((current) => {
                             current.photos.brideChildPhoto.src = value;
+                            current.photos.brideChildPhoto.scale =
+                              current.photos.brideChildPhoto.scale ?? 1;
                             return current;
                           })
                         }
+                      />
+                      <RangeField
+                        label="신부 사진 확대"
+                        value={draft.photos.brideChildPhoto?.scale ?? 1}
+                        min={1}
+                        max={2.4}
+                        step={0.05}
+                        suffix="x"
+                        onChange={(value) => updateChildPhotoScale("bride", value)}
                       />
                     </div>
                   </div>

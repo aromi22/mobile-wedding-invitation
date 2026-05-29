@@ -29,6 +29,7 @@ export type WeddingPhoto = {
   src: string;
   alt: string;
   ratio: PhotoRatio;
+  scale?: number;
 };
 
 export type WeddingStory = {

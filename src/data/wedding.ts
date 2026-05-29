@@ -97,11 +97,13 @@ export const wedding: WeddingData = {
       src: "",
       alt: "신랑 어릴 적 사진",
       ratio: "portrait",
+      scale: 1,
     },
     brideChildPhoto: {
       src: "",
       alt: "신부 어릴 적 사진",
       ratio: "portrait",
+      scale: 1,
     },
     gallery: [
       {
