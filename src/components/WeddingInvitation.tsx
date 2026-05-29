@@ -225,70 +225,46 @@ function Section({
 function Cover({ data }: { data: WeddingData }) {
   const { groom, bride } = data.couple;
   const hero = data.hero;
-  const scriptWrapStyle = {
-    top: `${hero.letteringTop}%`,
-  };
-  const scriptTextStyle = {
-    color: hero.letteringColor,
-    fontFamily: LETTERING_FONTS[hero.letteringFont],
-    animationDuration: `${hero.letteringDuration}s`,
-  };
-  const mainTextStyle = {
-    color: hero.mainTextColor,
-    top: `${hero.mainTextTop}%`,
-  };
-  const letteringKey = `${hero.letteringText}-${hero.letteringFont}-${hero.letteringColor}-${hero.letteringTop}-${hero.letteringDuration}`;
+  const openingVenue = data.event.venue;
 
   return (
-    <section className="kitsch-paper relative min-h-screen overflow-hidden text-center">
-      <div className="relative mx-6 mt-8 h-[73vh] min-h-[31rem] overflow-hidden rounded-[1.8rem] bg-[#1f1918] shadow-[0_24px_55px_rgba(52,37,38,0.16)]">
-        <div className="relative h-full overflow-hidden">
-          <InvitationImage photo={data.photos.cover} priority />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/8 via-black/5 to-black/42" />
-        <span className="kitsch-heart fill left-8 top-[18%]" />
-        <span className="kitsch-heart right-9 top-[28%] scale-75" />
-        <span className="kitsch-heart fill bottom-[28%] left-9 scale-[0.62]" />
-        <div className="cover-reveal absolute inset-x-7 top-7 pt-5">
-          <p className="text-[0.65rem] uppercase tracking-[0.34em] text-white/72">
-            We are getting married!
-          </p>
-        </div>
-        <div className="cover-reveal cover-reveal-delay-1 absolute inset-x-0 px-4" style={scriptWrapStyle}>
-          <p key={letteringKey} className="cover-script" style={scriptTextStyle}>
-            {hero.letteringText}
-          </p>
-        </div>
-        <div className="cover-reveal cover-reveal-delay-2 absolute inset-x-8 -translate-y-1/2" style={mainTextStyle}>
-          <p className="mx-auto mt-2 max-w-[16rem] break-keep text-sm leading-7 tracking-[0.04em] text-white/88">
-            {hero.mainText}
-          </p>
-        </div>
-      </div>
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#fffdf9] px-7 py-9 text-center">
+      <div className="cover-reveal w-full max-w-[20rem]">
+        <div className="bg-[#f8f4ee] px-4 pb-10 pt-4 shadow-[0_22px_48px_rgba(42,34,30,0.13)] ring-1 ring-[#2f2924]/5">
+          <div className="relative aspect-[4/5.15] overflow-hidden bg-[#e8e1d8]">
+            <InvitationImage
+              photo={data.photos.cover}
+              priority
+              className="object-cover"
+            />
+          </div>
 
-      <div className="px-7 pb-10 pt-8">
-        <h1 className="cover-reveal cover-reveal-delay-3 flex items-center justify-center gap-3 text-[1.62rem] font-medium leading-none text-[#342526]">
-          <span className="whitespace-nowrap">{groom.name}</span>
-          <span className="text-base text-[#7f1d2d]/58">{coupleSeparator(data)}</span>
-          <span className="whitespace-nowrap">{bride.name}</span>
-        </h1>
-        <p className="cover-reveal cover-reveal-delay-4 mt-3 text-[0.66rem] uppercase tracking-[0.24em] text-[#8a7671]">
-          {groom.englishName} · {bride.englishName}
-        </p>
-        {hero.showEventInfo ? (
-          <>
-            <p className="cover-reveal cover-reveal-delay-5 mx-auto mt-6 inline-flex border-y border-[#7f1d2d]/18 px-4 py-2 text-[0.78rem] tracking-[0.2em] text-[#7f1d2d]">
-              {data.event.calendarText}
+          <div className="mx-auto mt-8 flex h-10 w-10 items-center justify-center rounded-full border border-[#2f2924]/20 text-[0.52rem] uppercase leading-tight tracking-[0.12em] text-[#2f2924]/55">
+            <span>
+              K<br />A
+            </span>
+          </div>
+
+          <div className="mt-7 text-[#2f2924]">
+            <p className="font-display text-[0.58rem] tracking-[0.08em] text-[#2f2924]/48">
+              The marriage of
             </p>
-            <p className="cover-reveal cover-reveal-delay-5 mt-3 text-sm text-[#76695e]">
-              {data.event.venue}
+            <h1 className="mt-2 break-keep font-display text-[1.08rem] font-medium capitalize leading-tight tracking-[0.02em]">
+              {groom.englishName} &amp; {bride.englishName}
+            </h1>
+            <p className="mt-3 break-keep text-[0.62rem] leading-5 tracking-[0.08em] text-[#2f2924]/64">
+              {openingVenue}
             </p>
-          </>
-        ) : null}
+            <p className="mt-1 text-[0.62rem] uppercase tracking-[0.12em] text-[#2f2924]/58">
+              {data.event.calendarText.replaceAll(" ", " | ")}
+            </p>
+          </div>
+        </div>
+
         {hero.showScrollHint ? (
-          <div className="cover-reveal cover-reveal-delay-6 mx-auto mt-8 flex w-7 flex-col items-center gap-1.5 text-[#7f1d2d]/55">
-            <span className="text-[0.62rem] tracking-[0.28em]">SCROLL</span>
-            <span className="h-8 w-px bg-[#7f1d2d]/25" />
+          <div className="cover-reveal cover-reveal-delay-2 mx-auto mt-7 flex w-7 flex-col items-center gap-1.5 text-[#2f2924]/35">
+            <span className="text-[0.56rem] tracking-[0.26em]">SCROLL</span>
+            <span className="h-7 w-px bg-[#2f2924]/18" />
           </div>
         ) : null}
       </div>
