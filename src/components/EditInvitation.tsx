@@ -28,6 +28,10 @@ const MUSIC_OPTIONS: Array<WeddingMusic | null> = [
 const LETTERING_SUGGESTIONS = [
   "Our wedding day",
   "We're getting married",
+  "Save the date",
+  "Just married",
+  "With love",
+  "Together forever",
   "The beginning of us",
   "Forever starts here",
 ];

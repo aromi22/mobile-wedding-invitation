@@ -226,26 +226,41 @@ function Cover({ data }: { data: WeddingData }) {
   const { groom, bride } = data.couple;
   const hero = data.hero;
   const openingVenue = data.event.venue;
+  const letteringColor = ["#fff", "#ffffff", "white"].includes(
+    hero.letteringColor.trim().toLowerCase(),
+  )
+    ? "#2f2924"
+    : hero.letteringColor;
+  const letteringStyle = {
+    color: letteringColor,
+    fontFamily: LETTERING_FONTS[hero.letteringFont],
+    animationDuration: `${hero.letteringDuration}s`,
+  };
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#fffdf9] px-7 py-9 text-center">
       <div className="cover-reveal w-full max-w-[20rem]">
-        <div className="bg-[#f8f4ee] px-4 pb-10 pt-4 shadow-[0_22px_48px_rgba(42,34,30,0.13)] ring-1 ring-[#2f2924]/5">
-          <div className="relative aspect-[4/5.15] overflow-hidden bg-[#e8e1d8]">
+        <div className="bg-[#f9f6ef] px-3.5 pb-12 pt-3.5 shadow-[0_24px_54px_rgba(42,34,30,0.14)] ring-1 ring-[#2f2924]/5">
+          <div className="relative bg-white px-3 pb-16 pt-3 shadow-[0_12px_28px_rgba(42,34,30,0.08)] ring-1 ring-[#2f2924]/[0.04]">
+            <div className="relative aspect-[4/4.9] overflow-hidden bg-[#e8e1d8]">
             <InvitationImage
               photo={data.photos.cover}
               priority
               className="object-cover"
             />
+            </div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.78)_48%,#fff_100%)]" />
           </div>
 
-          <div className="mx-auto mt-8 flex h-10 w-10 items-center justify-center rounded-full border border-[#2f2924]/20 text-[0.52rem] uppercase leading-tight tracking-[0.12em] text-[#2f2924]/55">
-            <span>
-              K<br />A
-            </span>
-          </div>
+          <p
+            key={`${hero.letteringText}-${hero.letteringFont}-${letteringColor}`}
+            className="cover-script mx-auto mt-9 max-w-[15.5rem] text-[3.35rem] leading-[0.86] opacity-80"
+            style={letteringStyle}
+          >
+            {hero.letteringText}
+          </p>
 
-          <div className="mt-7 text-[#2f2924]">
+          <div className="mt-6 text-[#2f2924]">
             <p className="font-display text-[0.58rem] tracking-[0.08em] text-[#2f2924]/48">
               The marriage of
             </p>
