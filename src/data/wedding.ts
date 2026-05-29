@@ -137,7 +137,7 @@ export const wedding: WeddingData = {
     ],
   },
   hero: {
-    letteringText: "Our wedding day",
+    letteringText: "Our Wedding Day",
     letteringFont: "segoe-print",
     letteringColor: "#ffffff",
     letteringTop: 48,

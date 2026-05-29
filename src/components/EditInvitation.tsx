@@ -25,16 +25,15 @@ const MUSIC_OPTIONS: Array<WeddingMusic | null> = [
   { title: "샘플 음악 2", src: "/music/sample-2.wav" },
 ];
 
-const LETTERING_SUGGESTIONS = [
-  "Our wedding day",
-  "We're getting married",
-  "Save the date",
-  "Just married",
-  "With love",
-  "Together forever",
-  "The beginning of us",
-  "Forever starts here",
+const weddingHandwritingPhrases = [
+  "Our Wedding Day",
+  "We Got Married",
+  "Just Married",
+  "The Wedding Day",
+  "Happily Ever After",
 ];
+
+const selectedPhrase = weddingHandwritingPhrases[0];
 
 const LETTERING_FONT_OPTIONS = [
   { label: "Segoe Print", value: "segoe-print" },
@@ -1135,7 +1134,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
                 <Field
                   label="레터링 문구"
                   value={draft.hero.letteringText}
-                  placeholder="Our wedding day"
+                  placeholder={selectedPhrase}
                   onChange={(value) =>
                     update((current) => {
                       current.hero.letteringText = value;
@@ -1163,7 +1162,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
                   </select>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {LETTERING_SUGGESTIONS.map((suggestion) => (
+                  {weddingHandwritingPhrases.map((suggestion) => (
                     <button
                       key={suggestion}
                       type="button"
