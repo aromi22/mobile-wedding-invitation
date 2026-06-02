@@ -14,16 +14,16 @@ const LETTERING_FONTS = {
 
 const CHILD_PHOTO_FRAME_CONFIG = {
   groom: {
-    top: "10.8%",
-    left: "18.5%",
-    width: "20.9%",
-    height: "24.2%",
+    top: "10.1%",
+    left: "18.35%",
+    width: "23.75%",
+    height: "26.25%",
   },
   bride: {
-    top: "14.4%",
-    left: "63.2%",
-    width: "18.7%",
-    height: "24.7%",
+    top: "16.05%",
+    left: "62.75%",
+    width: "23.1%",
+    height: "26.25%",
   },
 } satisfies Record<string, CSSProperties>;
 
@@ -314,7 +314,7 @@ function ChildPhotoLayer({
 
   return (
     <div
-      className="absolute z-[15] overflow-hidden bg-[#f6f2ec]"
+      className="absolute z-10 overflow-hidden bg-[#f6f2ec]"
       style={style}
       aria-hidden={!photo?.src}
     >
