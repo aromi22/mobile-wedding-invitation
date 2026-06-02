@@ -310,26 +310,25 @@ function ChildPhotoLayer({
   photo?: WeddingPhoto;
   style: CSSProperties;
 }) {
+  const scale = photo?.scale ?? 1;
+
   return (
     <div
-      className="absolute z-10 overflow-hidden bg-[#f6f2ec]"
+      className="absolute z-[15] overflow-hidden bg-[#f6f2ec]"
       style={style}
       aria-hidden={!photo?.src}
     >
       {photo?.src ? (
-        <div
-          className="relative h-full w-full"
+        <img
+          key={photo.src}
+          src={photo.src}
+          alt={photo.alt}
+          className="absolute inset-0 h-full w-full object-cover"
           style={{
-            transform: `scale(${photo.scale ?? 1})`,
+            transform: `scale(${scale})`,
             transformOrigin: "center",
           }}
-        >
-          <InvitationImage
-            photo={photo}
-            sizes="160px"
-            className="object-cover"
-          />
-        </div>
+        />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.96),rgba(238,231,222,0.72))] text-[0.52rem] uppercase tracking-[0.16em] text-[#9a8c7d]">
           Photo
