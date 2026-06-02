@@ -14,16 +14,16 @@ const LETTERING_FONTS = {
 
 const CHILD_PHOTO_FRAME_CONFIG = {
   groom: {
-    top: "8.8%",
-    left: "15.8%",
-    width: "25.8%",
-    height: "25.1%",
+    top: "11.3%",
+    left: "18.6%",
+    width: "22.8%",
+    height: "25.2%",
   },
   bride: {
-    top: "15.2%",
-    left: "60.7%",
-    width: "23.2%",
-    height: "25.1%",
+    top: "14.3%",
+    left: "63.0%",
+    width: "20.7%",
+    height: "28.2%",
   },
 } satisfies Record<string, CSSProperties>;
 
@@ -258,8 +258,6 @@ function Cover({ data }: { data: WeddingData }) {
       <div className="cover-reveal w-full max-w-[20rem]">
         <div className="bg-[#f9f6ef] px-3.5 pb-12 pt-3.5 shadow-[0_24px_54px_rgba(42,34,30,0.14)] ring-1 ring-[#2f2924]/5">
           <div className="relative mx-auto bg-[#fffefe] px-4 pb-20 pt-4 shadow-[0_22px_38px_rgba(34,28,24,0.16),0_2px_8px_rgba(34,28,24,0.08)] ring-1 ring-black/[0.035]">
-            <span className="pointer-events-none absolute -left-10 -top-6 z-10 h-11 w-28 -rotate-[34deg] bg-white/55 shadow-[0_2px_8px_rgba(90,82,74,0.08)] ring-1 ring-white/65 backdrop-blur-[1px]" />
-            <span className="pointer-events-none absolute -bottom-7 -right-8 z-10 h-9 w-28 -rotate-[28deg] bg-white/55 shadow-[0_2px_8px_rgba(90,82,74,0.08)] ring-1 ring-white/65 backdrop-blur-[1px]" />
             <div className="pointer-events-none absolute inset-0 rounded-[0.15rem] bg-[linear-gradient(120deg,rgba(255,255,255,0.78),rgba(255,255,255,0)_26%),linear-gradient(180deg,rgba(255,255,255,0)_70%,rgba(225,220,211,0.2))]" />
             <div className="relative aspect-[4/4.95] overflow-hidden bg-[#e8e1d8] shadow-[inset_0_0_0_1px_rgba(47,41,36,0.12),inset_0_3px_12px_rgba(47,41,36,0.2)]">
               <InvitationImage
@@ -352,7 +350,7 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
   return (
     <section className="relative bg-[#fffdf9] px-5 pb-14 pt-4 text-center">
       <div className="reveal mx-auto max-w-[24rem]">
-        <div className="relative mx-auto aspect-[4/5] w-full overflow-hidden">
+        <div className="relative mx-auto aspect-[1123/1429] w-full overflow-hidden bg-[#fffdf9]">
           <ChildPhotoLayer
             photo={data.photos.groomChildPhoto}
             style={CHILD_PHOTO_FRAME_CONFIG.groom}
@@ -365,7 +363,7 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
             <InvitationImage
               photo={illustration}
               sizes="430px"
-              className="object-contain"
+              className="object-contain mix-blend-multiply"
             />
           </div>
         </div>
