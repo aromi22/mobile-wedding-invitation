@@ -40,6 +40,27 @@ const LETTERING_FONT_OPTIONS = [
   { label: "Freestyle Script", value: "freestyle-script" },
 ] as const;
 
+type SectionToggleKey = keyof WeddingData["sections"];
+
+const SECTION_TOGGLE_OPTIONS: Array<{
+  key: SectionToggleKey;
+  label: string;
+}> = [
+  { key: "openingMessage", label: "초대 문구" },
+  { key: "story", label: "우리들의 이야기" },
+  { key: "qa", label: "Q&A" },
+  { key: "timeline", label: "타임라인" },
+  { key: "family", label: "신랑 신부 소개" },
+  { key: "profile", label: "프로필 문구" },
+  { key: "calendar", label: "달력 / 예식 날짜" },
+  { key: "location", label: "예식 장소 / 지도" },
+  { key: "gallery", label: "갤러리" },
+  { key: "accounts", label: "마음 전하실 곳" },
+  { key: "rsvp", label: "참석 여부 전달" },
+  { key: "share", label: "링크 공유" },
+  { key: "footer", label: "감사 문구" },
+];
+
 function splitName(name = "") {
   const trimmed = name.trim();
 
@@ -64,6 +85,14 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
   merged.couple = {
     groom: { ...merged.couple.groom, ...source.couple?.groom },
     bride: { ...merged.couple.bride, ...source.couple?.bride },
+  };
+  merged.couple.groom.profile = {
+    ...wedding.couple.groom.profile,
+    ...source.couple?.groom?.profile,
+  };
+  merged.couple.bride.profile = {
+    ...wedding.couple.bride.profile,
+    ...source.couple?.bride?.profile,
   };
   merged.couple.groom.parents = {
     ...merged.couple.groom.parents,
@@ -136,6 +165,10 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
     ...merged.hero,
     ...source.hero,
     mainText: source.hero?.mainText ?? source.message?.coverLine ?? merged.hero.mainText,
+  };
+  merged.sections = {
+    ...merged.sections,
+    ...source.sections,
   };
   merged.stories = source.stories?.length ? source.stories : merged.stories;
   merged.storyStyle = {
@@ -518,6 +551,17 @@ function AccountEditor({
           value={account.holder}
           onChange={(value) => onChange({ ...account, holder: value })}
         />
+        <div className="sm:col-span-2">
+          <Field
+            label="카카오페이 송금 링크"
+            value={account.kakaoPayUrl ?? ""}
+            placeholder="https://qr.kakaopay.com/..."
+            onChange={(value) => onChange({ ...account, kakaoPayUrl: value })}
+          />
+          <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
+            입력하면 청첩장에 카카오페이로 보내기 버튼이 표시돼요.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -662,6 +706,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
   const [editUrl, setEditUrl] = useState("");
   const [currentSlug, setCurrentSlug] = useState(slug ?? "");
   const [editSecret, setEditSecret] = useState("");
+  const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
   const isCustomerEditPage = Boolean(slug);
 
   useEffect(() => {
@@ -802,7 +847,8 @@ export function EditInvitation({ slug }: { slug?: string }) {
       const urls = value
         .split("\n")
         .map((item) => item.trim())
-        .filter(Boolean);
+        .filter(Boolean)
+        .slice(0, 50);
 
       current.photos.gallery = urls.map((src, index) => ({
         src,
@@ -859,7 +905,13 @@ export function EditInvitation({ slug }: { slug?: string }) {
   }
 
   async function appendGalleryFiles(files: FileList) {
-    const selectedFiles = Array.from(files);
+    const remainingSlots = Math.max(0, 50 - draft.photos.gallery.length);
+    const selectedFiles = Array.from(files).slice(0, remainingSlots);
+
+    if (remainingSlots === 0) {
+      setSaveMessage("갤러리는 최대 50장까지 등록할 수 있어요.");
+      return;
+    }
     setSaveMessage("갤러리 사진을 모바일에 맞게 줄이는 중이에요.");
     const dataUrls: string[] = [];
 
@@ -873,7 +925,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
         alt: selectedFiles[index].name,
         ratio: "portrait" as const,
       }));
-      current.photos.gallery = [...current.photos.gallery, ...newPhotos];
+      current.photos.gallery = [...current.photos.gallery, ...newPhotos].slice(0, 50);
       setGalleryText(current.photos.gallery.map((photo) => photo.src).join("\n"));
       return current;
     });
@@ -903,6 +955,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
         bank: "",
         number: "",
         holder: "",
+        kakaoPayUrl: "",
       });
       return current;
     });
@@ -964,6 +1017,375 @@ export function EditInvitation({ slug }: { slug?: string }) {
       current.timeline.splice(index, 1);
       return current;
     });
+  }
+
+  function renderSectionEditor(sectionKey: SectionToggleKey) {
+    switch (sectionKey) {
+      case "openingMessage":
+        return (
+          <div className="grid gap-3">
+            <TextArea
+              label="초대 문구"
+              value={draft.message.opening}
+              rows={4}
+              onChange={(value) =>
+                update((current) => {
+                  current.message.opening = value;
+                  return current;
+                })
+              }
+            />
+            <TextArea
+              label="본문 문구"
+              value={draft.message.body}
+              rows={4}
+              onChange={(value) =>
+                update((current) => {
+                  current.message.body = value;
+                  return current;
+                })
+              }
+            />
+          </div>
+        );
+      case "story":
+        return (
+          <div className="grid gap-4">
+            {draft.stories.map((story, index) => (
+              <div key={`${story.title}-${index}`} className="grid gap-3 rounded-lg border border-[#eadfcd] p-3">
+                <Field
+                  label={`이야기 ${index + 1} 제목`}
+                  value={story.title}
+                  onChange={(value) =>
+                    update((current) => {
+                      current.stories[index].title = value;
+                      return current;
+                    })
+                  }
+                />
+                <Field
+                  label="사진 URL"
+                  value={story.image}
+                  onChange={(value) =>
+                    update((current) => {
+                      current.stories[index].image = value;
+                      return current;
+                    })
+                  }
+                />
+                <TextArea
+                  label="내용"
+                  value={story.body}
+                  rows={3}
+                  onChange={(value) =>
+                    update((current) => {
+                      current.stories[index].body = value;
+                      return current;
+                    })
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        );
+      case "qa":
+        return (
+          <div className="grid gap-4">
+            <ToggleField
+              label="Q&A형으로 보여주기"
+              checked={draft.storyStyle.type === "qa" && draft.storyStyle.qaEnabled}
+              onChange={(checked) =>
+                update((current) => {
+                  current.storyStyle.type = checked ? "qa" : "default";
+                  current.storyStyle.qaEnabled = checked;
+                  return current;
+                })
+              }
+            />
+            {draft.qa.map((item, index) => (
+              <div key={item.id} className="grid gap-3 rounded-lg border border-[#eadfcd] p-3">
+                <Field
+                  label={`질문 ${index + 1}`}
+                  value={item.question}
+                  onChange={(value) => updateQA(index, { ...item, question: value })}
+                />
+                <TextArea
+                  label="답변"
+                  value={item.answer}
+                  rows={3}
+                  onChange={(value) => updateQA(index, { ...item, answer: value })}
+                />
+                <button
+                  type="button"
+                  onClick={() => removeQA(index)}
+                  className="justify-self-end text-xs font-semibold text-[#8a7a6a] underline underline-offset-4"
+                >
+                  삭제
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addQA} className="rounded-full border border-[#d8c6ab] px-4 py-3 text-sm text-[#806b4f]">
+              Q&A 추가
+            </button>
+          </div>
+        );
+      case "timeline":
+        return (
+          <div className="grid gap-4">
+            <ToggleField
+              label="타임라인형으로 보여주기"
+              checked={draft.storyStyle.type === "timeline" && draft.storyStyle.timelineEnabled}
+              onChange={(checked) =>
+                update((current) => {
+                  current.storyStyle.type = checked ? "timeline" : "default";
+                  current.storyStyle.timelineEnabled = checked;
+                  return current;
+                })
+              }
+            />
+            {draft.timeline.map((item, index) => (
+              <div key={item.id} className="grid gap-3 rounded-lg border border-[#eadfcd] p-3">
+                <Field label="제목" value={item.title} onChange={(value) => updateTimeline(index, { ...item, title: value })} />
+                <Field label="시점 / 날짜" value={item.date} onChange={(value) => updateTimeline(index, { ...item, date: value })} />
+                <TextArea label="내용" value={item.body} rows={3} onChange={(value) => updateTimeline(index, { ...item, body: value })} />
+                <button
+                  type="button"
+                  onClick={() => removeTimeline(index)}
+                  className="justify-self-end text-xs font-semibold text-[#8a7a6a] underline underline-offset-4"
+                >
+                  삭제
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addTimeline} className="rounded-full border border-[#d8c6ab] px-4 py-3 text-sm text-[#806b4f]">
+              타임라인 추가
+            </button>
+          </div>
+        );
+      case "family":
+        return (
+          <div className="grid gap-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="신랑 성" value={draft.couple.groom.familyName} onChange={(value) => updatePersonName("groom", value, draft.couple.groom.givenName)} />
+              <Field label="신랑 이름" value={draft.couple.groom.givenName} onChange={(value) => updatePersonName("groom", draft.couple.groom.familyName, value)} />
+              <Field label="신부 성" value={draft.couple.bride.familyName} onChange={(value) => updatePersonName("bride", value, draft.couple.bride.givenName)} />
+              <Field label="신부 이름" value={draft.couple.bride.givenName} onChange={(value) => updatePersonName("bride", draft.couple.bride.familyName, value)} />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field
+                label="신랑 관계명"
+                value={draft.couple.groom.parents.relation}
+                onChange={(value) =>
+                  update((current) => {
+                    current.couple.groom.parents.relation = value;
+                    return current;
+                  })
+                }
+              />
+              <Field
+                label="신부 관계명"
+                value={draft.couple.bride.parents.relation}
+                onChange={(value) =>
+                  update((current) => {
+                    current.couple.bride.parents.relation = value;
+                    return current;
+                  })
+                }
+              />
+            </div>
+          </div>
+        );
+      case "profile":
+        return (
+          <div className="grid gap-4">
+            {(["groom", "bride"] as const).map((side) => {
+              const person = draft.couple[side];
+              const sideLabel = side === "groom" ? "신랑" : "신부";
+
+              return (
+                <div key={side} className="grid gap-3 rounded-lg border border-[#eadfcd] p-3">
+                  <p className="text-sm font-semibold text-[#332b24]">{sideLabel} 프로필</p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field
+                      label="출생년도"
+                      value={person.profile.birthYear}
+                      onChange={(value) =>
+                        update((current) => {
+                          current.couple[side].profile.birthYear = value;
+                          return current;
+                        })
+                      }
+                    />
+                    <Field
+                      label="지역"
+                      value={person.profile.hometown}
+                      onChange={(value) =>
+                        update((current) => {
+                          current.couple[side].profile.hometown = value;
+                          return current;
+                        })
+                      }
+                    />
+                    <Field
+                      label="MBTI"
+                      value={person.profile.mbti}
+                      onChange={(value) =>
+                        update((current) => {
+                          current.couple[side].profile.mbti = value;
+                          return current;
+                        })
+                      }
+                    />
+                    <Field
+                      label="한 줄 소개"
+                      value={person.profile.intro}
+                      onChange={(value) =>
+                        update((current) => {
+                          current.couple[side].profile.intro = value;
+                          return current;
+                        })
+                      }
+                    />
+                  </div>
+                  <Field
+                    label="관계 별명"
+                    value={person.profile.relationship}
+                    onChange={(value) =>
+                      update((current) => {
+                        current.couple[side].profile.relationship = value;
+                        return current;
+                      })
+                    }
+                  />
+                  <Field
+                    label="해시태그"
+                    value={person.profile.tags.join(", ")}
+                    placeholder="운동광, 계획적인남자"
+                    onChange={(value) =>
+                      update((current) => {
+                        current.couple[side].profile.tags = value
+                          .split(",")
+                          .map((tag) => tag.trim().replace(/^#/, ""))
+                          .filter(Boolean);
+                        return current;
+                      })
+                    }
+                  />
+                </div>
+              );
+            })}
+          </div>
+        );
+      case "calendar":
+        return (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="예식 날짜" type="date" value={dateValue} onChange={updateDate} />
+            <Field label="예식 시간" type="time" value={draft.event.time} onChange={updateTime} />
+          </div>
+        );
+      case "location":
+        return (
+          <div className="grid gap-3">
+            <Field
+              label="예식 장소"
+              value={draft.event.venue}
+              onChange={(value) =>
+                update((current) => {
+                  current.event.venue = value;
+                  return current;
+                })
+              }
+            />
+            <Field
+              label="주소"
+              value={draft.event.address}
+              onChange={(value) =>
+                update((current) => {
+                  current.event.address = value;
+                  return current;
+                })
+              }
+            />
+            <Field
+              label="지도 링크"
+              value={draft.event.mapUrl}
+              onChange={(value) =>
+                update((current) => {
+                  current.event.mapUrl = value;
+                  return current;
+                })
+              }
+            />
+          </div>
+        );
+      case "gallery":
+        return (
+          <div className="grid gap-3">
+            <FileField label="갤러리 사진 첨부" multiple onSelect={appendGalleryFiles} />
+            <TextArea label="갤러리 이미지 URL" value={galleryText} rows={6} onChange={updateGallery} />
+            <p className="text-xs leading-5 text-[#8a7a6a]">최대 50장까지 등록할 수 있어요.</p>
+          </div>
+        );
+      case "accounts":
+        return (
+          <div className="grid gap-4">
+            {draft.accounts.map((account, index) => (
+              <AccountEditor
+                key={account.id}
+                account={account}
+                onChange={(nextAccount) => updateAccount(index, nextAccount)}
+                onRemove={() => removeAccount(index)}
+              />
+            ))}
+            <button type="button" onClick={addAccount} className="rounded-full border border-[#d8c6ab] px-4 py-3 text-sm text-[#806b4f]">
+              계좌 추가
+            </button>
+          </div>
+        );
+      case "rsvp":
+        return (
+          <div className="grid gap-3">
+            <Field
+              label="버튼 문구"
+              value={draft.rsvp.label}
+              onChange={(value) =>
+                update((current) => {
+                  current.rsvp.label = value;
+                  return current;
+                })
+              }
+            />
+            <Field
+              label="참석 여부 링크"
+              value={draft.rsvp.url}
+              onChange={(value) =>
+                update((current) => {
+                  current.rsvp.url = value;
+                  return current;
+                })
+              }
+            />
+          </div>
+        );
+      case "share":
+        return <p className="text-sm leading-6 text-[#7c6e62]">공유하기는 청첩장 현재 주소를 복사하는 버튼이에요. 표시 여부만 선택하면 됩니다.</p>;
+      case "footer":
+        return (
+          <TextArea
+            label="푸터 감사 문구"
+            value={draft.message.footer}
+            rows={4}
+            onChange={(value) =>
+              update((current) => {
+                current.message.footer = value;
+                return current;
+              })
+            }
+          />
+        );
+      default:
+        return null;
+    }
   }
 
   function resetDraft() {
@@ -1070,6 +1492,59 @@ export function EditInvitation({ slug }: { slug?: string }) {
               </div>
             ) : null}
           </header>
+
+          <FormSection title="섹션별 사용 설정">
+            <div className="grid gap-2">
+              {SECTION_TOGGLE_OPTIONS.map((option) => {
+                const isOpen = openSectionKey === option.key;
+
+                return (
+                  <div
+                    key={option.key}
+                    className="overflow-hidden rounded-xl border border-[#eadfcd] bg-white shadow-[0_8px_24px_rgba(91,70,42,0.05)]"
+                  >
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <label className="relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          checked={draft.sections[option.key]}
+                          onChange={(event) =>
+                            update((current) => {
+                              current.sections = {
+                                ...wedding.sections,
+                                ...current.sections,
+                                [option.key]: event.target.checked,
+                              };
+                              return current;
+                            })
+                          }
+                          className="peer sr-only"
+                          aria-label={`${option.label} 표시 여부`}
+                        />
+                        <span className="absolute inset-0 rounded-full bg-[#d4d4d4] transition peer-checked:bg-[#f3d489]" />
+                        <span className="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition peer-checked:translate-x-6" />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setOpenSectionKey(isOpen ? "openingMessage" : option.key)}
+                        className="flex flex-1 items-center justify-between gap-4 py-1 text-left text-base font-medium text-[#332b24]"
+                      >
+                        <span>{option.label}</span>
+                        <span className="text-2xl font-light leading-none text-[#2f2924]">
+                          {isOpen ? "⌃" : "⌄"}
+                        </span>
+                      </button>
+                    </div>
+                    {isOpen ? (
+                      <div className="border-t border-[#eadfcd] px-4 py-5">
+                        {renderSectionEditor(option.key)}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </FormSection>
 
           <FormSection title="1. 메인 화면 설정">
             <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">

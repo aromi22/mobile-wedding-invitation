@@ -123,6 +123,18 @@ export function invitationRowToWeddingData(row: InvitationRow): WeddingData {
     ...wedding.photos,
     ...data.photos,
   };
+  data.sections = {
+    ...wedding.sections,
+    ...data.sections,
+  };
+  data.couple.groom.profile = {
+    ...wedding.couple.groom.profile,
+    ...data.couple.groom.profile,
+  };
+  data.couple.bride.profile = {
+    ...wedding.couple.bride.profile,
+    ...data.couple.bride.profile,
+  };
   data.couple.groom.name = row.groom_name || data.couple.groom.name;
   data.couple.bride.name = row.bride_name || data.couple.bride.name;
   data.event.venue = row.venue_name || data.event.venue;

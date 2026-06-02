@@ -6,6 +6,14 @@ export type WeddingPerson = {
   familyName: string;
   givenName: string;
   englishName: string;
+  profile: {
+    birthYear: string;
+    hometown: string;
+    mbti: string;
+    intro: string;
+    relationship: string;
+    tags: string[];
+  };
   parents: {
     father: string;
     fatherFamilyName: string;
@@ -51,6 +59,7 @@ export type WeddingAccount = {
   bank: string;
   number: string;
   holder: string;
+  kakaoPayUrl?: string;
 };
 
 export type InvitationStoryType = "default" | "qa" | "timeline";
@@ -91,6 +100,22 @@ export type WeddingHeroSettings = {
   showScrollHint: boolean;
 };
 
+export type WeddingSectionSettings = {
+  openingMessage: boolean;
+  story: boolean;
+  qa: boolean;
+  timeline: boolean;
+  family: boolean;
+  profile: boolean;
+  calendar: boolean;
+  location: boolean;
+  gallery: boolean;
+  accounts: boolean;
+  rsvp: boolean;
+  share: boolean;
+  footer: boolean;
+};
+
 export type WeddingData = {
   couple: {
     groom: WeddingPerson;
@@ -124,6 +149,7 @@ export type WeddingData = {
     gallery: WeddingPhoto[];
   };
   hero: WeddingHeroSettings;
+  sections: WeddingSectionSettings;
   stories: WeddingStory[];
   storyStyle: {
     type: InvitationStoryType;

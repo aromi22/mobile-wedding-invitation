@@ -8,6 +8,14 @@ export const wedding: WeddingData = {
       familyName: "김",
       givenName: "민우",
       englishName: "kim minwoo",
+      profile: {
+        birthYear: "1993년",
+        hometown: "대구 수성구",
+        mbti: "ENFJ",
+        intro: "따뜻한 ENFJ",
+        relationship: "신부 우선주의",
+        tags: ["운동광", "계획적인남자"],
+      },
       parents: {
         father: "김철수",
         fatherFamilyName: "김",
@@ -32,6 +40,14 @@ export const wedding: WeddingData = {
       familyName: "김",
       givenName: "아름",
       englishName: "kim areum",
+      profile: {
+        birthYear: "1995년",
+        hometown: "서울 강남구",
+        mbti: "ESTP",
+        intro: "에너지 넘치는 ESTP",
+        relationship: "신랑 우선주의",
+        tags: ["냥만광", "즉흥적인여자"],
+      },
       parents: {
         father: "이상훈",
         fatherFamilyName: "이",
@@ -150,6 +166,21 @@ export const wedding: WeddingData = {
     showEventInfo: true,
     showScrollHint: true,
   },
+  sections: {
+    openingMessage: true,
+    story: true,
+    qa: true,
+    timeline: true,
+    family: true,
+    profile: true,
+    calendar: true,
+    location: true,
+    gallery: true,
+    accounts: true,
+    rsvp: true,
+    share: true,
+    footer: true,
+  },
   stories: [
     {
       title: "우리의 시작",
@@ -230,6 +261,7 @@ export const wedding: WeddingData = {
       bank: "신한은행",
       number: "110-000-000000",
       holder: "김민우",
+      kakaoPayUrl: "",
     },
     {
       id: "bride",
@@ -238,6 +270,7 @@ export const wedding: WeddingData = {
       bank: "국민은행",
       number: "123456-00-000000",
       holder: "김아름",
+      kakaoPayUrl: "",
     },
   ],
   music: {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -14,16 +14,16 @@ const LETTERING_FONTS = {
 
 const CHILD_PHOTO_FRAME_CONFIG = {
   groom: {
-    top: "10.1%",
-    left: "18.35%",
-    width: "23.75%",
-    height: "26.25%",
+    top: "10.85%",
+    left: "18.55%",
+    width: "23.85%",
+    height: "25.75%",
   },
   bride: {
-    top: "16.05%",
-    left: "62.75%",
-    width: "23.1%",
-    height: "26.25%",
+    top: "16.1%",
+    left: "63.0%",
+    width: "23.05%",
+    height: "26.75%",
   },
 } satisfies Record<string, CSSProperties>;
 
@@ -191,16 +191,16 @@ function FamilyLine({ person, data }: { person: Person; data: WeddingData }) {
 
 function Divider({ label }: { label?: string }) {
   return (
-    <div className="mx-auto flex w-full max-w-[18rem] items-center gap-3 px-8 text-[#7f1d2d]">
-      <span className="h-px flex-1 bg-[#7f1d2d]/18" />
+    <div className="mx-auto flex w-full max-w-[18rem] items-center gap-3 px-8 text-[#2f2924]">
+      <span className="h-px flex-1 bg-[#2f2924]/18" />
       {label ? (
-        <span className="font-display text-[0.68rem] uppercase tracking-[0.32em] text-[#7f1d2d]/70">
+        <span className="font-display text-[0.68rem] uppercase tracking-[0.32em] text-[#2f2924]/70">
           {label}
         </span>
       ) : (
-        <span className="h-1 w-1 rounded-full bg-[#7f1d2d]/45" />
+        <span className="h-1 w-1 rounded-full bg-[#2f2924]/45" />
       )}
-      <span className="h-px flex-1 bg-[#7f1d2d]/18" />
+      <span className="h-px flex-1 bg-[#2f2924]/18" />
     </div>
   );
 }
@@ -219,7 +219,7 @@ function Section({
   return (
     <section className={`relative px-7 py-16 text-center ${className}`}>
       {label ? (
-        <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#7f1d2d]/65">
+        <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#2f2924]/65">
           {label}
         </p>
       ) : null}
@@ -242,6 +242,7 @@ function Cover({ data }: { data: WeddingData }) {
   const { groom, bride } = data.couple;
   const hero = data.hero;
   const openingVenue = data.event.venue;
+  const letteringText = hero.letteringText.replace(/\s+/g, " ").trim() || "Our Wedding Day";
   const letteringColor = ["#fff", "#ffffff", "white"].includes(
     hero.letteringColor.trim().toLowerCase(),
   )
@@ -250,13 +251,19 @@ function Cover({ data }: { data: WeddingData }) {
   const letteringStyle = {
     color: letteringColor,
     fontFamily: LETTERING_FONTS[hero.letteringFont],
+    fontSize: "clamp(0.92rem, 4vw, 1.18rem)",
+    lineHeight: 1,
+    maxWidth: "13.5rem",
+    overflowWrap: "normal",
+    textWrap: "nowrap",
+    whiteSpace: "nowrap",
     animationDuration: `${hero.letteringDuration}s`,
-  };
+  } satisfies CSSProperties;
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#fffdf9] px-7 py-9 text-center">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-7 py-9 text-center">
       <div className="cover-reveal w-full max-w-[20rem]">
-        <div className="bg-[#f9f6ef] px-3.5 pb-12 pt-3.5 shadow-[0_24px_54px_rgba(42,34,30,0.14)] ring-1 ring-[#2f2924]/5">
+        <div className="bg-white px-3.5 pb-12 pt-3.5 shadow-[0_24px_54px_rgba(42,34,30,0.1)] ring-1 ring-[#2f2924]/5">
           <div className="relative mx-auto overflow-hidden bg-[#fffefe] px-4 pb-20 pt-4 shadow-[0_22px_38px_rgba(34,28,24,0.16),0_2px_8px_rgba(34,28,24,0.08)] ring-1 ring-black/[0.035]">
             <div className="relative aspect-[4/4.95] overflow-hidden bg-[#e8e1d8] shadow-[inset_0_0_0_1px_rgba(47,41,36,0.12),inset_0_3px_12px_rgba(47,41,36,0.2)]">
               <InvitationImage
@@ -266,15 +273,14 @@ function Cover({ data }: { data: WeddingData }) {
               />
             </div>
             <div className="pointer-events-none absolute inset-x-4 bottom-5 h-12 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.76)_52%,#fff_100%)]" />
+            <p
+              key={`${letteringText}-${hero.letteringFont}-${letteringColor}`}
+              className="cover-script absolute inset-x-4 bottom-8 mx-auto block w-full opacity-75"
+              style={letteringStyle}
+            >
+              {letteringText}
+            </p>
           </div>
-
-          <p
-            key={`${hero.letteringText}-${hero.letteringFont}-${letteringColor}`}
-            className="cover-script mx-auto mt-7 max-w-[15.5rem] whitespace-nowrap text-[clamp(1.05rem,3.9vw,1.28rem)] leading-none opacity-75"
-            style={letteringStyle}
-          >
-            {hero.letteringText}
-          </p>
 
           <div className="mt-6 text-[#2f2924]">
             <p className="font-display text-[0.58rem] tracking-[0.08em] text-[#2f2924]/48">
@@ -314,7 +320,7 @@ function ChildPhotoLayer({
 
   return (
     <div
-      className="absolute z-10 overflow-hidden bg-[#f6f2ec]"
+      className="absolute z-10 overflow-hidden bg-white"
       style={style}
       aria-hidden={!photo?.src}
     >
@@ -330,10 +336,37 @@ function ChildPhotoLayer({
           }}
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.96),rgba(238,231,222,0.72))] text-[0.52rem] uppercase tracking-[0.16em] text-[#9a8c7d]">
+        <div className="flex h-full w-full items-center justify-center bg-white text-[0.52rem] uppercase tracking-[0.16em] text-[#9a8c7d]">
           Photo
         </div>
       )}
+    </div>
+  );
+}
+
+function CoupleProfileCard({ person }: { person: Person }) {
+  const profile = person.profile;
+  const tags = profile.tags.map((tag) => tag.trim().replace(/^#/, "")).filter(Boolean);
+
+  return (
+    <div className="break-keep text-center text-[#161616]">
+      <p className="text-[0.98rem] font-semibold leading-7">
+        <span className="mr-1 text-[0.86rem] font-medium text-[#9f1f2d]">{person.role}</span>
+        {person.name}
+      </p>
+      <p className="mt-1 text-[0.92rem] leading-7">
+        {[profile.birthYear, profile.hometown].filter(Boolean).join(", ")}
+      </p>
+      <p className="text-[0.92rem] leading-7">{profile.intro}</p>
+      <p className="text-[0.92rem] leading-7">
+        {profile.relationship}
+        {profile.relationship ? <span className="ml-1 text-[#b5121b]">♥</span> : null}
+      </p>
+      {tags.length ? (
+        <p className="mt-1 text-[0.9rem] leading-7">
+          {tags.map((tag) => `#${tag}`).join(" ")}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -342,7 +375,7 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
   const illustration = {
     ...(data.photos.childhoodIllustration ?? {
     src: "/images/childhood-frame-illustration-overlay.png",
-    alt: "신랑 신부 어릴 적 사진을 넣는 액자 일러스트",
+    alt: "?좊옉 ?좊? ?대┫ ???ъ쭊???ｋ뒗 ?≪옄 ?쇰윭?ㅽ듃",
     ratio: "portrait" as const,
     }),
     src: "/images/childhood-frame-illustration-overlay.png",
@@ -350,9 +383,9 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
   };
 
   return (
-    <section className="relative bg-[#fffdf9] px-5 pb-14 pt-4 text-center">
+    <section className="relative px-5 pb-14 pt-4 text-center">
       <div className="reveal mx-auto max-w-[24rem]">
-        <div className="relative mx-auto aspect-[1123/1429] w-full overflow-hidden bg-[#fffdf9]">
+        <div className="relative mx-auto aspect-[1123/1429] w-full overflow-hidden bg-transparent">
           <ChildPhotoLayer
             photo={data.photos.groomChildPhoto}
             style={CHILD_PHOTO_FRAME_CONFIG.groom}
@@ -369,6 +402,12 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
             />
           </div>
         </div>
+        {data.sections.profile ? (
+          <div className="reveal mx-auto mt-6 grid max-w-[22rem] grid-cols-2 gap-5 px-1">
+            <CoupleProfileCard person={data.couple.groom} />
+            <CoupleProfileCard person={data.couple.bride} />
+          </div>
+        ) : null}
       </div>
     </section>
   );
@@ -377,7 +416,7 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
 function InvitationMessage({ data }: { data: WeddingData }) {
   return (
     <Section label="Invitation" title="소중한 분들을 초대합니다">
-      <div className="mx-auto mb-9 h-9 w-px bg-[#7f1d2d]/18" />
+      <div className="mx-auto mb-9 h-9 w-px bg-[#2f2924]/18" />
       <p className="mx-auto max-w-[17rem] whitespace-pre-line break-keep text-center text-[1.02rem] leading-9 text-[#403a34]">
         {data.message.opening}
       </p>
@@ -402,36 +441,37 @@ function StorySection({ data }: { data: WeddingData }) {
     <section className="kitsch-red-band relative px-7 py-16 text-center">
       <span className="kitsch-heart left-8 top-10 scale-75 brightness-0 invert" />
       <span className="kitsch-heart fill bottom-10 right-8 scale-90 brightness-0 invert" />
-      <p className="font-display text-[0.68rem] uppercase tracking-[0.36em] text-[#7f1d2d]/65">
+      <p className="font-display text-[0.68rem] uppercase tracking-[0.36em] text-[#2f2924]/65">
         Our Story
       </p>
       <h2 className="kitsch-title kitsch-scribble mt-4 text-[2.45rem] leading-snug">
         우리들의 이야기
       </h2>
-      <div className="mx-auto mt-10 max-w-[22rem] space-y-14">
+      <div className="mx-auto mt-10 max-w-[23rem] space-y-5">
         {data.stories.map((story, index) => (
-          <article key={story.title} className="reveal text-center" style={revealDelay(index)}>
-            <div
-              className={`photo-sticker relative overflow-hidden ${index % 2 === 0 ? "-rotate-2" : "rotate-2"} ${photoAspectClass(
-                story.ratio ?? "portrait",
-              )} ${
-                index % 2 === 0 ? "rounded-t-[7rem]" : "rounded-b-[7rem]"
-              }`}
-            >
+          <article
+            key={story.title}
+            className="reveal grid grid-cols-[45%_1fr] overflow-hidden bg-white/86 text-left shadow-[0_10px_26px_rgba(64,42,34,0.08)]"
+            style={revealDelay(index)}
+          >
+            <div className="relative min-h-[9.2rem] overflow-hidden bg-[#eee7de]">
               <InvitationImage
                 photo={{ src: story.image, alt: story.title }}
-                sizes="430px"
+                sizes="190px"
+                className="object-cover"
               />
             </div>
-            <p className="mt-7 text-[0.68rem] uppercase tracking-[0.3em] text-[#7f1d2d]/55">
-              Story {index + 1}
-            </p>
-            <h3 className="mt-3 text-xl font-medium text-[#342526]">
-              {story.title}
-            </h3>
-            <p className="mx-auto mt-5 max-w-[18rem] whitespace-pre-line break-keep text-center text-sm leading-7 text-[#746a61]">
-              {story.body}
-            </p>
+            <div className="flex min-h-[9.2rem] flex-col justify-center px-4 py-4">
+              <p className="font-display text-[1.15rem] font-semibold leading-none text-[#2f2924]/72">
+                {String(index + 1).padStart(2, "0")}
+              </p>
+              <h3 className="mt-3 break-keep text-[0.98rem] font-semibold leading-5 text-[#342526]">
+                {story.title}
+              </h3>
+              <p className="mt-2 whitespace-pre-line break-keep text-[0.72rem] leading-5 text-[#746a61]">
+                {story.body}
+              </p>
+            </div>
           </article>
         ))}
       </div>
@@ -445,7 +485,7 @@ function QASection({ data }: { data: WeddingData }) {
   }
 
   return (
-    <section className="bg-[#fbfaf7] px-7 py-16 text-center">
+    <section className="bg-white px-7 py-16 text-center">
       <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#b29467]">
         Q & A
       </p>
@@ -485,7 +525,7 @@ function TimelineSection({ data }: { data: WeddingData }) {
   }
 
   return (
-    <section className="bg-[#fffdf8] px-7 py-16 text-center">
+    <section className="bg-white px-7 py-16 text-center">
       <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#b29467]">
         Our Timeline
       </p>
@@ -531,7 +571,7 @@ function PersonLine({ person, data }: { person: Person; data: WeddingData }) {
           <FamilyLine person={person} data={data} />
         </p>
         <p className="hidden">
-          {person.parents.father} · {person.parents.mother}의{" "}
+          {person.parents.father} · {person.parents.mother}{" "}
           {person.parents.relation}
         </p>
       </div>
@@ -547,7 +587,7 @@ function PersonLine({ person, data }: { person: Person; data: WeddingData }) {
 
 function FamilySection({ data }: { data: WeddingData }) {
   return (
-    <Section label="Bride & Groom" title="신랑 신부 및 혼주">
+    <Section label="Bride & Groom" title="신랑 신부 소개">
       <div className="border-y border-[#eee7de] px-2 py-2">
         <div className="reveal">
           <PersonLine person={data.couple.groom} data={data} />
@@ -561,6 +601,35 @@ function FamilySection({ data }: { data: WeddingData }) {
 }
 
 function CalendarSection({ data }: { data: WeddingData }) {
+  const weekdayShort = useMemo(() => {
+    const date = new Date(data.event.year, data.event.month - 1, data.event.day);
+    return date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+  }, [data.event.day, data.event.month, data.event.year]);
+  const timeShort = useMemo(() => {
+    const match = data.event.time.match(/(\d{1,2})(?::(\d{2}))?/);
+    const hour24 = match ? Number(match[1]) : 13;
+    const minute = match?.[2] ?? "";
+    const period = hour24 >= 12 ? "PM" : "AM";
+    const hour12 = hour24 % 12 || 12;
+
+    return minute && minute !== "00" ? `${hour12}:${minute} ${period}` : `${hour12} ${period}`;
+  }, [data.event.time]);
+  const weddingDateLine = `${data.event.year}.${String(data.event.month).padStart(2, "0")}.${String(
+    data.event.day,
+  ).padStart(2, "0")} | ${weekdayShort} | ${timeShort}`;
+  const dDayText = useMemo(() => {
+    const weddingDate = new Date(data.event.year, data.event.month - 1, data.event.day);
+    const today = new Date();
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diff = Math.ceil((weddingDate.getTime() - todayOnly.getTime()) / 86400000);
+
+    if (diff === 0) {
+      return "D-Day";
+    }
+
+    return diff > 0 ? `D-${diff}` : `D+${Math.abs(diff)}`;
+  }, [data.event.day, data.event.month, data.event.year]);
+
   const days = useMemo(() => {
     const firstDay = new Date(data.event.year, data.event.month - 1, 1).getDay();
     const lastDate = new Date(data.event.year, data.event.month, 0).getDate();
@@ -571,17 +640,26 @@ function CalendarSection({ data }: { data: WeddingData }) {
   }, [data.event.day, data.event.month, data.event.year]);
 
   return (
-    <Section label="Wedding Day" title={data.event.dateText}>
+    <Section label="Wedding Day">
       <div className="mx-auto max-w-[19rem]">
+        <div className="reveal mb-8 text-center" style={revealDelay(1)}>
+          <p className="break-keep text-[1.18rem] font-light leading-8 tracking-[0.02em] text-[#2f2924]">
+            {weddingDateLine}
+          </p>
+          <div className="mx-auto mt-4 h-px w-28 bg-[#2f2924]/18" />
+          <p className="mt-4 font-display text-[1.02rem] uppercase tracking-[0.28em] text-[#2f2924]/72">
+            {dDayText}
+          </p>
+        </div>
         <div className="reveal mb-5 flex items-end justify-center gap-3">
-          <span className="font-display text-5xl font-light italic text-[#7f1d2d]">
+          <span className="font-display text-5xl font-light italic text-[#2f2924]">
             {String(data.event.month).padStart(2, "0")}
           </span>
           <span className="pb-1 text-sm tracking-[0.2em] text-[#7c4b45]">
             {data.event.year}
           </span>
         </div>
-        <div className="reveal grid grid-cols-7 gap-y-3 border-y border-[#7f1d2d]/18 py-4 text-xs text-[#7c4b45]" style={revealDelay(1)}>
+        <div className="reveal grid grid-cols-7 gap-y-3 border-y border-[#2f2924]/18 py-4 text-xs text-[#7c4b45]" style={revealDelay(1)}>
           {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
             <span key={`${day}-${index}`}>{day}</span>
           ))}
@@ -590,7 +668,7 @@ function CalendarSection({ data }: { data: WeddingData }) {
               key={`${day ?? "empty"}-${index}`}
               className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full ${
                 day === data.event.day
-                  ? "bg-[#7f1d2d] text-white shadow-[0_8px_18px_rgba(127,29,45,0.18)]"
+                  ? "bg-[#2f2924] text-white shadow-[0_8px_18px_rgba(47,41,36,0.14)]"
                   : "text-[#5f5349]"
               }`}
             >
@@ -598,9 +676,6 @@ function CalendarSection({ data }: { data: WeddingData }) {
             </span>
           ))}
         </div>
-        <p className="reveal mt-8 text-sm tracking-[0.18em] text-[#7c6e62]" style={revealDelay(2)}>
-          {data.event.weekday} {data.event.time}
-        </p>
       </div>
     </Section>
   );
@@ -627,7 +702,7 @@ function LocationSection({ data }: { data: WeddingData }) {
           href={data.event.mapUrl}
           target="_blank"
           rel="noreferrer"
-          className="reveal inline-flex w-full items-center justify-center border border-[#7f1d2d]/20 bg-white/55 px-6 py-4 text-sm font-medium tracking-[0.18em] text-[#7f1d2d] shadow-[0_14px_32px_rgba(64,42,34,0.06)]"
+          className="reveal inline-flex w-full items-center justify-center border border-[#2f2924]/20 bg-white/55 px-6 py-4 text-sm font-medium tracking-[0.18em] text-[#2f2924] shadow-[0_14px_32px_rgba(64,42,34,0.06)]"
           style={revealDelay(2)}
         >
           지도 보기
@@ -638,55 +713,88 @@ function LocationSection({ data }: { data: WeddingData }) {
 }
 
 function GallerySection({ data }: { data: WeddingData }) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const gallery = data.photos.gallery.slice(0, 50);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const selectedPhoto = selectedIndex === null ? null : gallery[selectedIndex];
+  const selectedDisplayIndex = selectedIndex === null ? 0 : selectedIndex + 1;
+  const showPrevious = () => {
+    setSelectedIndex((current) =>
+      current === null ? current : (current - 1 + gallery.length) % gallery.length,
+    );
+  };
+  const showNext = () => {
+    setSelectedIndex((current) =>
+      current === null ? current : (current + 1) % gallery.length,
+    );
+  };
 
   return (
     <Section label="Gallery" title="우리의 순간">
-      <div className="grid grid-cols-2 gap-3">
-        {data.photos.gallery.map((photo, index) => (
+      <div className="grid grid-cols-3 gap-1.5">
+        {gallery.map((photo, index) => (
           <button
             key={photo.src}
             type="button"
-            onClick={() => setSelectedImage(photo.src)}
-            className={`photo-sticker reveal relative overflow-hidden transition duration-300 hover:rotate-0 active:scale-[1.02] ${
-              index === 0
-                ? "col-span-2 aspect-[3/4.2] -rotate-1"
-                : photoAspectClass(photo.ratio)
-            }`}
-            style={revealDelay(index, 85)}
-            aria-label={`갤러리 사진 ${index + 1} 크게 보기`}
+            onClick={() => setSelectedIndex(index)}
+            className="reveal relative aspect-square overflow-hidden bg-[#eee7de] transition duration-300 active:scale-[0.98]"
+            style={revealDelay(index, 35)}
+            aria-label={`갤러리 사진 ${index + 1} 보기`}
           >
             <span className="relative block h-full w-full overflow-hidden">
               <InvitationImage
                 photo={photo}
-                sizes="430px"
-                className={`transition duration-500 hover:scale-[1.025] active:scale-105 ${
-                  photo.ratio === "landscape" ? "object-contain" : "object-cover"
-                }`}
+                sizes="140px"
+                className="object-cover"
               />
             </span>
           </button>
         ))}
       </div>
 
-      {selectedImage ? (
-        <button
-          type="button"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#241f1a]/88 p-5"
-          onClick={() => setSelectedImage(null)}
-          aria-label="갤러리 크게 보기 닫기"
-        >
-          <span className="absolute right-5 top-5 text-sm tracking-[0.2em] text-white/80">
-            CLOSE
-          </span>
-          <span className="relative block aspect-[4/5] w-full max-w-[25rem] overflow-hidden rounded-sm bg-[#eee7de]">
-            <InvitationImage
-              photo={{ src: selectedImage, alt: "확대된 갤러리 사진" }}
-              sizes="430px"
-              className="object-contain"
+      {selectedPhoto ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#241f1a]/88 p-5">
+          <button
+            type="button"
+            className="absolute inset-0 cursor-default"
+            onClick={() => setSelectedIndex(null)}
+            aria-label="갤러리 닫기"
+          />
+          <button
+            type="button"
+            onClick={showPrevious}
+            className="absolute left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/16 text-2xl text-white backdrop-blur"
+            aria-label="이전 사진"
+          >
+            ‹
+          </button>
+          <span className="relative z-10 block max-h-[78vh] w-full max-w-[25rem]">
+            <button
+              type="button"
+              onClick={() => setSelectedIndex(null)}
+              className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-lg leading-none text-white shadow-[0_6px_16px_rgba(0,0,0,0.2)] backdrop-blur"
+              aria-label="닫기"
+            >
+              ×
+            </button>
+            <img
+              src={selectedPhoto.src}
+              alt={selectedPhoto.alt}
+              className="mx-auto block max-h-[78vh] max-w-full object-contain"
+              draggable={false}
             />
           </span>
-        </button>
+          <button
+            type="button"
+            onClick={showNext}
+            className="absolute right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/16 text-2xl text-white backdrop-blur"
+            aria-label="다음 사진"
+          >
+            ›
+          </button>
+          <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-[0.2em] text-white/75">
+            {selectedDisplayIndex} / {gallery.length}
+          </p>
+        </div>
       ) : null}
     </Section>
   );
@@ -697,14 +805,14 @@ function AccountRow({ account }: { account: WeddingAccount }) {
     await navigator.clipboard.writeText(
       `${account.bank} ${account.number} ${account.holder}`,
     );
-    alert("계좌번호가 복사되었습니다.");
+    alert("怨꾩쥖踰덊샇媛 蹂듭궗?섏뿀?듬땲??");
   }
 
   return (
     <div className="reveal border-b border-[#eee7de] py-5 text-left last:border-b-0">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.28em] text-[#7f1d2d]/70">{account.label}</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-[#2f2924]/70">{account.label}</p>
           <p className="mt-2 text-base font-medium text-[#332b24]">
             {account.bank} {account.number}
           </p>
@@ -712,13 +820,25 @@ function AccountRow({ account }: { account: WeddingAccount }) {
             예금주 {account.holder}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={copyAccount}
-          className="shrink-0 rounded-full border border-[#7f1d2d]/20 px-3 py-2 text-xs font-medium text-[#7f1d2d]"
-        >
-          복사
-        </button>
+        <div className="flex shrink-0 flex-col gap-2">
+          <button
+            type="button"
+            onClick={copyAccount}
+            className="rounded-full border border-[#2f2924]/20 px-3 py-2 text-xs font-medium text-[#2f2924]"
+          >
+            복사
+          </button>
+          {account.kakaoPayUrl ? (
+            <a
+              href={account.kakaoPayUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full bg-[#2f2924] px-3 py-2 text-center text-xs font-medium text-white"
+            >
+              카카오페이
+            </a>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -757,28 +877,36 @@ function AccountSection({ data }: { data: WeddingData }) {
 function ActionSection({ data }: { data: WeddingData }) {
   async function copyLink() {
     await navigator.clipboard.writeText(window.location.href);
-    alert("청첩장 링크가 복사되었습니다.");
+    alert("泥?꺽??留곹겕媛 蹂듭궗?섏뿀?듬땲??");
+  }
+
+  if (!data.sections.rsvp && !data.sections.share) {
+    return null;
   }
 
   return (
     <section className="px-7 pb-16 pt-6 text-center">
       <div className="mx-auto max-w-[22rem] space-y-3">
-        <a
-          href={data.rsvp.url}
-          target="_blank"
-          rel="noreferrer"
-          className="reveal flex w-full items-center justify-center rounded-full bg-[#342526] px-6 py-4 text-sm font-medium tracking-[0.12em] text-white shadow-[0_18px_38px_rgba(52,37,38,0.18)]"
-        >
-          {data.rsvp.label}
-        </a>
-        <button
-          type="button"
-          onClick={copyLink}
-          className="reveal w-full rounded-full border border-[#7f1d2d]/18 bg-white/55 px-6 py-4 text-sm font-medium tracking-[0.12em] text-[#7f1d2d]"
-          style={revealDelay(1)}
-        >
-          링크 복사하기
-        </button>
+        {data.sections.rsvp ? (
+          <a
+            href={data.rsvp.url}
+            target="_blank"
+            rel="noreferrer"
+            className="reveal flex w-full items-center justify-center rounded-full bg-[#342526] px-6 py-4 text-sm font-medium tracking-[0.12em] text-white shadow-[0_18px_38px_rgba(52,37,38,0.18)]"
+          >
+            {data.rsvp.label}
+          </a>
+        ) : null}
+        {data.sections.share ? (
+          <button
+            type="button"
+            onClick={copyLink}
+            className="reveal w-full rounded-full border border-[#2f2924]/18 bg-white/55 px-6 py-4 text-sm font-medium tracking-[0.12em] text-[#2f2924]"
+            style={revealDelay(data.sections.rsvp ? 1 : 0)}
+          >
+            留곹겕 蹂듭궗?섍린
+          </button>
+        ) : null}
       </div>
     </section>
   );
@@ -791,7 +919,7 @@ function Footer({ data }: { data: WeddingData }) {
       <p className="mx-auto mt-8 max-w-[18rem] break-keep text-sm leading-7 text-[#76695e]">
         {data.message.footer}
       </p>
-      <p className="mt-8 font-['Great_Vibes'] text-4xl font-light text-[#7f1d2d]/75">Thank you</p>
+      <p className="mt-8 font-['Great_Vibes'] text-4xl font-light text-[#2f2924]/75">Thank you</p>
     </footer>
   );
 }
@@ -831,14 +959,15 @@ function MusicButton({ music }: { music: WeddingData["music"] }) {
         aria-label={isPlaying ? "배경음악 정지" : "배경음악 재생"}
         title={music.title}
       >
-        {isPlaying ? "Ⅱ" : "♪"}
+        {isPlaying ? "STOP" : "PLAY"}
       </button>
     </>
   );
 }
 
 export function WeddingInvitation({ data }: { data: WeddingData }) {
-  const revealKey = `${data.storyStyle.type}-${data.storyStyle.qaEnabled}-${data.storyStyle.timelineEnabled}-${data.qa.length}-${data.timeline.length}`;
+  const sections = data.sections;
+  const revealKey = `${data.storyStyle.type}-${data.storyStyle.qaEnabled}-${data.storyStyle.timelineEnabled}-${data.qa.length}-${data.timeline.length}-${JSON.stringify(sections)}`;
 
   useScrollReveal(revealKey);
 
@@ -851,20 +980,21 @@ export function WeddingInvitation({ data }: { data: WeddingData }) {
       </div>
       <Cover data={data} />
       <ChildhoodFrameSection data={data} />
-      <InvitationMessage data={data} />
-      {data.storyStyle.type === "default" ? <StorySection data={data} /> : null}
-      <QASection data={data} />
-      <TimelineSection data={data} />
-      <Divider label="Together" />
-      <FamilySection data={data} />
-      <CalendarSection data={data} />
-      <Divider />
-      <LocationSection data={data} />
-      <GallerySection data={data} />
-      <AccountSection data={data} />
+      {sections.openingMessage ? <InvitationMessage data={data} /> : null}
+      {sections.story && data.storyStyle.type === "default" ? <StorySection data={data} /> : null}
+      {sections.qa ? <QASection data={data} /> : null}
+      {sections.timeline ? <TimelineSection data={data} /> : null}
+      {sections.family ? <Divider label="Together" /> : null}
+      {sections.family ? <FamilySection data={data} /> : null}
+      {sections.calendar ? <CalendarSection data={data} /> : null}
+      {sections.location ? <Divider /> : null}
+      {sections.location ? <LocationSection data={data} /> : null}
+      {sections.gallery ? <GallerySection data={data} /> : null}
+      {sections.accounts ? <AccountSection data={data} /> : null}
       <ActionSection data={data} />
-      <Footer data={data} />
+      {sections.footer ? <Footer data={data} /> : null}
       <MusicButton music={data.music} />
     </main>
   );
 }
+

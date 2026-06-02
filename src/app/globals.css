@@ -1,17 +1,17 @@
-@import url("https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduModu/subsets/GangwonEduModu-dynamic-subset.css");
+﻿@import url("https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduModu/subsets/GangwonEduModu-dynamic-subset.css");
 @import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #f3eee7;
+  --background: #ffffff;
   --paper: #ffffff;
   --ink: #332b24;
   --muted: #7c6e62;
   --gold: #b29467;
-  --kitsch-red: #7f1d2d;
-  --kitsch-cream: #fffaf4;
+  --kitsch-red: #2f2924;
+  --kitsch-cream: #ffffff;
   --kitsch-ink: #342526;
   --font-serif-kr: "GangwonEdu Modu", "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
   --font-display: "GangwonEdu Modu", Georgia, "Times New Roman", serif;
@@ -30,29 +30,13 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.98), transparent 30rem),
-    linear-gradient(180deg, #f8f5f0 0%, #eee5da 100%);
+  background: #ffffff;
   color: var(--ink);
   font-family: var(--font-serif-kr), serif;
 }
 
 body::before {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  content: "";
-  opacity: 0.2;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)),
-    repeating-linear-gradient(
-      90deg,
-      rgba(95, 72, 43, 0.045) 0,
-      rgba(95, 72, 43, 0.045) 1px,
-      transparent 1px,
-      transparent 7px
-    );
+  content: none;
 }
 
 button,
@@ -73,33 +57,23 @@ button {
 }
 
 .kitsch-paper {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.95), transparent 18rem),
-    linear-gradient(180deg, #fffdf9 0%, #fff8ef 46%, #fffdf9 100%);
+  background: #ffffff;
 }
 
 .kitsch-paper::before {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  content: "";
-  opacity: 0.18;
-  background-image:
-    radial-gradient(circle at 22% 18%, rgba(117, 80, 52, 0.12) 0 1px, transparent 1.2px),
-    radial-gradient(circle at 78% 64%, rgba(117, 80, 52, 0.1) 0 1px, transparent 1.2px);
-  background-size: 22px 22px, 28px 28px;
+  content: none;
 }
 
 .kitsch-card {
   position: relative;
-  border: 1px solid rgba(127, 29, 45, 0.12);
+  border: 1px solid rgba(47, 41, 36, 0.08);
   border-radius: 1.1rem;
   background: rgba(255, 253, 249, 0.92);
   box-shadow: 0 18px 45px rgba(64, 42, 34, 0.07);
 }
 
 .kitsch-title {
-  color: var(--kitsch-red);
+  color: #2f2924 !important;
   font-family: "Cormorant Garamond", var(--font-display);
   font-weight: 300;
   letter-spacing: 0.01em;
@@ -156,33 +130,32 @@ button {
 }
 
 .photo-sticker {
-  border: 0.42rem solid rgba(255, 255, 255, 0.92);
-  border-radius: 1.05rem;
-  background: #fffaf4;
-  box-shadow: 0 18px 36px rgba(64, 42, 34, 0.11);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   transform: rotate(0deg) !important;
 }
 
 .kitsch-red-band {
-  background:
-    linear-gradient(90deg, rgba(127, 29, 45, 0.12), transparent 1px) 2rem 0 / 1px 100% no-repeat,
-    linear-gradient(180deg, #fff8ef 0%, #fffdf9 100%);
+  background: #ffffff;
   color: var(--kitsch-ink);
 }
 
 .cover-script {
   margin: 0 auto;
   width: 100%;
-  max-width: min(78vw, 18.5rem);
+  max-width: min(74vw, 15.75rem);
   color: rgba(255, 255, 255, 0.78);
   font-family: "Great Vibes", "Freestyle Script", "Segoe Print", cursive;
-  font-size: clamp(2.55rem, 10vw, 4.2rem);
+  font-size: clamp(1.25rem, 5.2vw, 1.65rem);
   font-weight: 300;
-  line-height: 0.92;
+  line-height: 1;
   letter-spacing: 0.01em;
   text-align: center;
-  overflow-wrap: break-word;
-  text-wrap: balance;
+  overflow-wrap: normal;
+  text-wrap: nowrap;
+  white-space: nowrap;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
   transform: translateY(12px);
   opacity: 0;
@@ -328,3 +301,4 @@ button {
     padding: 28px 0;
   }
 }
+
