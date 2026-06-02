@@ -2,14 +2,14 @@ import Link from "next/link";
 import { LandingInvitationPreview } from "@/components/LandingInvitationPreview";
 
 const features = [
-  "모바일 화면에 맞춘 고급 청첩장 디자인",
+  "모바일 화면에 맞춘 감성 청첩장 디자인",
   "사진, 이름, 날짜, 장소, 문구 직접 수정",
-  "고객 전용 편집 링크와 최종 공유 링크 제공",
-  "계좌 복사, 지도 보기, 참석 여부 링크 지원",
+  "구매 고객별 전용 편집 링크 제공",
+  "완성 후 하객에게 공유할 최종 보기 링크 제공",
 ];
 
 const steps = [
-  "샘플 편집 화면을 체험합니다.",
+  "구매 전 데모 편집 화면을 체험합니다.",
   "구매 후 고객 전용 편집 링크를 받습니다.",
   "사진과 예식 정보를 직접 수정합니다.",
   "완성된 청첩장 링크를 하객에게 공유합니다.",
@@ -26,12 +26,12 @@ export default function Home() {
           <h1 className="mt-5 text-4xl font-semibold leading-tight sm:text-5xl">
             고객이 직접 완성하는
             <br />
-            감성 모바일 청첩장
+            모바일 청첩장
           </h1>
           <p className="mt-6 max-w-xl text-base leading-8 text-[#6f6258]">
-            사진과 예식 정보만 바꾸면 완성되는 모바일 청첩장 제작 서비스입니다. 구매
-            전에는 데모로 편집 흐름을 체험하고, 구매 후에는 고객 전용 링크로 직접
-            수정할 수 있어요.
+            사진과 예식 정보만 바꾸면 완성되는 모바일 청첩장 제작 서비스입니다.
+            구매 전에는 데모로 편집 흐름을 체험하고, 구매 후에는 고객 전용
+            링크에서 직접 수정할 수 있어요.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -39,12 +39,6 @@ export default function Home() {
               className="rounded-full bg-[#332b24] px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(51,43,36,0.18)]"
             >
               편집 체험하기
-            </Link>
-            <Link
-              href="/edit"
-              className="rounded-full border border-[#d5c2a6] bg-white/80 px-6 py-3 text-sm font-semibold text-[#6d583e]"
-            >
-              관리자 편집 열기
             </Link>
           </div>
         </div>
@@ -60,7 +54,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-[#b29467]">Service</p>
-            <h2 className="mt-3 text-2xl font-semibold">판매용 구성</h2>
+            <h2 className="mt-3 text-2xl font-semibold">판매 구성</h2>
             <div className="mt-6 grid gap-3">
               {features.map((feature) => (
                 <div key={feature} className="border-b border-[#eadfcd] pb-3 text-[#5f5349]">
@@ -90,8 +84,9 @@ export default function Home() {
         <p className="text-xs uppercase tracking-[0.28em] text-[#b29467]">Try First</p>
         <h2 className="mt-3 text-3xl font-semibold">구매 전, 편집 방식을 먼저 보여주세요</h2>
         <p className="mx-auto mt-4 max-w-2xl leading-7 text-[#6f6258]">
-          고객은 데모 페이지에서 이름, 날짜, 장소, 사진 URL을 바꿔보며 실제 제작 흐름을
-          이해할 수 있습니다. 최종 저장 링크는 구매 후 발급하면 됩니다.
+          고객은 데모 페이지에서 이름, 날짜, 장소, 사진 URL을 바꿔보며 실제 제작
+          흐름을 이해할 수 있습니다. 실제 저장과 링크 발급은 구매 후 전용 링크에서
+          진행됩니다.
         </p>
         <Link
           href="/demo"

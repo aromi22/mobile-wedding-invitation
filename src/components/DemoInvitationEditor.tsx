@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { wedding } from "@/data/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
 import type { WeddingData } from "@/types/wedding";
@@ -71,8 +70,8 @@ export function DemoInvitationEditor() {
               구매 전 편집 체험
             </h1>
             <p className="mt-3 text-sm leading-6 text-[#7c6e62]">
-              실제 저장은 되지 않는 체험 화면입니다. 구매 후에는 고객 전용 편집 링크에서
-              최종 청첩장을 저장할 수 있어요.
+              실제 저장은 되지 않는 체험 화면입니다. 구매 후에는 고객 전용 편집
+              링크에서 최종 청첩장을 저장할 수 있어요.
             </p>
           </header>
 
@@ -105,15 +104,13 @@ export function DemoInvitationEditor() {
             <div className="rounded-xl border border-[#eadfcd] bg-white p-5">
               <p className="text-sm font-semibold text-[#332b24]">구매 후 제공되는 것</p>
               <p className="mt-2 text-sm leading-6 text-[#7c6e62]">
-                구매 고객에게는 비밀코드가 포함된 고객용 편집 링크와 최종 보기 링크가
-                제공됩니다.
+                구매 고객에게는 비밀코드가 포함된 고객 전용 편집 링크와 최종 보기
+                링크가 개별로 제공됩니다.
               </p>
-              <Link
-                href="/edit"
-                className="mt-4 inline-flex rounded-full bg-[#332b24] px-5 py-2.5 text-sm font-semibold text-white"
-              >
-                관리자용 링크 발급 화면 보기
-              </Link>
+              <p className="mt-4 rounded-lg bg-[#f8f4ee] px-4 py-3 text-sm leading-6 text-[#5f5349]">
+                이 화면은 구매 전 체험용이라 저장과 링크 발급은 되지 않습니다.
+                구매 후 안내받은 전용 링크에서 실제 청첩장을 수정할 수 있어요.
+              </p>
             </div>
           </div>
         </section>
