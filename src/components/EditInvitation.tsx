@@ -12,9 +12,9 @@ import type {
   WeddingTimelineItem,
 } from "@/types/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
+import { EDITOR_STORAGE_KEY } from "@/lib/editorStorage";
 import { getInvitationForEdit, invitationRowToWeddingData, saveInvitation } from "@/lib/invitations";
 
-const STORAGE_KEY = "mobile-wedding-editor-v1";
 const COVER_IMAGE_MAX_SIZE = 1600;
 const GALLERY_IMAGE_MAX_SIZE = 1400;
 const IMAGE_EXPORT_QUALITY = 0.78;
@@ -452,6 +452,7 @@ function FileField({
         onChange={(event) => {
           if (event.target.files?.length) {
             onSelect(event.target.files);
+            event.currentTarget.value = "";
           }
         }}
         className="rounded-md border border-dashed border-[#d8c6ab] bg-white px-3 py-3 text-sm text-[#806b4f] file:mr-3 file:rounded-full file:border-0 file:bg-[#b29467] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
@@ -706,7 +707,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
       return;
     }
 
-    const saved = window.localStorage.getItem(STORAGE_KEY);
+    const saved = window.localStorage.getItem(EDITOR_STORAGE_KEY);
 
     if (saved) {
       try {
@@ -715,7 +716,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
         setDateValue(getDateInputValue(parsed));
         setGalleryText(parsed.photos.gallery.map((photo) => photo.src).join("\n"));
       } catch {
-        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(EDITOR_STORAGE_KEY);
       }
     }
 
@@ -728,7 +729,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
     }
 
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+      window.localStorage.setItem(EDITOR_STORAGE_KEY, JSON.stringify(draft));
     } catch {
       setSaveMessage(
         "사진 용량이 커서 이 기기에는 임시저장을 못 했어요. 저장 버튼을 눌러 서버에 저장해 주세요.",
@@ -974,7 +975,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
     setEditUrl("");
     setCurrentSlug("");
     setEditSecret("");
-    window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem(EDITOR_STORAGE_KEY);
   }
 
   async function saveToSupabase() {

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { WeddingInvitation } from "@/components/WeddingInvitation";
-import { wedding } from "@/data/wedding";
+import { LandingInvitationPreview } from "@/components/LandingInvitationPreview";
 
 const features = [
   "모바일 화면에 맞춘 고급 청첩장 디자인",
@@ -52,7 +51,7 @@ export default function Home() {
 
         <div className="mx-auto w-full max-w-[390px] rounded-[2rem] bg-[#eee5da] p-3 shadow-[0_24px_70px_rgba(91,70,42,0.2)]">
           <div className="max-h-[720px] overflow-hidden rounded-[1.4rem] bg-white">
-            <WeddingInvitation data={wedding} />
+            <LandingInvitationPreview />
           </div>
         </div>
       </section>
