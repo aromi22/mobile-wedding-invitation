@@ -340,10 +340,14 @@ function ChildPhotoLayer({
 }
 
 function ChildhoodFrameSection({ data }: { data: WeddingData }) {
-  const illustration = data.photos.childhoodIllustration ?? {
-    src: "/images/childhood-frame-illustration.png",
+  const illustration = {
+    ...(data.photos.childhoodIllustration ?? {
+    src: "/images/childhood-frame-illustration-overlay.png",
     alt: "신랑 신부 어릴 적 사진을 넣는 액자 일러스트",
     ratio: "portrait" as const,
+    }),
+    src: "/images/childhood-frame-illustration-overlay.png",
+    alt: "Childhood frame illustration",
   };
 
   return (
@@ -362,7 +366,7 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
             <InvitationImage
               photo={illustration}
               sizes="430px"
-              className="object-contain mix-blend-multiply"
+              className="object-contain"
             />
           </div>
         </div>
