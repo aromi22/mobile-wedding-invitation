@@ -805,7 +805,7 @@ function AccountRow({ account }: { account: WeddingAccount }) {
     await navigator.clipboard.writeText(
       `${account.bank} ${account.number} ${account.holder}`,
     );
-    alert("怨꾩쥖踰덊샇媛 蹂듭궗?섏뿀?듬땲??");
+    alert("계좌번호가 복사되었어요.");
   }
 
   return (
@@ -877,7 +877,7 @@ function AccountSection({ data }: { data: WeddingData }) {
 function ActionSection({ data }: { data: WeddingData }) {
   async function copyLink() {
     await navigator.clipboard.writeText(window.location.href);
-    alert("泥?꺽??留곹겕媛 蹂듭궗?섏뿀?듬땲??");
+    alert("청첩장 링크가 복사되었어요.");
   }
 
   if (!data.sections.rsvp && !data.sections.share) {
@@ -904,7 +904,7 @@ function ActionSection({ data }: { data: WeddingData }) {
             className="reveal w-full rounded-full border border-[#2f2924]/18 bg-white/55 px-6 py-4 text-sm font-medium tracking-[0.12em] text-[#2f2924]"
             style={revealDelay(data.sections.rsvp ? 1 : 0)}
           >
-            留곹겕 蹂듭궗?섍린
+            링크 복사하기
           </button>
         ) : null}
       </div>
