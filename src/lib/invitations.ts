@@ -1,7 +1,12 @@
-import { wedding } from "@/data/wedding";
+﻿import { wedding } from "@/data/wedding";
 import type { WeddingData, WeddingPhoto } from "@/types/wedding";
 import { supabaseFetch, uploadPublicFile } from "@/lib/supabase";
-import { isCloudinaryConfigured, uploadCloudinaryImage } from "@/lib/cloudinary";
+import {
+  fetchCloudinaryJson,
+  isCloudinaryConfigured,
+  uploadCloudinaryImage,
+  uploadCloudinaryJson,
+} from "@/lib/cloudinary";
 
 export type InvitationRow = {
   id?: string;
@@ -147,7 +152,7 @@ export function invitationRowToWeddingData(row: InvitationRow): WeddingData {
   data.message.body = row.invitation_text || data.message.body;
   data.photos.cover.src = row.cover_image_url || data.photos.cover.src;
   data.photos.gallery = row.gallery_images?.length ? row.gallery_images : data.photos.gallery;
-  data.music = row.music_url ? { title: "저장된 배경음악", src: row.music_url } : data.music;
+  data.music = row.music_url ? { title: "??λ맂 諛곌꼍?뚯븙", src: row.music_url } : data.music;
   data.qa = row.qa_items?.length ? row.qa_items : data.qa;
   data.timeline = row.story_items?.length ? row.story_items : data.timeline;
   data.accounts = row.account_info?.length ? row.account_info : data.accounts;
@@ -223,61 +228,89 @@ export async function saveInvitation(
     options.slug ? undefined : editSecret,
   );
 
-  if (options.slug) {
+  try {
+    if (options.slug) {
+      const rows = await supabaseFetch<InvitationRow[]>(
+        `/rest/v1/invitations?slug=eq.${encodeURIComponent(slug)}&select=${INVITATION_PUBLIC_COLUMNS}`,
+        {
+          method: "PATCH",
+          body: row,
+          headers: {
+            Prefer: "return=representation",
+            "x-edit-secret": editSecret,
+          },
+        },
+      );
+
+      if (!rows[0]) {
+        throw new Error("편집 권한을 확인하지 못했어요. 고객용 편집 링크가 맞는지 확인해 주세요.");
+      }
+
+      return { row: rows[0], editSecret };
+    }
+
     const rows = await supabaseFetch<InvitationRow[]>(
-      `/rest/v1/invitations?slug=eq.${encodeURIComponent(slug)}&select=${INVITATION_PUBLIC_COLUMNS}`,
+      `/rest/v1/invitations?select=${INVITATION_PUBLIC_COLUMNS}`,
       {
-        method: "PATCH",
+        method: "POST",
         body: row,
         headers: {
           Prefer: "return=representation",
+        },
+      },
+    );
+
+    return { row: rows[0], editSecret };
+  } catch (error) {
+    if (!isCloudinaryConfigured()) {
+      throw error;
+    }
+
+    const publicRow: InvitationRow = {
+      ...row,
+      edit_secret: undefined,
+      edit_secret_hash: undefined,
+    };
+
+    await uploadCloudinaryJson(publicRow, { slug, name: "invitation" });
+    await uploadCloudinaryJson(
+      { ...row, edit_secret: editSecret },
+      { slug, name: `edit-${editSecret}` },
+    );
+
+    return { row: publicRow, editSecret };
+  }
+}
+
+export async function getInvitationBySlug(slug: string) {
+  try {
+    const rows = await supabaseFetch<InvitationRow[]>(
+      `/rest/v1/invitations?slug=eq.${encodeURIComponent(
+        slug,
+      )}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
+    );
+
+    return rows[0] ?? null;
+  } catch {
+    return fetchCloudinaryJson<InvitationRow>(slug, "invitation");
+  }
+}
+
+export async function getInvitationForEdit(slug: string, editSecret: string) {
+  try {
+    const rows = await supabaseFetch<InvitationRow[]>(
+      `/rest/v1/invitations?slug=eq.${encodeURIComponent(
+        slug,
+      )}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
+      {
+        headers: {
           "x-edit-secret": editSecret,
         },
       },
     );
 
-    if (!rows[0]) {
-      throw new Error("편집 권한을 확인하지 못했어요. 고객용 편집 링크가 맞는지 확인해 주세요.");
-    }
-
-    return { row: rows[0], editSecret };
+    return rows[0] ?? null;
+  } catch {
+    return fetchCloudinaryJson<InvitationRow>(slug, `edit-${editSecret}`);
   }
-
-  const rows = await supabaseFetch<InvitationRow[]>(
-    `/rest/v1/invitations?select=${INVITATION_PUBLIC_COLUMNS}`,
-    {
-      method: "POST",
-      body: row,
-      headers: {
-        Prefer: "return=representation",
-      },
-    },
-  );
-
-  return { row: rows[0], editSecret };
-}
-
-export async function getInvitationBySlug(slug: string) {
-  const rows = await supabaseFetch<InvitationRow[]>(
-    `/rest/v1/invitations?slug=eq.${encodeURIComponent(
-      slug,
-    )}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
-  );
-
-  return rows[0] ?? null;
-}
-
-export async function getInvitationForEdit(slug: string, editSecret: string) {
-  const rows = await supabaseFetch<InvitationRow[]>(
-    `/rest/v1/invitations?slug=eq.${encodeURIComponent(
-      slug,
-    )}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
-    {
-      headers: {
-        "x-edit-secret": editSecret,
-      },
-    },
-  );
-
-  return rows[0] ?? null;
 }

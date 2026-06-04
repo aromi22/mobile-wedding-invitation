@@ -62,3 +62,67 @@ export async function uploadCloudinaryImage(file: Blob, options: { slug: string;
 
   return result.secure_url;
 }
+
+export function getCloudinaryRawJsonUrl(slug: string, name: string) {
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/raw/upload/mobile-wedding-invitations/${slug}/${name}.json`;
+}
+
+export async function uploadCloudinaryJson(
+  data: unknown,
+  options: { slug: string; name: string },
+) {
+  if (!isCloudinaryConfigured()) {
+    throw new Error("Cloudinary 환경변수가 아직 설정되지 않았어요.");
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const folder = `mobile-wedding-invitations/${options.slug}`;
+  const publicId = `${options.name}.json`;
+  const signature = await createSignature({
+    folder,
+    overwrite: "true",
+    public_id: publicId,
+    timestamp,
+  });
+
+  const file = new Blob([JSON.stringify(data)], { type: "application/json" });
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("api_key", CLOUDINARY_API_KEY);
+  formData.append("timestamp", String(timestamp));
+  formData.append("folder", folder);
+  formData.append("public_id", publicId);
+  formData.append("overwrite", "true");
+  formData.append("signature", signature);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+  const result = (await response.json()) as CloudinaryUploadResponse;
+
+  if (!response.ok || !result.secure_url) {
+    throw new Error(result.error?.message ?? "Cloudinary 데이터 저장에 실패했어요.");
+  }
+
+  return result.secure_url;
+}
+
+export async function fetchCloudinaryJson<T>(slug: string, name: string) {
+  if (!CLOUDINARY_CLOUD_NAME) {
+    return null;
+  }
+
+  const response = await fetch(getCloudinaryRawJsonUrl(slug, name), {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return (await response.json()) as T;
+}
