@@ -971,14 +971,17 @@ function Watermark({ data }: { data: WeddingData }) {
   }
 
   return (
-    <>
-      <div className="pointer-events-none fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-black/10 bg-white/78 px-4 py-2 text-[0.68rem] font-semibold tracking-[0.18em] text-[#2f2924]/70 shadow-[0_10px_28px_rgba(0,0,0,0.08)] backdrop-blur">
+    <div className="pointer-events-none absolute inset-0 z-50" aria-hidden="true">
+      <div className="sticky top-4 mx-auto mt-4 w-fit rounded-full border border-black/10 bg-white/88 px-4 py-2 text-[0.68rem] font-semibold tracking-[0.18em] text-[#2f2924]/72 shadow-[0_10px_28px_rgba(0,0,0,0.08)] backdrop-blur">
+        {data.payment.watermarkText} · 결제 후 제거
+      </div>
+      <div className="absolute left-1/2 top-[36rem] w-[22rem] -translate-x-1/2 -rotate-12 border-y border-[#2f2924]/10 bg-white/46 py-4 text-center text-[1.45rem] font-semibold tracking-[0.28em] text-[#2f2924]/16 backdrop-blur-[1px]">
         {data.payment.watermarkText}
       </div>
-      <div className="pointer-events-none fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#2f2924]/78 px-4 py-2 text-[0.65rem] font-medium tracking-[0.12em] text-white/90 shadow-[0_10px_28px_rgba(0,0,0,0.16)] backdrop-blur">
+      <div className="sticky bottom-4 mx-auto mt-[80vh] mb-4 w-fit rounded-full bg-[#2f2924]/82 px-4 py-2 text-[0.65rem] font-medium tracking-[0.12em] text-white/90 shadow-[0_10px_28px_rgba(0,0,0,0.16)] backdrop-blur">
         결제 후 워터마크 제거
       </div>
-    </>
+    </div>
   );
 }
 

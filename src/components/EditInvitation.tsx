@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { wedding } from "@/data/wedding";
@@ -13,7 +13,8 @@ import type {
 } from "@/types/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
 import { EDITOR_STORAGE_KEY } from "@/lib/editorStorage";
-import { getInvitationForEdit, invitationRowToWeddingData, saveInvitation } from "@/lib/invitations";
+import { getInvitationForEdit, invitationRowToWeddingData } from "@/lib/invitations";
+import type { InvitationRow } from "@/lib/invitations";
 
 const COVER_IMAGE_MAX_SIZE = 1600;
 const GALLERY_IMAGE_MAX_SIZE = 1400;
@@ -34,6 +35,11 @@ const weddingHandwritingPhrases = [
 ];
 
 const selectedPhrase = weddingHandwritingPhrases[0];
+
+type SaveInvitationResponse = {
+  row: InvitationRow;
+  editSecret: string;
+};
 
 const LETTERING_FONT_OPTIONS = [
   { label: "Segoe Print", value: "segoe-print" },
@@ -1432,10 +1438,27 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
         dataToSave.payment.isPaid = false;
       }
 
-      const saved = await saveInvitation(dataToSave, {
-        slug: currentSlug || undefined,
-        editSecret: editSecret || undefined,
+      const response = await fetch("/api/invitations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: dataToSave,
+          slug: currentSlug || undefined,
+          editSecret: editSecret || undefined,
+        }),
       });
+
+      if (!response.ok) {
+        const errorBody = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(
+          errorBody?.message ??
+            "저장 서버에 연결하지 못했어요. 인터넷 연결과 Supabase 설정을 확인해 주세요.",
+        );
+      }
+
+      const saved = (await response.json()) as SaveInvitationResponse;
       const nextData = saved.row.design_settings;
       const nextShareUrl = `${window.location.origin}/w/${saved.row.slug}`;
       const nextEditUrl = `${window.location.origin}/edit/${saved.row.slug}?key=${saved.editSecret}`;
@@ -1446,7 +1469,17 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
       setEditSecret(saved.editSecret);
       setShareUrl(nextShareUrl);
       setEditUrl(isCustomerEditPage ? "" : nextEditUrl);
+      setSaveMessage(
+        isPublicMakePage
+          ? "저장 완료! 워터마크가 포함된 제작본 링크가 생성됐어요."
+          : "저장 완료! 아래 공유 링크가 생성됐어요.",
+      );
       setSaveMessage("저장 완료! 아래 공유 링크가 생성됐어요.");
+      setSaveMessage(
+        isPublicMakePage
+          ? "저장 완료! 워터마크가 포함된 제작본 링크가 생성됐어요."
+          : "저장 완료! 아래 공유 링크가 생성됐어요.",
+      );
     } catch (error) {
       setSaveMessage(
         error instanceof Error
@@ -1463,14 +1496,20 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
       <div className="mx-auto grid max-w-[1180px] gap-8 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
         <div className="rounded-lg bg-[#fffdf8] px-5 shadow-[0_18px_50px_rgba(91,70,42,0.12)]">
           <header className="sticky top-0 z-10 -mx-5 border-b border-[#eadfcd] bg-[#fffdf8]/95 px-5 py-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-[#b29467]">Invitation Editor</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-[#b29467]">
+              {isPublicMakePage ? "Invitation Maker" : "Invitation Editor"}
+            </p>
             <button
               type="button"
               onClick={saveToSupabase}
               disabled={isSaving}
               className="mt-4 rounded-full bg-[#2f2a25] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSaving ? "저장 중" : "Supabase에 저장"}
+              {isSaving
+                ? "저장 중"
+                : isPublicMakePage
+                  ? "제작본 저장하고 링크 받기"
+                  : "Supabase에 저장"}
             </button>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
               <h1 className="text-2xl font-semibold text-[#332b24]">모바일 청첩장 편집</h1>
@@ -1482,10 +1521,41 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
                 기본값으로 되돌리기
               </button>
             </div>
+            {isPublicMakePage ? (
+              <div className="mt-4 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
+                지금 만드는 청첩장은 워터마크가 포함된 제작본입니다. 결제 확인 후
+                워터마크가 제거된 최종 링크로 사용할 수 있어요.
+              </div>
+            ) : null}
             {saveMessage ? (
               <div className="mt-4 rounded-md border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#806b4f]">
                 <p>{saveMessage}</p>
-                {shareUrl ? (
+                {isPublicMakePage && shareUrl ? (
+                  <div className="mt-3 grid gap-3 rounded-md border border-[#eadfcd] bg-[#fffaf3] p-3">
+                    <span className="text-xs font-semibold text-[#b29467]">
+                      워터마크 제작본 링크
+                    </span>
+                    <a
+                      href={shareUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block break-all font-semibold text-[#2f2a25] underline underline-offset-4"
+                    >
+                      {shareUrl}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => void navigator.clipboard.writeText(shareUrl)}
+                      className="justify-self-start rounded-full bg-[#2f2a25] px-4 py-2 text-xs font-semibold text-white"
+                    >
+                      제작본 링크 복사
+                    </button>
+                    <p className="text-xs leading-5 text-[#8a7a6a]">
+                      이 링크에는 워터마크가 표시됩니다. 결제 확인 후 워터마크가 제거된 최종 링크로 사용할 수 있어요.
+                    </p>
+                  </div>
+                ) : null}
+                {!isPublicMakePage && shareUrl ? (
                   <div className="mt-3 grid gap-2">
                     <span className="text-xs font-semibold text-[#b29467]">보기 링크</span>
                     <a
@@ -1501,6 +1571,9 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
                 {editUrl ? (
                   <div className="mt-3 grid gap-2 rounded-md border border-[#eadfcd] bg-[#fffaf3] p-3">
                     <span className="text-xs font-semibold text-[#b29467]">
+                      {isPublicMakePage ? "다시 수정할 링크" : "고객용 편집 링크"}
+                    </span>
+                    <span className="hidden">
                       고객용 편집 링크
                     </span>
                     <a
@@ -1511,6 +1584,15 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
                     >
                       {editUrl}
                     </a>
+                    {isPublicMakePage ? (
+                      <button
+                        type="button"
+                        onClick={() => void navigator.clipboard.writeText(editUrl)}
+                        className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
+                      >
+                        수정 링크 복사
+                      </button>
+                    ) : null}
                     <p className="text-xs leading-5 text-[#8a7a6a]">
                       이 링크는 비밀코드가 들어간 관리용 주소라 고객에게만 전달해 주세요.
                     </p>
@@ -2337,3 +2419,4 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
     </div>
   );
 }
+
