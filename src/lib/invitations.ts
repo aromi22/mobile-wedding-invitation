@@ -117,7 +117,7 @@ export function weddingDataToInvitationRow(
     qa_items: data.qa,
     story_items: data.timeline,
     account_info: data.accounts,
-    rsvp_enabled: Boolean(data.rsvp.url),
+    rsvp_enabled: Boolean(data.sections.rsvp),
     guestbook_enabled: false,
   };
 }

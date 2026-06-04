@@ -10,6 +10,7 @@ import type {
   WeddingMusic,
   WeddingQuestionAnswer,
   WeddingRsvpFieldKey,
+  WeddingRsvpResponse,
   WeddingTimelineItem,
 } from "@/types/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
@@ -767,6 +768,9 @@ export function EditInvitation({
   const [editUrl, setEditUrl] = useState("");
   const [currentSlug, setCurrentSlug] = useState(slug ?? "");
   const [editSecret, setEditSecret] = useState(initialEditSecret);
+  const [rsvpResponses, setRsvpResponses] = useState<WeddingRsvpResponse[]>([]);
+  const [rsvpResponseMessage, setRsvpResponseMessage] = useState("");
+  const [rsvpRefreshKey, setRsvpRefreshKey] = useState(0);
   const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
   const isCustomerEditPage = Boolean(slug);
   const isPublicMakePage = mode === "public" && !slug;
@@ -824,6 +828,44 @@ export function EditInvitation({
       );
     }
   }, [draft, isLoaded, storageKey]);
+
+  useEffect(() => {
+    if (!slug || !editSecret) {
+      setRsvpResponses([]);
+      return;
+    }
+
+    async function loadRsvpResponses() {
+      setRsvpResponseMessage("참석 여부 응답을 불러오는 중이에요.");
+
+      try {
+        const result = await fetch(
+          `/api/rsvp?slug=${encodeURIComponent(slug ?? "")}&key=${encodeURIComponent(editSecret)}`,
+          {
+            cache: "no-store",
+          },
+        );
+
+        if (!result.ok) {
+          const body = (await result.json().catch(() => null)) as { message?: string } | null;
+          throw new Error(body?.message ?? "참석 여부 응답을 불러오지 못했어요.");
+        }
+
+        const body = (await result.json()) as { responses?: WeddingRsvpResponse[] };
+        const responses = body.responses ?? [];
+        setRsvpResponses(responses);
+        setRsvpResponseMessage(
+          responses.length ? `총 ${responses.length}개의 응답이 도착했어요.` : "아직 도착한 응답이 없어요.",
+        );
+      } catch (error) {
+        setRsvpResponseMessage(
+          error instanceof Error ? error.message : "참석 여부 응답을 불러오지 못했어요.",
+        );
+      }
+    }
+
+    void loadRsvpResponses();
+  }, [editSecret, rsvpRefreshKey, slug]);
 
   const preview = useMemo(() => draft, [draft]);
 
@@ -1498,16 +1540,50 @@ export function EditInvitation({
                 })
               }
             />
-            <Field
-              label="외부 참석 여부 링크"
-              value={draft.rsvp.url}
-              onChange={(value) =>
-                update((current) => {
-                  current.rsvp.url = value;
-                  return current;
-                })
-              }
-            />
+            {isCustomerEditPage ? (
+              <div className="grid gap-3 rounded-xl border border-[#eadfcd] bg-white p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-[#332b24]">도착한 참석 여부</p>
+                    <p className="mt-1 text-xs text-[#7c6e62]">{rsvpResponseMessage}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setRsvpRefreshKey((current) => current + 1)}
+                    className="rounded-full border border-[#d8c6ab] px-3 py-2 text-xs text-[#806b4f]"
+                  >
+                    새로고침
+                  </button>
+                </div>
+                <div className="grid gap-3">
+                  {rsvpResponses.map((response) => (
+                    <div key={response.id} className="rounded-lg bg-[#faf7f2] p-3 text-sm text-[#4d4036]">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="font-semibold text-[#332b24]">
+                          {response.name || "이름 없음"} · {response.attendance || "응답"}
+                        </p>
+                        <p className="text-[11px] text-[#9a8a78]">
+                          {new Date(response.createdAt).toLocaleString("ko-KR")}
+                        </p>
+                      </div>
+                      <div className="mt-2 grid gap-1 text-xs leading-5 text-[#6f6258]">
+                        {response.category ? <p>하객분류: {response.category}</p> : null}
+                        {response.meal ? <p>식사여부: {response.meal}</p> : null}
+                        {response.shuttle ? <p>전세버스: {response.shuttle}</p> : null}
+                        {response.phone ? <p>연락처: {response.phone}</p> : null}
+                        {response.companionName ? <p>동행인: {response.companionName}</p> : null}
+                        {response.companionPhone ? <p>동행인 수: {response.companionPhone}</p> : null}
+                        {response.allEvents ? <p>전달 사항: {response.allEvents}</p> : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs leading-5 text-[#7c6e62]">
+                하객이 제출한 참석 여부는 저장 후 발급되는 고객용 편집 링크에서 확인할 수 있어요.
+              </p>
+            )}
           </div>
         );
       case "share":
@@ -2504,16 +2580,6 @@ export function EditInvitation({
               onChange={(value) =>
                 update((current) => {
                   current.event.mapUrl = value;
-                  return current;
-                })
-              }
-            />
-            <Field
-              label="참석 여부 링크"
-              value={draft.rsvp.url}
-              onChange={(value) =>
-                update((current) => {
-                  current.rsvp.url = value;
                   return current;
                 })
               }

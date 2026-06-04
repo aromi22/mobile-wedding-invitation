@@ -3,7 +3,13 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
-import type { WeddingAccount, WeddingData, WeddingPhoto, WeddingRsvpFieldKey } from "@/types/wedding";
+import type {
+  WeddingAccount,
+  WeddingData,
+  WeddingPhoto,
+  WeddingRsvpFieldKey,
+  WeddingRsvpResponse,
+} from "@/types/wedding";
 
 type Person = WeddingData["couple"]["groom"];
 
@@ -887,7 +893,7 @@ function AccountSection({ data }: { data: WeddingData }) {
   );
 }
 
-function ActionSection({ data }: { data: WeddingData }) {
+function ActionSection({ data, invitationSlug }: { data: WeddingData; invitationSlug?: string }) {
   const savedRsvp = data.rsvp;
   const rsvp = {
     label: savedRsvp.label || "참석 여부 전달하기",
@@ -906,6 +912,7 @@ function ActionSection({ data }: { data: WeddingData }) {
     },
   };
   const [isRsvpOpen, setIsRsvpOpen] = useState(false);
+  const [isRsvpSubmitting, setIsRsvpSubmitting] = useState(false);
   const [rsvpForm, setRsvpForm] = useState({
     category: "신랑측",
     attendance: "참석",
@@ -932,20 +939,10 @@ function ActionSection({ data }: { data: WeddingData }) {
   }
 
   function openRsvp() {
-    if (rsvp.usePopup) {
-      setIsRsvpOpen(true);
-      return;
-    }
-
-    if (rsvp.url) {
-      window.open(rsvp.url, "_blank", "noopener,noreferrer");
-      return;
-    }
-
     setIsRsvpOpen(true);
   }
 
-  function submitRsvp(event: FormEvent<HTMLFormElement>) {
+  async function submitRsvp(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (rsvp.fields.privacy && !rsvpForm.privacy) {
@@ -953,28 +950,49 @@ function ActionSection({ data }: { data: WeddingData }) {
       return;
     }
 
-    const lines = [
-      `[${rsvp.title}]`,
-      rsvp.fields.category ? `하객분류: ${rsvpForm.category}` : "",
-      rsvp.fields.attendance ? `참석여부: ${rsvpForm.attendance}` : "",
-      rsvp.fields.meal ? `식사여부: ${rsvpForm.meal}` : "",
-      rsvp.fields.shuttle ? `전세버스 탑승여부: ${rsvpForm.shuttle}` : "",
-      rsvp.fields.name ? `성함: ${rsvpForm.name}` : "",
-      rsvp.fields.phone ? `연락처: ${rsvpForm.phone}` : "",
-      rsvp.fields.companionName ? `동행인 성함: ${rsvpForm.companionName}` : "",
-      rsvp.fields.companionPhone ? `동행인 수: ${rsvpForm.companionPhone}` : "",
-      rsvp.fields.allEvents ? `전달 사항: ${rsvpForm.allEvents}` : "",
-    ].filter(Boolean);
-
-    if (rsvp.recipientEmail) {
-      const subject = encodeURIComponent(`${data.couple.groom.name}·${data.couple.bride.name} 참석 여부`);
-      const body = encodeURIComponent(lines.join("\n"));
-      window.location.href = `mailto:${rsvp.recipientEmail}?subject=${subject}&body=${body}`;
+    if (!invitationSlug) {
+      alert("미리보기에서는 저장되지 않아요. 제작본 저장 후 받은 링크에서 테스트해 주세요.");
       return;
     }
 
-    alert("참석 여부가 작성되었어요. 수신 메일을 입력하면 메일로 전달할 수 있어요.");
-    setIsRsvpOpen(false);
+    const response: Omit<WeddingRsvpResponse, "id" | "createdAt"> = {
+      category: rsvp.fields.category ? rsvpForm.category : undefined,
+      attendance: rsvp.fields.attendance ? rsvpForm.attendance : undefined,
+      meal: rsvp.fields.meal ? rsvpForm.meal : undefined,
+      shuttle: rsvp.fields.shuttle ? rsvpForm.shuttle : undefined,
+      name: rsvp.fields.name ? rsvpForm.name : undefined,
+      phone: rsvp.fields.phone ? rsvpForm.phone : undefined,
+      companionName: rsvp.fields.companionName ? rsvpForm.companionName : undefined,
+      companionPhone: rsvp.fields.companionPhone ? rsvpForm.companionPhone : undefined,
+      allEvents: rsvp.fields.allEvents ? rsvpForm.allEvents : undefined,
+    };
+
+    setIsRsvpSubmitting(true);
+
+    try {
+      const result = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slug: invitationSlug,
+          response,
+        }),
+      });
+
+      if (!result.ok) {
+        const body = (await result.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(body?.message ?? "참석 여부 저장에 실패했어요.");
+      }
+
+      alert("참석 여부가 전달되었어요.");
+      setIsRsvpOpen(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "참석 여부 저장에 실패했어요.");
+    } finally {
+      setIsRsvpSubmitting(false);
+    }
   }
 
   if (!data.sections.rsvp && !data.sections.share) {
@@ -1096,8 +1114,12 @@ function ActionSection({ data }: { data: WeddingData }) {
                   개인정보 수집 및 참석 여부 전달에 동의합니다.
                 </label>
               ) : null}
-              <button type="submit" className="mt-2 rounded-full bg-[#342526] px-5 py-4 text-sm font-medium text-white">
-                참석 여부 보내기
+              <button
+                type="submit"
+                disabled={isRsvpSubmitting}
+                className="mt-2 rounded-full bg-[#342526] px-5 py-4 text-sm font-medium text-white disabled:opacity-45"
+              >
+                {isRsvpSubmitting ? "저장 중..." : "참석 여부 보내기"}
               </button>
               {rsvp.recipientPhone ? (
                 <a href={`tel:${rsvp.recipientPhone}`} className="text-center text-xs text-[#7c6e62] underline underline-offset-4">
@@ -1235,7 +1257,13 @@ function Watermark({ data }: { data: WeddingData }) {
   );
 }
 
-export function WeddingInvitation({ data }: { data: WeddingData }) {
+export function WeddingInvitation({
+  data,
+  invitationSlug,
+}: {
+  data: WeddingData;
+  invitationSlug?: string;
+}) {
   const sections = data.sections;
   const revealKey = `${data.storyStyle.type}-${data.storyStyle.qaEnabled}-${data.storyStyle.timelineEnabled}-${data.qa.length}-${data.timeline.length}-${JSON.stringify(sections)}`;
 
@@ -1261,7 +1289,7 @@ export function WeddingInvitation({ data }: { data: WeddingData }) {
       {sections.location ? <LocationSection data={data} /> : null}
       {sections.gallery ? <GallerySection data={data} /> : null}
       {sections.accounts ? <AccountSection data={data} /> : null}
-      <ActionSection data={data} />
+      <ActionSection data={data} invitationSlug={invitationSlug} />
       {sections.footer ? <Footer data={data} /> : null}
       <MusicButton music={data.music} />
       <Watermark data={data} />

@@ -5,7 +5,7 @@ export async function SharedInvitation({ slug }: { slug: string }) {
   const row = await getInvitationBySlug(slug);
 
   if (row) {
-    return <WeddingInvitation data={invitationRowToWeddingData(row)} />;
+    return <WeddingInvitation data={invitationRowToWeddingData(row)} invitationSlug={slug} />;
   }
 
   return (

@@ -145,6 +145,20 @@ export type WeddingRsvpSettings = {
   recipientPhone: string;
 };
 
+export type WeddingRsvpResponse = {
+  id: string;
+  createdAt: string;
+  category?: string;
+  attendance?: string;
+  meal?: string;
+  shuttle?: string;
+  name?: string;
+  phone?: string;
+  companionName?: string;
+  companionPhone?: string;
+  allEvents?: string;
+};
+
 export type WeddingData = {
   couple: {
     groom: WeddingPerson;
