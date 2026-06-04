@@ -13,7 +13,6 @@ import type {
 } from "@/types/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
 import { EDITOR_STORAGE_KEY } from "@/lib/editorStorage";
-import { getInvitationForEdit, invitationRowToWeddingData } from "@/lib/invitations";
 import type { InvitationRow } from "@/lib/invitations";
 
 const COVER_IMAGE_MAX_SIZE = 1600;
@@ -714,8 +713,26 @@ function ParentNameFields({
   );
 }
 
-export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?: EditorMode }) {
-  const initialDraft = useMemo(() => getInitialWeddingData(mode), [mode]);
+export function EditInvitation({
+  slug,
+  mode = "admin",
+  initialData,
+  initialEditSecret = "",
+  initialLoadMessage = "",
+}: {
+  slug?: string;
+  mode?: EditorMode;
+  initialData?: WeddingData;
+  initialEditSecret?: string;
+  initialLoadMessage?: string;
+}) {
+  const initialDraft = useMemo(() => {
+    if (initialData) {
+      return structuredClone(initialData);
+    }
+
+    return getInitialWeddingData(mode);
+  }, [initialData, mode]);
   const storageKey = mode === "public" ? `${EDITOR_STORAGE_KEY}-make` : EDITOR_STORAGE_KEY;
   const [draft, setDraft] = useState<WeddingData>(initialDraft);
   const [dateValue, setDateValue] = useState(getDateInputValue(initialDraft));
@@ -728,51 +745,29 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
   const [shareUrl, setShareUrl] = useState("");
   const [editUrl, setEditUrl] = useState("");
   const [currentSlug, setCurrentSlug] = useState(slug ?? "");
-  const [editSecret, setEditSecret] = useState("");
+  const [editSecret, setEditSecret] = useState(initialEditSecret);
   const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
   const isCustomerEditPage = Boolean(slug);
   const isPublicMakePage = mode === "public" && !slug;
 
   useEffect(() => {
-    const loadEditableInvitation = async (targetSlug: string, targetSecret: string) => {
-      setSaveMessage("저장된 청첩장을 불러오는 중이에요.");
-
-      try {
-        const row = await getInvitationForEdit(targetSlug, targetSecret);
-
-        if (!row) {
-          setSaveMessage("편집 링크를 확인하지 못했어요. 주소와 비밀코드를 다시 확인해 주세요.");
-          return;
-        }
-
-        const parsed = normalizeWeddingData(invitationRowToWeddingData(row));
-        setDraft(parsed);
-        setDateValue(getDateInputValue(parsed));
-        setGalleryText(parsed.photos.gallery.map((photo) => photo.src).join("\n"));
-        setCurrentSlug(row.slug);
-        setEditSecret(targetSecret);
-        setShareUrl(`${window.location.origin}/w/${row.slug}`);
-        setEditUrl("");
-        setSaveMessage("저장된 청첩장을 불러왔어요. 수정 후 다시 저장할 수 있어요.");
-      } catch (error) {
-        setSaveMessage(
-          error instanceof Error ? error.message : "청첩장을 불러오는 중 문제가 생겼어요.",
-        );
-      }
-    };
-
     if (slug) {
       const params = new URLSearchParams(window.location.search);
       const targetSecret = params.get("key") ?? params.get("secret") ?? "";
 
-      if (!targetSecret) {
-        setSaveMessage("편집용 비밀코드가 없어요. 고객용 편집 링크 전체로 다시 접속해 주세요.");
-        setCurrentSlug(slug);
-        setIsLoaded(true);
-        return;
+      if (initialData) {
+        const parsed = normalizeWeddingData(initialData);
+        setDraft(parsed);
+        setDateValue(getDateInputValue(parsed));
+        setGalleryText(parsed.photos.gallery.map((photo) => photo.src).join("\n"));
+        setShareUrl(`${window.location.origin}/w/${slug}`);
+        setEditUrl("");
       }
 
-      void loadEditableInvitation(slug, targetSecret).finally(() => setIsLoaded(true));
+      setCurrentSlug(slug);
+      setEditSecret(initialEditSecret || targetSecret);
+      setSaveMessage(initialLoadMessage);
+      setIsLoaded(true);
       return;
     }
 
@@ -793,7 +788,7 @@ export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?:
     }
 
     setIsLoaded(true);
-  }, [isPublicMakePage, slug, storageKey]);
+  }, [initialData, initialEditSecret, initialLoadMessage, isPublicMakePage, slug, storageKey]);
 
   useEffect(() => {
     if (!isLoaded) {
