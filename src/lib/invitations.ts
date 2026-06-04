@@ -1,6 +1,7 @@
 import { wedding } from "@/data/wedding";
 import type { WeddingData, WeddingPhoto } from "@/types/wedding";
 import { supabaseFetch, uploadPublicFile } from "@/lib/supabase";
+import { isCloudinaryConfigured, uploadCloudinaryImage } from "@/lib/cloudinary";
 
 export type InvitationRow = {
   id?: string;
@@ -173,6 +174,10 @@ async function uploadDataUrlImage(src: string, slug: string, name: string) {
   }
 
   const file = dataUrlToFile(src);
+  if (isCloudinaryConfigured()) {
+    return uploadCloudinaryImage(file, { slug, name });
+  }
+
   const extension = file.type.split("/")[1] || "jpg";
   return uploadPublicFile(`${slug}/${name}.${extension}`, file, file.type);
 }
