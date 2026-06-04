@@ -6,18 +6,26 @@ export default async function EditInvitationPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ key?: string; secret?: string }>;
+  searchParams: Promise<{ key?: string; secret?: string; admin?: string }>;
 }) {
   const { slug } = await params;
   const query = await searchParams;
   const editSecret = query.key ?? query.secret ?? "";
-  const row = editSecret ? await getInvitationForEdit(decodeURIComponent(slug), editSecret) : null;
+  const adminPaymentKey = query.admin ?? "";
+  const canMarkPaid = Boolean(
+    process.env.ADMIN_PAYMENT_KEY && adminPaymentKey === process.env.ADMIN_PAYMENT_KEY,
+  );
+  const decodedSlug = decodeURIComponent(slug);
+  const row = editSecret ? await getInvitationForEdit(decodedSlug, editSecret) : null;
 
   return (
     <EditInvitation
-      slug={decodeURIComponent(slug)}
+      slug={decodedSlug}
+      mode="public"
       initialData={row ? invitationRowToWeddingData(row) : undefined}
       initialEditSecret={editSecret}
+      canMarkPaid={canMarkPaid}
+      adminPaymentKey={canMarkPaid ? adminPaymentKey : ""}
       initialLoadMessage={
         editSecret
           ? row

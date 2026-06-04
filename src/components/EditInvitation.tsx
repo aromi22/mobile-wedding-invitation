@@ -43,6 +43,10 @@ type SaveInvitationResponse = {
   editSecret: string;
 };
 
+type UnlockPaymentResponse = SaveInvitationResponse & {
+  message?: string;
+};
+
 const LETTERING_FONT_OPTIONS = [
   { label: "Segoe Print", value: "segoe-print" },
   { label: "Freestyle Script", value: "freestyle-script" },
@@ -742,12 +746,16 @@ export function EditInvitation({
   initialData,
   initialEditSecret = "",
   initialLoadMessage = "",
+  canMarkPaid = false,
+  adminPaymentKey = "",
 }: {
   slug?: string;
   mode?: EditorMode;
   initialData?: WeddingData;
   initialEditSecret?: string;
   initialLoadMessage?: string;
+  canMarkPaid?: boolean;
+  adminPaymentKey?: string;
 }) {
   const initialDraft = useMemo(() => {
     if (initialData) {
@@ -764,7 +772,10 @@ export function EditInvitation({
   );
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUnlockingPayment, setIsUnlockingPayment] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
+  const [paymentOrderNumber, setPaymentOrderNumber] = useState("");
+  const [paymentMessage, setPaymentMessage] = useState("");
   const [shareUrl, setShareUrl] = useState("");
   const [editUrl, setEditUrl] = useState("");
   const [currentSlug, setCurrentSlug] = useState(slug ?? "");
@@ -1667,12 +1678,6 @@ export function EditInvitation({
           ? "저장 완료! 워터마크가 포함된 제작본 링크가 생성됐어요."
           : "저장 완료! 아래 공유 링크가 생성됐어요.",
       );
-      setSaveMessage("저장 완료! 아래 공유 링크가 생성됐어요.");
-      setSaveMessage(
-        isPublicMakePage
-          ? "저장 완료! 워터마크가 포함된 제작본 링크가 생성됐어요."
-          : "저장 완료! 아래 공유 링크가 생성됐어요.",
-      );
     } catch (error) {
       setSaveMessage(
         error instanceof Error
@@ -1706,6 +1711,7 @@ export function EditInvitation({
           data: dataToSave,
           slug: currentSlug,
           editSecret,
+          adminPaymentKey,
         }),
       });
 
@@ -1732,6 +1738,62 @@ export function EditInvitation({
     }
   }
 
+  async function unlockPaymentWithOrderNumber() {
+    if (!currentSlug || !editSecret) {
+      setPaymentMessage("고객용 편집 링크에서만 워터마크를 제거할 수 있어요.");
+      return;
+    }
+
+    if (!paymentOrderNumber.trim()) {
+      setPaymentMessage("스마트스토어 주문번호를 입력해 주세요.");
+      return;
+    }
+
+    setIsUnlockingPayment(true);
+    setPaymentMessage("주문번호를 확인하고 있어요.");
+
+    try {
+      const response = await fetch("/api/payments/unlock", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slug: currentSlug,
+          editSecret,
+          orderNumber: paymentOrderNumber,
+        }),
+      });
+
+      const body = (await response.json().catch(() => null)) as UnlockPaymentResponse | null;
+
+      if (!response.ok || !body?.row) {
+        throw new Error(body?.message ?? "주문번호 확인에 실패했어요.");
+      }
+
+      const nextData = body.row.design_settings;
+      const nextShareUrl = `${window.location.origin}/w/${body.row.slug}`;
+
+      setDraft(nextData);
+      setGalleryText(nextData.photos.gallery.map((photo) => photo.src).join("\n"));
+      setCurrentSlug(body.row.slug);
+      setEditSecret(body.editSecret);
+      setShareUrl(nextShareUrl);
+      setEditUrl("");
+      setPaymentOrderNumber("");
+      setPaymentMessage(body.message ?? "워터마크가 제거됐어요. 최종 링크를 공유해 주세요.");
+      setSaveMessage("워터마크 제거 완료! 아래 보기 링크가 최종 링크입니다.");
+    } catch (error) {
+      setPaymentMessage(
+        error instanceof Error
+          ? error.message
+          : "워터마크 제거 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.",
+      );
+    } finally {
+      setIsUnlockingPayment(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f0e8]">
       <div className="mx-auto grid max-w-[1180px] gap-8 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
@@ -1752,7 +1814,7 @@ export function EditInvitation({
                   ? "제작본 저장하고 링크 받기"
                   : "Supabase에 저장"}
             </button>
-            {isCustomerEditPage ? (
+            {isCustomerEditPage && canMarkPaid ? (
               <div className="mt-3 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
@@ -1794,6 +1856,68 @@ export function EditInvitation({
                     </button>
                   </div>
                 ) : null}
+              </div>
+            ) : null}
+            {isCustomerEditPage && !canMarkPaid ? (
+              <div className="mt-3 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
+                <div className="grid gap-3">
+                  <div>
+                    <p className="font-semibold text-[#332b24]">워터마크 제거</p>
+                    <p className="text-xs text-[#7c6e62]">
+                      스마트스토어 결제 후 주문번호를 입력하면 워터마크가 제거됩니다.
+                    </p>
+                  </div>
+                  {draft.payment.isPaid ? (
+                    <div className="rounded-lg border border-[#eadfcd] bg-[#fffaf3] p-3">
+                      <p className="font-semibold text-[#332b24]">결제 확인 완료 상태예요.</p>
+                      {shareUrl ? (
+                        <div className="mt-2 grid gap-2">
+                          <span className="text-xs font-semibold text-[#b29467]">
+                            최종 보기 링크
+                          </span>
+                          <a
+                            href={shareUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="break-all font-semibold text-[#2f2a25] underline underline-offset-4"
+                          >
+                            {shareUrl}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => void navigator.clipboard.writeText(shareUrl)}
+                            className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
+                          >
+                            최종 링크 복사
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                      <input
+                        type="text"
+                        value={paymentOrderNumber}
+                        onChange={(event) => setPaymentOrderNumber(event.target.value)}
+                        placeholder="주문번호 입력"
+                        className="rounded-lg border border-[#eadfcd] bg-white px-3 py-3 text-sm text-[#332b24] outline-none transition focus:border-[#b29467]"
+                      />
+                      <button
+                        type="button"
+                        onClick={unlockPaymentWithOrderNumber}
+                        disabled={isUnlockingPayment}
+                        className="rounded-lg bg-[#2f2a25] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isUnlockingPayment ? "확인 중" : "워터마크 제거하기"}
+                      </button>
+                    </div>
+                  )}
+                  {paymentMessage ? (
+                    <p className="rounded-lg bg-[#fffaf3] px-3 py-2 text-xs leading-5 text-[#806b4f]">
+                      {paymentMessage}
+                    </p>
+                  ) : null}
+                </div>
               </div>
             ) : null}
             <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
