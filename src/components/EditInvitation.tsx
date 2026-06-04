@@ -1684,6 +1684,54 @@ export function EditInvitation({
     }
   }
 
+  async function markAsPaidAndSave() {
+    if (!currentSlug || !editSecret) {
+      setSaveMessage("고객용 편집 링크로 접속해야 결제 완료 처리를 할 수 있어요.");
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage("결제 완료 처리 중이에요. 워터마크를 제거하고 저장합니다.");
+
+    try {
+      const dataToSave = structuredClone(draft);
+      dataToSave.payment.isPaid = true;
+
+      const response = await fetch("/api/invitations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: dataToSave,
+          slug: currentSlug,
+          editSecret,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(errorBody?.message ?? "결제 완료 저장에 실패했어요.");
+      }
+
+      const saved = (await response.json()) as SaveInvitationResponse;
+      const nextData = saved.row.design_settings;
+      const nextShareUrl = `${window.location.origin}/w/${saved.row.slug}`;
+
+      setDraft(nextData);
+      setGalleryText(nextData.photos.gallery.map((photo) => photo.src).join("\n"));
+      setCurrentSlug(saved.row.slug);
+      setEditSecret(saved.editSecret);
+      setShareUrl(nextShareUrl);
+      setEditUrl("");
+      setSaveMessage("결제 완료 처리됐어요. 아래 보기 링크가 워터마크 없는 최종 링크입니다.");
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "결제 완료 처리 중 문제가 생겼어요.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f0e8]">
       <div className="mx-auto grid max-w-[1180px] gap-8 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
@@ -1704,6 +1752,50 @@ export function EditInvitation({
                   ? "제작본 저장하고 링크 받기"
                   : "Supabase에 저장"}
             </button>
+            {isCustomerEditPage ? (
+              <div className="mt-3 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-[#332b24]">
+                      {draft.payment.isPaid ? "결제 완료 상태" : "아직 워터마크 제작본 상태"}
+                    </p>
+                    <p className="text-xs text-[#7c6e62]">
+                      결제 확인 후 버튼을 누르면 같은 보기 링크가 최종 링크가 됩니다.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={markAsPaidAndSave}
+                    disabled={isSaving || draft.payment.isPaid}
+                    className="rounded-full bg-[#b29467] px-4 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {draft.payment.isPaid ? "처리 완료" : "결제 완료 처리"}
+                  </button>
+                </div>
+                {shareUrl ? (
+                  <div className="mt-3 grid gap-2 rounded-md bg-[#fffaf3] p-3">
+                    <span className="text-xs font-semibold text-[#b29467]">
+                      {draft.payment.isPaid ? "최종 보기 링크" : "현재 보기 링크"}
+                    </span>
+                    <a
+                      href={shareUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="break-all font-semibold text-[#2f2a25] underline underline-offset-4"
+                    >
+                      {shareUrl}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => void navigator.clipboard.writeText(shareUrl)}
+                      className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
+                    >
+                      링크 복사
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
             <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
               <h1 className="text-2xl font-semibold text-[#332b24]">모바일 청첩장 편집</h1>
               <button
