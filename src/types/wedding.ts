@@ -121,6 +121,30 @@ export type WeddingPaymentSettings = {
   watermarkText: string;
 };
 
+export type WeddingRsvpFieldKey =
+  | "category"
+  | "attendance"
+  | "meal"
+  | "shuttle"
+  | "name"
+  | "phone"
+  | "companionName"
+  | "companionPhone"
+  | "privacy"
+  | "allEvents";
+
+export type WeddingRsvpSettings = {
+  label: string;
+  url: string;
+  title: string;
+  guide: string;
+  usePopup: boolean;
+  popupMode: "none" | "before" | "after";
+  fields: Record<WeddingRsvpFieldKey, boolean>;
+  recipientEmail: string;
+  recipientPhone: string;
+};
+
 export type WeddingData = {
   couple: {
     groom: WeddingPerson;
@@ -167,8 +191,5 @@ export type WeddingData = {
   timeline: WeddingTimelineItem[];
   accounts: WeddingAccount[];
   music: WeddingMusic | null;
-  rsvp: {
-    label: string;
-    url: string;
-  };
+  rsvp: WeddingRsvpSettings;
 };

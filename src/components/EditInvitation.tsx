@@ -9,6 +9,7 @@ import type {
   WeddingData,
   WeddingMusic,
   WeddingQuestionAnswer,
+  WeddingRsvpFieldKey,
   WeddingTimelineItem,
 } from "@/types/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
@@ -64,6 +65,19 @@ const SECTION_TOGGLE_OPTIONS: Array<{
   { key: "rsvp", label: "참석 여부 전달" },
   { key: "share", label: "링크 공유" },
   { key: "footer", label: "감사 문구" },
+];
+
+const RSVP_FIELD_OPTIONS: Array<{ key: WeddingRsvpFieldKey; label: string }> = [
+  { key: "category", label: "하객분류" },
+  { key: "attendance", label: "참석여부" },
+  { key: "meal", label: "식사여부" },
+  { key: "shuttle", label: "전세버스 탑승여부" },
+  { key: "name", label: "성함" },
+  { key: "phone", label: "연락처" },
+  { key: "companionName", label: "동행인 성함" },
+  { key: "companionPhone", label: "동행인 수(본인 제외)" },
+  { key: "privacy", label: "개인정보 수집 동의" },
+  { key: "allEvents", label: "전달 사항" },
 ];
 
 type EditorMode = "admin" | "public";
@@ -202,7 +216,14 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
   merged.qa = source.qa?.length ? source.qa : merged.qa;
   merged.timeline = source.timeline?.length ? source.timeline : merged.timeline;
   merged.music = source.music ?? merged.music;
-  merged.rsvp = { ...merged.rsvp, ...source.rsvp };
+  merged.rsvp = {
+    ...merged.rsvp,
+    ...source.rsvp,
+    fields: {
+      ...merged.rsvp.fields,
+      ...source.rsvp?.fields,
+    },
+  };
   merged.accounts = source.accounts?.length
     ? source.accounts
     : [
@@ -1366,7 +1387,7 @@ export function EditInvitation({
         );
       case "rsvp":
         return (
-          <div className="grid gap-3">
+          <div className="grid gap-4">
             <Field
               label="버튼 문구"
               value={draft.rsvp.label}
@@ -1378,7 +1399,107 @@ export function EditInvitation({
               }
             />
             <Field
-              label="참석 여부 링크"
+              label="타이틀"
+              value={draft.rsvp.title}
+              onChange={(value) =>
+                update((current) => {
+                  current.rsvp.title = value;
+                  return current;
+                })
+              }
+            />
+            <TextArea
+              label="안내문구"
+              value={draft.rsvp.guide}
+              rows={5}
+              onChange={(value) =>
+                update((current) => {
+                  current.rsvp.guide = value;
+                  return current;
+                })
+              }
+            />
+            <div className="grid gap-2 rounded-xl border border-[#eadfcd] bg-white p-4">
+              <p className="text-sm font-semibold text-[#332b24]">사용 항목</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {RSVP_FIELD_OPTIONS.map((option) => (
+                  <label key={option.key} className="flex items-center gap-2 text-sm text-[#4d4036]">
+                    <input
+                      type="checkbox"
+                      checked={draft.rsvp.fields[option.key]}
+                      onChange={(event) =>
+                        update((current) => {
+                          current.rsvp.fields = {
+                            ...current.rsvp.fields,
+                            [option.key]: event.target.checked,
+                          };
+                          return current;
+                        })
+                      }
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <label className="flex items-center gap-2 text-sm text-[#4d4036]">
+              <input
+                type="checkbox"
+                checked={draft.rsvp.usePopup}
+                onChange={(event) =>
+                  update((current) => {
+                    current.rsvp.usePopup = event.target.checked;
+                    return current;
+                  })
+                }
+              />
+              <span>청첩장 안에서 팝업으로 받기</span>
+            </label>
+            <div className="grid gap-2">
+              <p className="text-sm font-medium text-[#332b24]">팝업 사용 여부</p>
+              {[
+                { value: "none", label: "미사용" },
+                { value: "before", label: "청첩장 접속 시 참석여부 팝업을 먼저 띄웁니다." },
+                { value: "after", label: "메인에서 벗어나면 팝업을 띄웁니다." },
+              ].map((option) => (
+                <label key={option.value} className="flex items-center gap-2 text-sm text-[#4d4036]">
+                  <input
+                    type="radio"
+                    name="rsvp-popup-mode"
+                    checked={draft.rsvp.popupMode === option.value}
+                    onChange={() =>
+                      update((current) => {
+                        current.rsvp.popupMode = option.value as WeddingData["rsvp"]["popupMode"];
+                        return current;
+                      })
+                    }
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+            <Field
+              label="수신받을 메일"
+              value={draft.rsvp.recipientEmail}
+              onChange={(value) =>
+                update((current) => {
+                  current.rsvp.recipientEmail = value;
+                  return current;
+                })
+              }
+            />
+            <Field
+              label="수신받을 전화번호"
+              value={draft.rsvp.recipientPhone}
+              onChange={(value) =>
+                update((current) => {
+                  current.rsvp.recipientPhone = value;
+                  return current;
+                })
+              }
+            />
+            <Field
+              label="외부 참석 여부 링크"
               value={draft.rsvp.url}
               onChange={(value) =>
                 update((current) => {

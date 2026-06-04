@@ -284,5 +284,24 @@ export const wedding: WeddingData = {
   rsvp: {
     label: "참석 여부 전달하기",
     url: "https://forms.gle/",
+    title: "참석 여부 전달",
+    guide:
+      "결혼식에 참석해주시는 모든 분들을 더욱 특별하게 모시고자 하오니, 참석 여부 전달을 부탁드립니다.",
+    usePopup: true,
+    popupMode: "none",
+    fields: {
+      category: true,
+      attendance: true,
+      meal: true,
+      shuttle: false,
+      name: true,
+      phone: false,
+      companionName: true,
+      companionPhone: false,
+      privacy: false,
+      allEvents: true,
+    },
+    recipientEmail: "",
+    recipientPhone: "",
   },
 };

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties } from "react";
-import type { WeddingAccount, WeddingData, WeddingPhoto } from "@/types/wedding";
+import type { CSSProperties, FormEvent } from "react";
+import type { WeddingAccount, WeddingData, WeddingPhoto, WeddingRsvpFieldKey } from "@/types/wedding";
 
 type Person = WeddingData["couple"]["groom"];
 
@@ -26,6 +26,19 @@ const CHILD_PHOTO_FRAME_CONFIG = {
     height: "26.75%",
   },
 } satisfies Record<string, CSSProperties>;
+
+const DEFAULT_RSVP_FIELDS: Record<WeddingRsvpFieldKey, boolean> = {
+  category: true,
+  attendance: true,
+  meal: true,
+  shuttle: false,
+  name: true,
+  phone: false,
+  companionName: true,
+  companionPhone: false,
+  privacy: false,
+  allEvents: true,
+};
 
 function photoAspectClass(ratio: WeddingPhoto["ratio"]) {
   if (ratio === "portrait") {
@@ -875,9 +888,93 @@ function AccountSection({ data }: { data: WeddingData }) {
 }
 
 function ActionSection({ data }: { data: WeddingData }) {
+  const savedRsvp = data.rsvp;
+  const rsvp = {
+    label: savedRsvp.label || "참석 여부 전달하기",
+    url: savedRsvp.url || "",
+    title: savedRsvp.title || "참석 여부 전달",
+    guide:
+      savedRsvp.guide ||
+      "결혼식에 참석해주시는 모든 분들을 더욱 특별하게 모시고자 하오니, 참석 여부 전달을 부탁드립니다.",
+    usePopup: savedRsvp.usePopup ?? true,
+    popupMode: savedRsvp.popupMode || ("none" as const),
+    recipientEmail: savedRsvp.recipientEmail || "",
+    recipientPhone: savedRsvp.recipientPhone || "",
+    fields: {
+      ...DEFAULT_RSVP_FIELDS,
+      ...savedRsvp.fields,
+    },
+  };
+  const [isRsvpOpen, setIsRsvpOpen] = useState(false);
+  const [rsvpForm, setRsvpForm] = useState({
+    category: "신랑측",
+    attendance: "참석",
+    meal: "식사함",
+    shuttle: "미탑승",
+    name: "",
+    phone: "",
+    companionName: "",
+    companionPhone: "",
+    allEvents: "",
+    privacy: false,
+  });
+
   async function copyLink() {
     await navigator.clipboard.writeText(window.location.href);
     alert("청첩장 링크가 복사되었어요.");
+  }
+
+  function updateRsvpForm(key: keyof typeof rsvpForm, value: string | boolean) {
+    setRsvpForm((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  }
+
+  function openRsvp() {
+    if (rsvp.usePopup) {
+      setIsRsvpOpen(true);
+      return;
+    }
+
+    if (rsvp.url) {
+      window.open(rsvp.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    setIsRsvpOpen(true);
+  }
+
+  function submitRsvp(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (rsvp.fields.privacy && !rsvpForm.privacy) {
+      alert("개인정보 수집 동의가 필요해요.");
+      return;
+    }
+
+    const lines = [
+      `[${rsvp.title}]`,
+      rsvp.fields.category ? `하객분류: ${rsvpForm.category}` : "",
+      rsvp.fields.attendance ? `참석여부: ${rsvpForm.attendance}` : "",
+      rsvp.fields.meal ? `식사여부: ${rsvpForm.meal}` : "",
+      rsvp.fields.shuttle ? `전세버스 탑승여부: ${rsvpForm.shuttle}` : "",
+      rsvp.fields.name ? `성함: ${rsvpForm.name}` : "",
+      rsvp.fields.phone ? `연락처: ${rsvpForm.phone}` : "",
+      rsvp.fields.companionName ? `동행인 성함: ${rsvpForm.companionName}` : "",
+      rsvp.fields.companionPhone ? `동행인 수: ${rsvpForm.companionPhone}` : "",
+      rsvp.fields.allEvents ? `전달 사항: ${rsvpForm.allEvents}` : "",
+    ].filter(Boolean);
+
+    if (rsvp.recipientEmail) {
+      const subject = encodeURIComponent(`${data.couple.groom.name}·${data.couple.bride.name} 참석 여부`);
+      const body = encodeURIComponent(lines.join("\n"));
+      window.location.href = `mailto:${rsvp.recipientEmail}?subject=${subject}&body=${body}`;
+      return;
+    }
+
+    alert("참석 여부가 작성되었어요. 수신 메일을 입력하면 메일로 전달할 수 있어요.");
+    setIsRsvpOpen(false);
   }
 
   if (!data.sections.rsvp && !data.sections.share) {
@@ -888,14 +985,13 @@ function ActionSection({ data }: { data: WeddingData }) {
     <section className="px-7 pb-16 pt-6 text-center">
       <div className="mx-auto max-w-[22rem] space-y-3">
         {data.sections.rsvp ? (
-          <a
-            href={data.rsvp.url}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={openRsvp}
             className="reveal flex w-full items-center justify-center rounded-full bg-[#342526] px-6 py-4 text-sm font-medium tracking-[0.12em] text-white shadow-[0_18px_38px_rgba(52,37,38,0.18)]"
           >
-            {data.rsvp.label}
-          </a>
+            {rsvp.label}
+          </button>
         ) : null}
         {data.sections.share ? (
           <button
@@ -908,7 +1004,161 @@ function ActionSection({ data }: { data: WeddingData }) {
           </button>
         ) : null}
       </div>
+      {isRsvpOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-5 py-8">
+          <div className="max-h-[86vh] w-full max-w-[390px] overflow-y-auto bg-white px-6 py-7 text-left shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.35em] text-[#a48b6a]">RSVP</p>
+                <h3 className="mt-2 text-xl font-medium text-[#2f2924]">{rsvp.title}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsRsvpOpen(false)}
+                className="text-2xl leading-none text-[#2f2924]/65"
+                aria-label="참석 여부 창 닫기"
+              >
+                ×
+              </button>
+            </div>
+            <p className="mb-6 whitespace-pre-line text-sm leading-7 text-[#6f6258]">{rsvp.guide}</p>
+            <form className="grid gap-4" onSubmit={submitRsvp}>
+              {rsvp.fields.category ? (
+                <RsvpSelect
+                  label="하객분류"
+                  value={rsvpForm.category}
+                  options={["신랑측", "신부측", "공통 지인"]}
+                  onChange={(value) => updateRsvpForm("category", value)}
+                />
+              ) : null}
+              {rsvp.fields.attendance ? (
+                <RsvpSelect
+                  label="참석여부"
+                  value={rsvpForm.attendance}
+                  options={["참석", "불참"]}
+                  onChange={(value) => updateRsvpForm("attendance", value)}
+                />
+              ) : null}
+              {rsvp.fields.meal ? (
+                <RsvpSelect
+                  label="식사여부"
+                  value={rsvpForm.meal}
+                  options={["식사함", "식사 안 함", "미정"]}
+                  onChange={(value) => updateRsvpForm("meal", value)}
+                />
+              ) : null}
+              {rsvp.fields.shuttle ? (
+                <RsvpSelect
+                  label="전세버스 탑승여부"
+                  value={rsvpForm.shuttle}
+                  options={["탑승", "미탑승"]}
+                  onChange={(value) => updateRsvpForm("shuttle", value)}
+                />
+              ) : null}
+              {rsvp.fields.name ? (
+                <RsvpInput label="성함" value={rsvpForm.name} onChange={(value) => updateRsvpForm("name", value)} />
+              ) : null}
+              {rsvp.fields.phone ? (
+                <RsvpInput label="연락처" value={rsvpForm.phone} onChange={(value) => updateRsvpForm("phone", value)} />
+              ) : null}
+              {rsvp.fields.companionName ? (
+                <RsvpInput
+                  label="동행인 성함"
+                  value={rsvpForm.companionName}
+                  onChange={(value) => updateRsvpForm("companionName", value)}
+                />
+              ) : null}
+              {rsvp.fields.companionPhone ? (
+                <RsvpInput
+                  label="동행인 수"
+                  value={rsvpForm.companionPhone}
+                  onChange={(value) => updateRsvpForm("companionPhone", value)}
+                />
+              ) : null}
+              {rsvp.fields.allEvents ? (
+                <label className="grid gap-2 text-sm text-[#4f453d]">
+                  <span>전달 사항</span>
+                  <textarea
+                    value={rsvpForm.allEvents}
+                    onChange={(event) => updateRsvpForm("allEvents", event.target.value)}
+                    rows={3}
+                    className="border border-[#e4d8ca] bg-white px-3 py-3 text-sm outline-none focus:border-[#b29467]"
+                  />
+                </label>
+              ) : null}
+              {rsvp.fields.privacy ? (
+                <label className="flex items-center gap-2 text-xs text-[#6f6258]">
+                  <input
+                    type="checkbox"
+                    checked={rsvpForm.privacy}
+                    onChange={(event) => updateRsvpForm("privacy", event.target.checked)}
+                  />
+                  개인정보 수집 및 참석 여부 전달에 동의합니다.
+                </label>
+              ) : null}
+              <button type="submit" className="mt-2 rounded-full bg-[#342526] px-5 py-4 text-sm font-medium text-white">
+                참석 여부 보내기
+              </button>
+              {rsvp.recipientPhone ? (
+                <a href={`tel:${rsvp.recipientPhone}`} className="text-center text-xs text-[#7c6e62] underline underline-offset-4">
+                  전화로 전달하기
+                </a>
+              ) : null}
+            </form>
+          </div>
+        </div>
+      ) : null}
     </section>
+  );
+}
+
+function RsvpInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="grid gap-2 text-sm text-[#4f453d]">
+      <span>{label}</span>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="border border-[#e4d8ca] bg-white px-3 py-3 text-sm outline-none focus:border-[#b29467]"
+      />
+    </label>
+  );
+}
+
+function RsvpSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="grid gap-2 text-sm text-[#4f453d]">
+      <span>{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="border border-[#e4d8ca] bg-white px-3 py-3 text-sm outline-none focus:border-[#b29467]"
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

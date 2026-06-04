@@ -156,6 +156,14 @@ export function invitationRowToWeddingData(row: InvitationRow): WeddingData {
   data.qa = row.qa_items?.length ? row.qa_items : data.qa;
   data.timeline = row.story_items?.length ? row.story_items : data.timeline;
   data.accounts = row.account_info?.length ? row.account_info : data.accounts;
+  data.rsvp = {
+    ...wedding.rsvp,
+    ...data.rsvp,
+    fields: {
+      ...wedding.rsvp.fields,
+      ...data.rsvp?.fields,
+    },
+  };
 
   return data;
 }
