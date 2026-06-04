@@ -13,6 +13,17 @@ export function isCloudinaryConfigured() {
   return Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);
 }
 
+export function getCloudinaryConfigStatus() {
+  return {
+    cloudName: Boolean(CLOUDINARY_CLOUD_NAME),
+    apiKey: Boolean(CLOUDINARY_API_KEY),
+    apiSecret: Boolean(CLOUDINARY_API_SECRET),
+    cloudNameLength: CLOUDINARY_CLOUD_NAME.length,
+    apiKeyLength: CLOUDINARY_API_KEY.length,
+    apiSecretLength: CLOUDINARY_API_SECRET.length,
+  };
+}
+
 async function createSignature(params: Record<string, string | number>) {
   const { createHash } = await import("node:crypto");
   const signatureBase = Object.entries(params)
