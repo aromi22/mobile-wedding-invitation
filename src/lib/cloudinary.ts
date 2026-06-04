@@ -88,7 +88,7 @@ export async function uploadCloudinaryJson(
 
   const timestamp = Math.floor(Date.now() / 1000);
   const folder = `mobile-wedding-invitations/${options.slug}`;
-  const publicId = `${options.name}.json`;
+  const publicId = options.name;
   const signature = await createSignature({
     folder,
     overwrite: "true",
