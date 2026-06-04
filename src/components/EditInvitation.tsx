@@ -23,8 +23,9 @@ const IMAGE_EXPORT_QUALITY = 0.78;
 
 const MUSIC_OPTIONS: Array<WeddingMusic | null> = [
   null,
-  { title: "샘플 음악 1", src: "/music/sample-1.wav" },
-  { title: "샘플 음악 2", src: "/music/sample-2.wav" },
+  { title: "음원 1", src: "/music/music-1.mp3" },
+  { title: "음원 2", src: "/music/music-2.mp3" },
+  { title: "음원 3", src: "/music/music-3.mp3" },
 ];
 
 const weddingHandwritingPhrases = [

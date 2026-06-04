@@ -278,8 +278,8 @@ export const wedding: WeddingData = {
     },
   ],
   music: {
-    title: "샘플 음악 1",
-    src: "/music/sample-1.wav",
+    title: "음원 1",
+    src: "/music/music-1.mp3",
   },
   rsvp: {
     label: "참석 여부 전달하기",
