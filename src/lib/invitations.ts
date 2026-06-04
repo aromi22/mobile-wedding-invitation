@@ -300,10 +300,14 @@ export async function getInvitationBySlug(slug: string) {
       )}&select=${INVITATION_PUBLIC_COLUMNS}&limit=1`,
     );
 
-    return rows[0] ?? null;
+    if (rows[0]) {
+      return rows[0];
+    }
   } catch {
-    return fetchCloudinaryJson<InvitationRow>(slug, "invitation");
+    // Supabase may be unavailable or over quota. Cloudinary keeps the public draft copy.
   }
+
+  return fetchCloudinaryJson<InvitationRow>(slug, "invitation");
 }
 
 export async function getInvitationForEdit(slug: string, editSecret: string) {
@@ -319,8 +323,12 @@ export async function getInvitationForEdit(slug: string, editSecret: string) {
       },
     );
 
-    return rows[0] ?? null;
+    if (rows[0]) {
+      return rows[0];
+    }
   } catch {
-    return fetchCloudinaryJson<InvitationRow>(slug, `edit-${editSecret}`);
+    // Supabase may be unavailable or over quota. Cloudinary keeps the editable draft copy.
   }
+
+  return fetchCloudinaryJson<InvitationRow>(slug, `edit-${editSecret}`);
 }
