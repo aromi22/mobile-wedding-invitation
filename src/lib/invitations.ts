@@ -263,6 +263,7 @@ export async function saveInvitation(
     return { row: rows[0], editSecret };
   } catch (error) {
     if (!isCloudinaryConfigured()) {
+      console.error("Cloudinary fallback skipped because environment variables are missing.");
       throw error;
     }
 
@@ -273,6 +274,7 @@ export async function saveInvitation(
     };
 
     try {
+      console.error("Supabase save failed. Trying Cloudinary fallback.", error);
       await uploadCloudinaryJson(publicRow, { slug, name: "invitation" });
       await uploadCloudinaryJson(
         { ...row, edit_secret: editSecret },
