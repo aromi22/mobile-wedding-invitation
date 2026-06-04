@@ -272,11 +272,19 @@ export async function saveInvitation(
       edit_secret_hash: undefined,
     };
 
-    await uploadCloudinaryJson(publicRow, { slug, name: "invitation" });
-    await uploadCloudinaryJson(
-      { ...row, edit_secret: editSecret },
-      { slug, name: `edit-${editSecret}` },
-    );
+    try {
+      await uploadCloudinaryJson(publicRow, { slug, name: "invitation" });
+      await uploadCloudinaryJson(
+        { ...row, edit_secret: editSecret },
+        { slug, name: `edit-${editSecret}` },
+      );
+    } catch (cloudinaryError) {
+      const message =
+        cloudinaryError instanceof Error
+          ? cloudinaryError.message
+          : "Cloudinary 저장 중 문제가 생겼어요.";
+      throw new Error(`Cloudinary 백업 저장 실패: ${message}`);
+    }
 
     return { row: publicRow, editSecret };
   }

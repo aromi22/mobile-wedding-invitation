@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         : "저장 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.";
     const message =
       rawMessage === "fetch failed" || rawMessage.includes("ENOTFOUND")
-        ? "Supabase 저장 서버에 연결하지 못했어요. 로컬에서는 인터넷/방화벽 문제로 막힐 수 있고, 배포된 사이트에서는 다시 저장해 주세요."
+        ? "저장 서버에 연결하지 못했어요. Supabase 또는 Cloudinary 환경변수와 서비스 상태를 확인해 주세요."
         : rawMessage;
 
     return NextResponse.json({ message }, { status: 500 });
