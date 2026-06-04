@@ -1,6 +1,17 @@
-const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME ?? "";
-const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY ?? "";
-const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET ?? "";
+function cleanEnvValue(value: string, key: string) {
+  return value
+    .trim()
+    .replace(new RegExp(`^${key}=`), "")
+    .replace(/^["']|["']$/g, "")
+    .trim();
+}
+
+const CLOUDINARY_CLOUD_NAME = cleanEnvValue(process.env.CLOUDINARY_CLOUD_NAME ?? "", "CLOUDINARY_CLOUD_NAME");
+const CLOUDINARY_API_KEY = cleanEnvValue(process.env.CLOUDINARY_API_KEY ?? "", "CLOUDINARY_API_KEY");
+const CLOUDINARY_API_SECRET = cleanEnvValue(
+  process.env.CLOUDINARY_API_SECRET ?? "",
+  "CLOUDINARY_API_SECRET",
+);
 
 type CloudinaryUploadResponse = {
   secure_url?: string;
