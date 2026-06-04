@@ -1,8 +1,15 @@
 function cleanEnvValue(value: string, key: string) {
-  return value
-    .trim()
-    .replace(new RegExp(`^${key}=`), "")
+  const trimmed = value.trim();
+  const matchingLine =
+    trimmed
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find((line) => line.startsWith(key)) ?? trimmed;
+
+  return matchingLine
+    .replace(new RegExp(`^${key}\\s*=\\s*`), "")
     .replace(/^["']|["']$/g, "")
+    .replace(/\s/g, "")
     .trim();
 }
 
