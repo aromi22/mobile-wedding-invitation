@@ -127,6 +127,10 @@ export function invitationRowToWeddingData(row: InvitationRow): WeddingData {
     ...wedding.sections,
     ...data.sections,
   };
+  data.payment = {
+    ...wedding.payment,
+    ...data.payment,
+  };
   data.couple.groom.profile = {
     ...wedding.couple.groom.profile,
     ...data.couple.groom.profile,

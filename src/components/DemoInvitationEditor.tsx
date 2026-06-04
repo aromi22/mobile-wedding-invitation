@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { wedding } from "@/data/wedding";
 import { WeddingInvitation } from "@/components/WeddingInvitation";
 import type { WeddingData } from "@/types/wedding";
@@ -111,6 +112,12 @@ export function DemoInvitationEditor() {
                 이 화면은 구매 전 체험용이라 저장과 링크 발급은 되지 않습니다.
                 구매 후 안내받은 전용 링크에서 실제 청첩장을 수정할 수 있어요.
               </p>
+              <Link
+                href="/make"
+                className="mt-4 inline-flex rounded-full bg-[#332b24] px-5 py-2.5 text-sm font-semibold text-white"
+              >
+                워터마크 제작본 만들기
+              </Link>
             </div>
           </div>
         </section>

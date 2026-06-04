@@ -116,6 +116,11 @@ export type WeddingSectionSettings = {
   footer: boolean;
 };
 
+export type WeddingPaymentSettings = {
+  isPaid: boolean;
+  watermarkText: string;
+};
+
 export type WeddingData = {
   couple: {
     groom: WeddingPerson;
@@ -150,6 +155,7 @@ export type WeddingData = {
   };
   hero: WeddingHeroSettings;
   sections: WeddingSectionSettings;
+  payment: WeddingPaymentSettings;
   stories: WeddingStory[];
   storyStyle: {
     type: InvitationStoryType;

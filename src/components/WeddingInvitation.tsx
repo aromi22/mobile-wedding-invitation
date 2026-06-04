@@ -965,6 +965,23 @@ function MusicButton({ music }: { music: WeddingData["music"] }) {
   );
 }
 
+function Watermark({ data }: { data: WeddingData }) {
+  if (data.payment.isPaid) {
+    return null;
+  }
+
+  return (
+    <>
+      <div className="pointer-events-none fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-black/10 bg-white/78 px-4 py-2 text-[0.68rem] font-semibold tracking-[0.18em] text-[#2f2924]/70 shadow-[0_10px_28px_rgba(0,0,0,0.08)] backdrop-blur">
+        {data.payment.watermarkText}
+      </div>
+      <div className="pointer-events-none fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#2f2924]/78 px-4 py-2 text-[0.65rem] font-medium tracking-[0.12em] text-white/90 shadow-[0_10px_28px_rgba(0,0,0,0.16)] backdrop-blur">
+        결제 후 워터마크 제거
+      </div>
+    </>
+  );
+}
+
 export function WeddingInvitation({ data }: { data: WeddingData }) {
   const sections = data.sections;
   const revealKey = `${data.storyStyle.type}-${data.storyStyle.qaEnabled}-${data.storyStyle.timelineEnabled}-${data.qa.length}-${data.timeline.length}-${JSON.stringify(sections)}`;
@@ -994,6 +1011,7 @@ export function WeddingInvitation({ data }: { data: WeddingData }) {
       <ActionSection data={data} />
       {sections.footer ? <Footer data={data} /> : null}
       <MusicButton music={data.music} />
+      <Watermark data={data} />
     </main>
   );
 }

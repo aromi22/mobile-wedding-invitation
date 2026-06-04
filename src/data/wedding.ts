@@ -181,6 +181,10 @@ export const wedding: WeddingData = {
     share: true,
     footer: true,
   },
+  payment: {
+    isPaid: true,
+    watermarkText: "미결제 제작본",
+  },
   stories: [
     {
       title: "우리의 시작",

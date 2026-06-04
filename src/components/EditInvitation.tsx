@@ -61,6 +61,17 @@ const SECTION_TOGGLE_OPTIONS: Array<{
   { key: "footer", label: "감사 문구" },
 ];
 
+type EditorMode = "admin" | "public";
+
+function getInitialWeddingData(mode: EditorMode) {
+  const initial = structuredClone(wedding);
+  initial.payment = {
+    ...wedding.payment,
+    isPaid: mode === "admin",
+  };
+  return initial;
+}
+
 function splitName(name = "") {
   const trimmed = name.trim();
 
@@ -169,6 +180,10 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
   merged.sections = {
     ...merged.sections,
     ...source.sections,
+  };
+  merged.payment = {
+    ...merged.payment,
+    ...source.payment,
   };
   merged.stories = source.stories?.length ? source.stories : merged.stories;
   merged.storyStyle = {
@@ -693,11 +708,13 @@ function ParentNameFields({
   );
 }
 
-export function EditInvitation({ slug }: { slug?: string }) {
-  const [draft, setDraft] = useState<WeddingData>(wedding);
-  const [dateValue, setDateValue] = useState(getDateInputValue(wedding));
+export function EditInvitation({ slug, mode = "admin" }: { slug?: string; mode?: EditorMode }) {
+  const initialDraft = useMemo(() => getInitialWeddingData(mode), [mode]);
+  const storageKey = mode === "public" ? `${EDITOR_STORAGE_KEY}-make` : EDITOR_STORAGE_KEY;
+  const [draft, setDraft] = useState<WeddingData>(initialDraft);
+  const [dateValue, setDateValue] = useState(getDateInputValue(initialDraft));
   const [galleryText, setGalleryText] = useState(
-    wedding.photos.gallery.map((photo) => photo.src).join("\n"),
+    initialDraft.photos.gallery.map((photo) => photo.src).join("\n"),
   );
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -708,6 +725,7 @@ export function EditInvitation({ slug }: { slug?: string }) {
   const [editSecret, setEditSecret] = useState("");
   const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
   const isCustomerEditPage = Boolean(slug);
+  const isPublicMakePage = mode === "public" && !slug;
 
   useEffect(() => {
     const loadEditableInvitation = async (targetSlug: string, targetSecret: string) => {
@@ -752,21 +770,24 @@ export function EditInvitation({ slug }: { slug?: string }) {
       return;
     }
 
-    const saved = window.localStorage.getItem(EDITOR_STORAGE_KEY);
+    const saved = window.localStorage.getItem(storageKey);
 
     if (saved) {
       try {
         const parsed = normalizeWeddingData(JSON.parse(saved) as Partial<WeddingData>);
+        if (isPublicMakePage) {
+          parsed.payment.isPaid = false;
+        }
         setDraft(parsed);
         setDateValue(getDateInputValue(parsed));
         setGalleryText(parsed.photos.gallery.map((photo) => photo.src).join("\n"));
       } catch {
-        window.localStorage.removeItem(EDITOR_STORAGE_KEY);
+        window.localStorage.removeItem(storageKey);
       }
     }
 
     setIsLoaded(true);
-  }, [slug]);
+  }, [isPublicMakePage, slug, storageKey]);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -774,13 +795,13 @@ export function EditInvitation({ slug }: { slug?: string }) {
     }
 
     try {
-      window.localStorage.setItem(EDITOR_STORAGE_KEY, JSON.stringify(draft));
+      window.localStorage.setItem(storageKey, JSON.stringify(draft));
     } catch {
       setSaveMessage(
         "사진 용량이 커서 이 기기에는 임시저장을 못 했어요. 저장 버튼을 눌러 서버에 저장해 주세요.",
       );
     }
-  }, [draft, isLoaded]);
+  }, [draft, isLoaded, storageKey]);
 
   const preview = useMemo(() => draft, [draft]);
 
@@ -1389,15 +1410,16 @@ export function EditInvitation({ slug }: { slug?: string }) {
   }
 
   function resetDraft() {
-    setDraft(wedding);
-    setDateValue(getDateInputValue(wedding));
-    setGalleryText(wedding.photos.gallery.map((photo) => photo.src).join("\n"));
+    const nextInitial = getInitialWeddingData(mode);
+    setDraft(nextInitial);
+    setDateValue(getDateInputValue(nextInitial));
+    setGalleryText(nextInitial.photos.gallery.map((photo) => photo.src).join("\n"));
     setSaveMessage("");
     setShareUrl("");
     setEditUrl("");
     setCurrentSlug("");
     setEditSecret("");
-    window.localStorage.removeItem(EDITOR_STORAGE_KEY);
+    window.localStorage.removeItem(storageKey);
   }
 
   async function saveToSupabase() {
@@ -1405,7 +1427,12 @@ export function EditInvitation({ slug }: { slug?: string }) {
     setSaveMessage("청첩장을 저장하고 있어요.");
 
     try {
-      const saved = await saveInvitation(draft, {
+      const dataToSave = structuredClone(draft);
+      if (isPublicMakePage) {
+        dataToSave.payment.isPaid = false;
+      }
+
+      const saved = await saveInvitation(dataToSave, {
         slug: currentSlug || undefined,
         editSecret: editSecret || undefined,
       });
