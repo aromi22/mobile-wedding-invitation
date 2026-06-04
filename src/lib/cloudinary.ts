@@ -6,11 +6,18 @@ function cleanEnvValue(value: string, key: string) {
       .map((line) => line.trim())
       .find((line) => line.startsWith(key)) ?? trimmed;
 
-  return matchingLine
+  const cleaned = matchingLine
     .replace(new RegExp(`^${key}\\s*=\\s*`), "")
     .replace(/^["']|["']$/g, "")
     .replace(/\s/g, "")
     .trim();
+
+  const midpoint = cleaned.length / 2;
+  if (cleaned.length % 2 === 0 && cleaned.slice(0, midpoint) === cleaned.slice(midpoint)) {
+    return cleaned.slice(0, midpoint);
+  }
+
+  return cleaned;
 }
 
 const CLOUDINARY_CLOUD_NAME = cleanEnvValue(process.env.CLOUDINARY_CLOUD_NAME ?? "", "CLOUDINARY_CLOUD_NAME");
@@ -93,7 +100,7 @@ export async function uploadCloudinaryImage(file: Blob, options: { slug: string;
 }
 
 export function getCloudinaryRawJsonUrl(slug: string, name: string) {
-  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/raw/upload/mobile-wedding-invitations/${slug}/${name}.json`;
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/raw/upload/mobile-wedding-invitations/${slug}/${name}`;
 }
 
 export async function uploadCloudinaryJson(
