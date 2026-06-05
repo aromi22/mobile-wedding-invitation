@@ -1942,7 +1942,7 @@ export function EditInvitation({
                 {isPublicMakePage && shareUrl ? (
                   <div className="mt-3 grid gap-3 rounded-md border border-[#eadfcd] bg-[#fffaf3] p-3">
                     <span className="text-xs font-semibold text-[#b29467]">
-                      워터마크 제작본 링크
+                      청첩장 공유 링크
                     </span>
                     <a
                       href={shareUrl}
@@ -1957,10 +1957,10 @@ export function EditInvitation({
                       onClick={() => void navigator.clipboard.writeText(shareUrl)}
                       className="justify-self-start rounded-full bg-[#2f2a25] px-4 py-2 text-xs font-semibold text-white"
                     >
-                      제작본 링크 복사
+                      공유 링크 복사
                     </button>
                     <p className="text-xs leading-5 text-[#8a7a6a]">
-                      이 링크에는 워터마크가 표시됩니다. 결제 확인 후 워터마크가 제거된 최종 링크로 사용할 수 있어요.
+                      하객에게 공유하는 링크입니다. 결제 확인 전에는 워터마크가 표시될 수 있어요.
                     </p>
                   </div>
                 ) : null}
@@ -1980,7 +1980,7 @@ export function EditInvitation({
                 {editUrl ? (
                   <div className="mt-3 grid gap-2 rounded-md border border-[#eadfcd] bg-[#fffaf3] p-3">
                     <span className="text-xs font-semibold text-[#b29467]">
-                      {isPublicMakePage ? "다시 수정할 링크" : "고객용 편집 링크"}
+                      {isPublicMakePage ? "고객 수정 링크" : "고객 수정 링크"}
                     </span>
                     <span className="hidden">
                       고객용 편집 링크
@@ -1999,11 +1999,12 @@ export function EditInvitation({
                         onClick={() => void navigator.clipboard.writeText(editUrl)}
                         className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
                       >
-                        수정 링크 복사
+                        고객 수정 링크 복사
                       </button>
                     ) : null}
                     <p className="text-xs leading-5 text-[#8a7a6a]">
-                      이 링크는 비밀코드가 들어간 관리용 주소라 고객에게만 전달해 주세요.
+                      결제 확인을 위해 판매자에게 보내주시고, 이후 내용을 수정할 때도 이 링크를 사용해 주세요.
+                      비밀코드가 포함되어 있으니 하객에게는 공유하지 마세요.
                     </p>
                   </div>
                 ) : null}

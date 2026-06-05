@@ -41,7 +41,7 @@ export function AdminPaymentUnlock() {
 
   async function markAsPaid() {
     if (!canSubmit) {
-      setMessage("고객 편집 링크와 관리자 비밀번호를 입력해 주세요.");
+      setMessage("고객 수정 링크와 관리자 비밀번호를 입력해 주세요.");
       return;
     }
 
@@ -85,14 +85,14 @@ export function AdminPaymentUnlock() {
           <p className="text-xs uppercase tracking-[0.28em] text-[#b29467]">Admin Payment</p>
           <h1 className="mt-3 text-3xl font-semibold">결제 확인 후 워터마크 제거</h1>
           <p className="mt-3 text-sm leading-6 text-[#6f6258]">
-            고객이 보내준 편집 링크를 붙여넣고, 관리자 비밀번호를 입력하면 같은 보기 링크가
-            워터마크 없는 최종 링크로 바뀝니다.
+            고객이 보내준 고객 수정 링크를 붙여넣고, 관리자 비밀번호를 입력하면
+            청첩장 공유 링크에서 워터마크가 제거됩니다. 고객은 같은 수정 링크로 계속 수정할 수 있어요.
           </p>
         </div>
 
         <div className="grid gap-5 rounded-2xl border border-[#eadfcd] bg-[#fffdf8] p-5 shadow-[0_18px_50px_rgba(91,70,42,0.08)]">
           <label className="grid gap-2">
-            <span className="text-sm font-semibold">고객 편집 링크</span>
+            <span className="text-sm font-semibold">고객 수정 링크</span>
             <textarea
               value={customerEditLink}
               onChange={(event) => setCustomerEditLink(event.target.value)}
@@ -132,7 +132,7 @@ export function AdminPaymentUnlock() {
               <p>{message}</p>
               {finalUrl ? (
                 <div className="mt-3 grid gap-2">
-                  <span className="text-xs font-semibold text-[#b29467]">최종 보기 링크</span>
+                  <span className="text-xs font-semibold text-[#b29467]">청첩장 공유 링크</span>
                   <a
                     href={finalUrl}
                     target="_blank"
@@ -146,7 +146,7 @@ export function AdminPaymentUnlock() {
                     onClick={() => void navigator.clipboard.writeText(finalUrl)}
                     className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
                   >
-                    최종 링크 복사
+                    공유 링크 복사
                   </button>
                 </div>
               ) : null}
@@ -156,10 +156,11 @@ export function AdminPaymentUnlock() {
 
         <div className="rounded-2xl border border-[#eadfcd] bg-white px-5 py-4 text-sm leading-7 text-[#6f6258]">
           <p className="font-semibold text-[#332b24]">운영 순서</p>
-          <p>1. 고객이 제작본 저장 후 편집 링크를 보냅니다.</p>
+          <p>1. 고객이 제작본 저장 후 고객 수정 링크를 보냅니다.</p>
           <p>2. 네가 스마트스토어에서 주문번호와 결제 상태를 확인합니다.</p>
-          <p>3. 이 화면에 편집 링크를 붙여넣고 워터마크 제거를 누릅니다.</p>
-          <p>4. 생성된 최종 링크를 고객에게 전달합니다.</p>
+          <p>3. 이 화면에 고객 수정 링크를 붙여넣고 워터마크 제거를 누릅니다.</p>
+          <p>4. 생성된 청첩장 공유 링크를 고객에게 전달합니다.</p>
+          <p>5. 고객은 고객 수정 링크로 계속 수정하고, 하객에게는 공유 링크만 전달합니다.</p>
         </div>
       </section>
     </main>
