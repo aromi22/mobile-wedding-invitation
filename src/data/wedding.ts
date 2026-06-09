@@ -100,9 +100,9 @@ export const wedding: WeddingData = {
       ratio: "landscape",
     },
     venue: {
-      src: "/images/do (40).jpg",
+      src: "/images/sample-pool/sample-09.png",
       alt: "예식 정보 전후에 보여줄 사진",
-      ratio: "landscape",
+      ratio: "portrait",
     },
     childhoodIllustration: {
       src: "/images/childhood-frame-illustration.png",
@@ -123,33 +123,68 @@ export const wedding: WeddingData = {
     },
     gallery: [
       {
-        src: "/images/do (3).jpg",
+        src: "/images/sample-pool/sample-01.png",
         alt: "웨딩 갤러리 사진 1",
         ratio: "portrait",
       },
       {
-        src: "/images/do (15).jpg",
+        src: "/images/sample-pool/sample-02.png",
         alt: "웨딩 갤러리 사진 2",
         ratio: "portrait",
       },
       {
-        src: "/images/do (24).jpg",
+        src: "/images/sample-pool/sample-03.png",
         alt: "웨딩 갤러리 사진 3",
         ratio: "portrait",
       },
       {
-        src: "/images/do (31).jpg",
+        src: "/images/sample-pool/sample-04.png",
         alt: "웨딩 갤러리 사진 4",
         ratio: "portrait",
       },
       {
-        src: "/images/do (40).jpg",
+        src: "/images/sample-pool/sample-05.png",
         alt: "웨딩 갤러리 사진 5",
-        ratio: "landscape",
+        ratio: "portrait",
       },
       {
-        src: "/images/do (52).jpg",
+        src: "/images/sample-pool/sample-06.png",
         alt: "웨딩 갤러리 사진 6",
+        ratio: "portrait",
+      },
+      {
+        src: "/images/sample-pool/sample-07.png",
+        alt: "Gallery sample 7",
+        ratio: "portrait",
+      },
+      {
+        src: "/images/sample-pool/sample-08.png",
+        alt: "Gallery sample 8",
+        ratio: "portrait",
+      },
+      {
+        src: "/images/sample-pool/sample-09.png",
+        alt: "Gallery sample 9",
+        ratio: "portrait",
+      },
+      {
+        src: "/images/sample-pool/sample-10.png",
+        alt: "Gallery sample 10",
+        ratio: "portrait",
+      },
+      {
+        src: "/images/sample-pool/sample-11.png",
+        alt: "Gallery sample 11",
+        ratio: "portrait",
+      },
+      {
+        src: "/images/sample-pool/sample-12.png",
+        alt: "Gallery sample 12",
+        ratio: "portrait",
+      },
+      {
+        src: "/images/sample-pool/sample-13.png",
+        alt: "Gallery sample 13",
         ratio: "portrait",
       },
     ],
@@ -189,13 +224,13 @@ export const wedding: WeddingData = {
     {
       title: "우리의 시작",
       body: "우연처럼 마주한 날들이\n자연스러운 약속이 되었습니다.\n\n서로의 하루를 묻고,\n작은 기쁨을 나누며\n같은 방향을 바라보게 되었습니다.",
-      image: "/images/do (20).jpg",
+      image: "/images/sample-pool/sample-04.png",
       ratio: "portrait",
     },
     {
       title: "함께하는 계절",
       body: "평범한 날도 함께라면\n오래 기억하고 싶은 장면이 되었습니다.\n\n앞으로의 모든 계절도\n서로에게 가장 다정한 편이 되어\n걸어가겠습니다.",
-      image: "/images/do (41).jpg",
+      image: "/images/sample-pool/sample-12.png",
       ratio: "portrait",
     },
   ],
