@@ -90,14 +90,14 @@ export const wedding: WeddingData = {
   photos: {
     // 실제 사진을 넣은 뒤 파일명만 바꾸면 됩니다. 예: "/images/main.jpg"
     cover: {
-      src: "/images/do (1).jpg",
+      src: "/images/sample-main-cover.png",
       alt: "신랑 신부 대표 사진",
       ratio: "portrait",
     },
     intro: {
-      src: "/images/do (10).jpg",
+      src: "/images/sample-invitation-intro.png",
       alt: "초대 문구와 함께 보여줄 사진",
-      ratio: "portrait",
+      ratio: "landscape",
     },
     venue: {
       src: "/images/do (40).jpg",
@@ -110,16 +110,16 @@ export const wedding: WeddingData = {
       ratio: "portrait",
     },
     groomChildPhoto: {
-      src: "",
+      src: "/images/sample-groom-child.png",
       alt: "신랑 어릴 적 사진",
       ratio: "portrait",
-      scale: 1,
+      scale: 1.12,
     },
     brideChildPhoto: {
-      src: "",
+      src: "/images/sample-bride-child.png",
       alt: "신부 어릴 적 사진",
       ratio: "portrait",
-      scale: 1,
+      scale: 1.12,
     },
     gallery: [
       {
