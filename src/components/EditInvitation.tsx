@@ -764,7 +764,7 @@ export function EditInvitation({
 
     return getInitialWeddingData(mode);
   }, [initialData, mode]);
-  const storageKey = mode === "public" ? `${EDITOR_STORAGE_KEY}-make` : EDITOR_STORAGE_KEY;
+  const storageKey = mode === "public" ? PUBLIC_MAKE_STORAGE_KEY : EDITOR_STORAGE_KEY;
   const [draft, setDraft] = useState<WeddingData>(initialDraft);
   const [dateValue, setDateValue] = useState(getDateInputValue(initialDraft));
   const [galleryText, setGalleryText] = useState(
@@ -2820,3 +2820,4 @@ export function EditInvitation({
   );
 }
 
+const PUBLIC_MAKE_STORAGE_KEY = `${EDITOR_STORAGE_KEY}-make-v2`;
