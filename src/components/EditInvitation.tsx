@@ -1001,6 +1001,23 @@ export function EditInvitation({
     });
   }
 
+  async function updateStoryFile(index: number, files: FileList) {
+    const file = files[0];
+
+    if (!file) {
+      return;
+    }
+
+    setSaveMessage("이야기 사진을 모바일에 맞게 줄이는 중이에요.");
+    const dataUrl = await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE);
+    update((current) => {
+      current.stories[index].image = dataUrl;
+      current.stories[index].ratio = "portrait";
+      return current;
+    });
+    setSaveMessage("이야기 사진을 바꿨어요.");
+  }
+
   async function appendGalleryFiles(files: FileList) {
     const remainingSlots = Math.max(0, 50 - draft.photos.gallery.length);
     const selectedFiles = Array.from(files).slice(0, remainingSlots);
@@ -1170,6 +1187,7 @@ export function EditInvitation({
                     })
                   }
                 />
+                <FileField label="이야기 사진 첨부" onSelect={(files) => updateStoryFile(index, files)} />
                 <TextArea
                   label="내용"
                   value={story.body}
