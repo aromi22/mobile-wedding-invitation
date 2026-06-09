@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getInvitationForEdit, saveInvitation } from "@/lib/invitations";
+import { getInvitationForEdit } from "@/lib/invitations";
 
-type AdminUnlockRequest = {
+type AdminPreviewRequest = {
   slug?: string;
   editSecret?: string;
   adminPaymentKey?: string;
@@ -11,9 +11,15 @@ function isValidAdminPaymentKey(key?: string) {
   return Boolean(process.env.ADMIN_PAYMENT_KEY && key === process.env.ADMIN_PAYMENT_KEY);
 }
 
+function formatWeddingDate(data: NonNullable<Awaited<ReturnType<typeof getInvitationForEdit>>>["design_settings"]) {
+  return `${data.event.year}.${String(data.event.month).padStart(2, "0")}.${String(
+    data.event.day,
+  ).padStart(2, "0")} ${data.event.weekday} ${data.event.time}`;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as AdminUnlockRequest;
+    const body = (await request.json()) as AdminPreviewRequest;
     const slug = body.slug?.trim();
     const editSecret = body.editSecret?.trim();
 
@@ -44,17 +50,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const nextData = structuredClone(invitation.design_settings);
-    nextData.payment = {
-      ...nextData.payment,
-      isPaid: true,
-    };
-
-    const saved = await saveInvitation(nextData, { slug, editSecret });
+    const data = invitation.design_settings;
 
     return NextResponse.json({
-      ...saved,
-      message: "결제 완료 처리됐어요. 청첩장 공유 링크에서 워터마크가 제거됩니다.",
+      summary: {
+        slug: invitation.slug,
+        groomName: data.couple.groom.name,
+        brideName: data.couple.bride.name,
+        weddingDate: formatWeddingDate(data),
+        venueName: data.event.venue,
+        venueAddress: data.event.address,
+        isPaid: Boolean(data.payment.isPaid),
+        shareUrlPath: `/w/${invitation.slug}`,
+      },
     });
   } catch (error) {
     return NextResponse.json(
@@ -62,7 +70,7 @@ export async function POST(request: Request) {
         message:
           error instanceof Error
             ? error.message
-            : "결제 완료 처리 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.",
+            : "청첩장 정보 확인 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.",
       },
       { status: 500 },
     );
