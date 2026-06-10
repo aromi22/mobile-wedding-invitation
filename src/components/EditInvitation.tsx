@@ -517,7 +517,7 @@ async function compressImageFile(file: File, maxSize: number) {
 }
 
 function isInlineImage(src: string) {
-  return src.startsWith("data:image/");
+  return src.startsWith("data:image/") || src.startsWith("blob:");
 }
 
 function createLocalStorageDraft(draft: WeddingData) {
@@ -813,6 +813,7 @@ export function EditInvitation({
   );
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [processingPhotoCount, setProcessingPhotoCount] = useState(0);
   const [isUnlockingPayment, setIsUnlockingPayment] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [paymentOrderNumber, setPaymentOrderNumber] = useState("");
@@ -827,6 +828,7 @@ export function EditInvitation({
   const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
   const isCustomerEditPage = Boolean(slug);
   const isPublicMakePage = mode === "public" && !slug;
+  const isProcessingPhoto = processingPhotoCount > 0;
 
   useEffect(() => {
     if (slug) {
@@ -1011,14 +1013,67 @@ export function EditInvitation({
       return;
     }
 
-    setSaveMessage("사진을 모바일에 맞게 줄이는 중이에요.");
-    const dataUrl = await compressImageFile(file, COVER_IMAGE_MAX_SIZE);
+    const previewUrl = URL.createObjectURL(file);
     update((current) => {
-      current.photos.cover.src = dataUrl;
+      current.photos.cover.src = previewUrl;
       current.photos.cover.alt = file.name;
       return current;
     });
-    setSaveMessage("메인 사진을 바꿨어요.");
+    setProcessingPhotoCount((count) => count + 1);
+    setSaveMessage("메인 사진을 미리보기에 반영했어요. 저장용으로 줄이는 중이에요.");
+
+    try {
+      const dataUrl = await compressImageFile(file, COVER_IMAGE_MAX_SIZE);
+      update((current) => {
+        current.photos.cover.src = dataUrl;
+        current.photos.cover.alt = file.name;
+        return current;
+      });
+      setSaveMessage("메인 사진을 바꿨어요.");
+    } catch {
+      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+    } finally {
+      URL.revokeObjectURL(previewUrl);
+      setProcessingPhotoCount((count) => Math.max(0, count - 1));
+    }
+  }
+
+  async function updateSinglePhotoFile(
+    photoKey: "intro" | "venue",
+    files: FileList,
+    label: string,
+  ) {
+    const file = files[0];
+
+    if (!file) {
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    update((current) => {
+      current.photos[photoKey].src = previewUrl;
+      current.photos[photoKey].alt = file.name;
+      current.photos[photoKey].ratio = "portrait";
+      return current;
+    });
+    setProcessingPhotoCount((count) => count + 1);
+    setSaveMessage(`${label}을 미리보기에 반영했어요. 저장용으로 줄이는 중이에요.`);
+
+    try {
+      const dataUrl = await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE);
+      update((current) => {
+        current.photos[photoKey].src = dataUrl;
+        current.photos[photoKey].alt = file.name;
+        current.photos[photoKey].ratio = "portrait";
+        return current;
+      });
+      setSaveMessage(`${label}을 바꿨어요.`);
+    } catch {
+      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+    } finally {
+      URL.revokeObjectURL(previewUrl);
+      setProcessingPhotoCount((count) => Math.max(0, count - 1));
+    }
   }
 
   async function updateChildPhotoFile(side: "groom" | "bride", files: FileList) {
@@ -1028,17 +1083,35 @@ export function EditInvitation({
       return;
     }
 
-    setSaveMessage("어릴 적 사진을 모바일에 맞게 줄이는 중이에요.");
-    const dataUrl = await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE);
+    const previewUrl = URL.createObjectURL(file);
     update((current) => {
       const photo = side === "groom" ? current.photos.groomChildPhoto : current.photos.brideChildPhoto;
-      photo.src = dataUrl;
+      photo.src = previewUrl;
       photo.alt = file.name;
       photo.ratio = "portrait";
       photo.scale = photo.scale ?? 1;
       return current;
     });
-    setSaveMessage("어릴 적 사진이 바뀌었어요.");
+    setProcessingPhotoCount((count) => count + 1);
+    setSaveMessage("어릴 적 사진을 미리보기에 반영했어요. 저장용으로 줄이는 중이에요.");
+
+    try {
+      const dataUrl = await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE);
+      update((current) => {
+        const photo = side === "groom" ? current.photos.groomChildPhoto : current.photos.brideChildPhoto;
+        photo.src = dataUrl;
+        photo.alt = file.name;
+        photo.ratio = "portrait";
+        photo.scale = photo.scale ?? 1;
+        return current;
+      });
+      setSaveMessage("어릴 적 사진이 바뀌었어요.");
+    } catch {
+      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+    } finally {
+      URL.revokeObjectURL(previewUrl);
+      setProcessingPhotoCount((count) => Math.max(0, count - 1));
+    }
   }
 
   function updateChildPhotoScale(side: "groom" | "bride", scale: number) {
@@ -1056,14 +1129,29 @@ export function EditInvitation({
       return;
     }
 
-    setSaveMessage("이야기 사진을 모바일에 맞게 줄이는 중이에요.");
-    const dataUrl = await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE);
+    const previewUrl = URL.createObjectURL(file);
     update((current) => {
-      current.stories[index].image = dataUrl;
+      current.stories[index].image = previewUrl;
       current.stories[index].ratio = "portrait";
       return current;
     });
-    setSaveMessage("이야기 사진을 바꿨어요.");
+    setProcessingPhotoCount((count) => count + 1);
+    setSaveMessage("이야기 사진을 미리보기에 반영했어요. 저장용으로 줄이는 중이에요.");
+
+    try {
+      const dataUrl = await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE);
+      update((current) => {
+        current.stories[index].image = dataUrl;
+        current.stories[index].ratio = "portrait";
+        return current;
+      });
+      setSaveMessage("이야기 사진을 바꿨어요.");
+    } catch {
+      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+    } finally {
+      URL.revokeObjectURL(previewUrl);
+      setProcessingPhotoCount((count) => Math.max(0, count - 1));
+    }
   }
 
   async function appendGalleryFiles(files: FileList) {
@@ -1074,23 +1162,46 @@ export function EditInvitation({
       setSaveMessage("갤러리는 최대 50장까지 등록할 수 있어요.");
       return;
     }
-    setSaveMessage("갤러리 사진을 모바일에 맞게 줄이는 중이에요.");
-    const dataUrls: string[] = [];
 
-    for (const file of selectedFiles) {
-      dataUrls.push(await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE));
-    }
+    const previewPhotos = selectedFiles.map((file) => ({
+      src: URL.createObjectURL(file),
+      alt: file.name,
+      ratio: "portrait" as const,
+    }));
 
     update((current) => {
-      const newPhotos = dataUrls.map((src, index) => ({
-        src,
-        alt: selectedFiles[index].name,
-        ratio: "portrait" as const,
-      }));
-      current.photos.gallery = [...current.photos.gallery, ...newPhotos].slice(0, 50);
+      current.photos.gallery = previewPhotos.slice(0, 50);
       setGalleryText(current.photos.gallery.map((photo) => photo.src).join("\n"));
       return current;
     });
+    setProcessingPhotoCount((count) => count + selectedFiles.length);
+    setSaveMessage("갤러리 사진을 미리보기에 반영했어요. 저장용으로 줄이는 중이에요.");
+
+    const compressedPhotos = await Promise.all(
+      selectedFiles.map(async (file, index) => ({
+        src: await compressImageFile(file, GALLERY_IMAGE_MAX_SIZE),
+        alt: file.name,
+        ratio: "portrait" as const,
+        previewSrc: previewPhotos[index].src,
+      })),
+    ).catch(() => null);
+
+    if (!compressedPhotos) {
+      setSaveMessage("일부 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+      setProcessingPhotoCount((count) => Math.max(0, count - selectedFiles.length));
+      return;
+    }
+
+    update((current) => {
+      current.photos.gallery = current.photos.gallery.map((photo) => {
+        const compressed = compressedPhotos.find((item) => item.previewSrc === photo.src);
+        return compressed ? { src: compressed.src, alt: compressed.alt, ratio: compressed.ratio } : photo;
+      });
+      setGalleryText(current.photos.gallery.map((photo) => photo.src).join("\n"));
+      return current;
+    });
+    previewPhotos.forEach((photo) => URL.revokeObjectURL(photo.src));
+    setProcessingPhotoCount((count) => Math.max(0, count - selectedFiles.length));
     setSaveMessage("갤러리 사진을 추가했어요.");
   }
 
@@ -1871,10 +1982,12 @@ export function EditInvitation({
             <button
               type="button"
               onClick={saveToSupabase}
-              disabled={isSaving}
+              disabled={isSaving || isProcessingPhoto}
               className="mt-4 rounded-full bg-[#2f2a25] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSaving
+              {isProcessingPhoto
+                ? "사진 처리 중"
+                : isSaving
                 ? "저장 중"
                 : isPublicMakePage
                   ? "제작본 저장하고 링크 받기"
@@ -2823,7 +2936,41 @@ export function EditInvitation({
           </FormSection>
 
           <FormSection title="7. 이미지 설정">
+            <div className="grid gap-4 rounded-lg border border-[#eadfcd] bg-white p-4">
+              <p className="text-sm font-semibold text-[#332b24]">본문 사진</p>
+              <FileField
+                label="초대 문구 아래 사진 첨부"
+                onSelect={(files) => updateSinglePhotoFile("intro", files, "초대 문구 아래 사진")}
+              />
+              <Field
+                label="초대 문구 아래 사진 URL"
+                value={draft.photos.intro.src}
+                onChange={(value) =>
+                  update((current) => {
+                    current.photos.intro.src = value;
+                    return current;
+                  })
+                }
+              />
+              <FileField
+                label="예식 정보 전후 사진 첨부"
+                onSelect={(files) => updateSinglePhotoFile("venue", files, "예식 정보 전후 사진")}
+              />
+              <Field
+                label="예식 정보 전후 사진 URL"
+                value={draft.photos.venue.src}
+                onChange={(value) =>
+                  update((current) => {
+                    current.photos.venue.src = value;
+                    return current;
+                  })
+                }
+              />
+            </div>
             <FileField label="갤러리 사진 첨부" onSelect={appendGalleryFiles} multiple />
+            <p className="-mt-2 text-xs leading-5 text-[#8a7a6a]">
+              새 사진을 첨부하면 기존 샘플 갤러리는 사라지고 첨부한 사진만 표시돼요.
+            </p>
             <TextArea
               label="갤러리 이미지 URL 여러 개"
               value={galleryText}
