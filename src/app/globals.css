@@ -23,12 +23,18 @@
 }
 
 html {
+  width: 100%;
+  overflow-x: hidden;
   scroll-behavior: smooth;
   background: var(--background);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
+  width: 100%;
+  overflow-x: hidden;
   min-height: 100vh;
   background: #ffffff;
   color: var(--ink);
