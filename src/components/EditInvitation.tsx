@@ -17,9 +17,10 @@ import { WeddingInvitation } from "@/components/WeddingInvitation";
 import { EDITOR_STORAGE_KEY } from "@/lib/editorStorage";
 import type { InvitationRow } from "@/lib/invitations";
 
-const COVER_IMAGE_MAX_SIZE = 1600;
-const GALLERY_IMAGE_MAX_SIZE = 1400;
-const IMAGE_EXPORT_QUALITY = 0.78;
+const COVER_IMAGE_MAX_SIZE = 1200;
+const GALLERY_IMAGE_MAX_SIZE = 1000;
+const IMAGE_EXPORT_QUALITY = 0.62;
+const LOCAL_DRAFT_MAX_LENGTH = 3_500_000;
 
 const MUSIC_OPTIONS: Array<WeddingMusic | null> = [
   null,
@@ -503,6 +504,8 @@ async function compressImageFile(file: File, maxSize: number) {
 
     canvas.width = width;
     canvas.height = height;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
     context.fillStyle = "#fffaf3";
     context.fillRect(0, 0, width, height);
     context.drawImage(image, 0, 0, width, height);
@@ -511,6 +514,44 @@ async function compressImageFile(file: File, maxSize: number) {
   } catch {
     return fileToDataUrl(file);
   }
+}
+
+function isInlineImage(src: string) {
+  return src.startsWith("data:image/");
+}
+
+function createLocalStorageDraft(draft: WeddingData) {
+  const fullJson = JSON.stringify(draft);
+
+  if (fullJson.length <= LOCAL_DRAFT_MAX_LENGTH) {
+    return { json: fullJson, isLightweight: false };
+  }
+
+  const lightweight = structuredClone(draft);
+  const photos = [
+    lightweight.photos.cover,
+    lightweight.photos.intro,
+    lightweight.photos.venue,
+    lightweight.photos.groomChildPhoto,
+    lightweight.photos.brideChildPhoto,
+  ];
+
+  photos.forEach((photo) => {
+    if (isInlineImage(photo.src)) {
+      photo.src = "";
+    }
+  });
+
+  lightweight.photos.gallery = lightweight.photos.gallery.map((photo) => ({
+    ...photo,
+    src: isInlineImage(photo.src) ? "" : photo.src,
+  }));
+  lightweight.stories = lightweight.stories.map((story) => ({
+    ...story,
+    image: isInlineImage(story.image) ? "" : story.image,
+  }));
+
+  return { json: JSON.stringify(lightweight), isLightweight: true };
 }
 
 function FileField({
@@ -833,10 +874,17 @@ export function EditInvitation({
     }
 
     try {
-      window.localStorage.setItem(storageKey, JSON.stringify(draft));
+      const localDraft = createLocalStorageDraft(draft);
+      window.localStorage.setItem(storageKey, localDraft.json);
+
+      if (localDraft.isLightweight) {
+        setSaveMessage(
+          "사진은 미리보기에 반영됐어요. 사진이 많아서 임시저장은 가볍게 처리했고, 최종 저장은 저장 버튼을 눌러주세요.",
+        );
+      }
     } catch {
       setSaveMessage(
-        "사진 용량이 커서 이 기기에는 임시저장을 못 했어요. 저장 버튼을 눌러 서버에 저장해 주세요.",
+        "사진은 미리보기에 반영됐어요. 이 기기에는 임시저장을 못 했으니 저장 버튼을 눌러 서버에 저장해 주세요.",
       );
     }
   }, [draft, isLoaded, storageKey]);
