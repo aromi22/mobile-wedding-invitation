@@ -2838,4 +2838,4 @@ export function EditInvitation({
   );
 }
 
-const PUBLIC_MAKE_STORAGE_KEY = `${EDITOR_STORAGE_KEY}-make-v3`;
+const PUBLIC_MAKE_STORAGE_KEY = `${EDITOR_STORAGE_KEY}-make-v4`;
