@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { wedding } from "@/data/wedding";
 import type {
   InvitationStoryType,
@@ -838,6 +838,16 @@ export function EditInvitation({
   const isCustomerEditPage = Boolean(slug);
   const isPublicMakePage = mode === "public" && !slug;
   const isProcessingPhoto = processingPhotoCount > 0;
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const previewRef = useRef<HTMLElement | null>(null);
+
+  function scrollToPreview() {
+    previewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function scrollToEditor() {
+    editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   function showToast(message: string) {
     setToastMessage(message);
@@ -2015,7 +2025,10 @@ export function EditInvitation({
   return (
     <div className="min-h-screen bg-[#f6f0e8]">
       <div className="mx-auto grid max-w-[1180px] gap-8 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
-        <div className="rounded-lg bg-[#fffdf8] px-5 shadow-[0_18px_50px_rgba(91,70,42,0.12)]">
+        <div
+          ref={editorRef}
+          className="rounded-lg bg-[#fffdf8] px-5 shadow-[0_18px_50px_rgba(91,70,42,0.12)]"
+        >
           <header className="sticky top-0 z-10 -mx-5 border-b border-[#eadfcd] bg-[#fffdf8]/95 px-5 py-5 backdrop-blur">
             <p className="text-xs uppercase tracking-[0.24em] text-[#b29467]">
               {isPublicMakePage ? "Invitation Maker" : "Invitation Editor"}
@@ -2044,6 +2057,13 @@ export function EditInvitation({
                 처음부터 새로 만들기
               </button>
             ) : null}
+            <button
+              type="button"
+              onClick={scrollToPreview}
+              className="ml-2 mt-4 rounded-full border border-[#2f2a25]/20 bg-[#fffaf3] px-4 py-2 text-sm font-semibold text-[#2f2a25]"
+            >
+              미리보기로 이동
+            </button>
             {isCustomerEditPage && canMarkPaid ? (
               <div className="mt-3 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -3072,9 +3092,16 @@ export function EditInvitation({
           </FormSection>
         </div>
 
-        <aside className="lg:sticky lg:top-6">
-          <div className="mb-3 px-1 text-sm text-[#7c6e62]">
-            오른쪽은 고객이 보는 모바일 청첩장 미리보기입니다.
+        <aside ref={previewRef} className="scroll-mt-6 lg:sticky lg:top-6">
+          <div className="mb-3 flex items-center justify-between gap-3 px-1 text-sm text-[#7c6e62]">
+            <span>오른쪽은 고객이 보는 모바일 청첩장 미리보기입니다.</span>
+            <button
+              type="button"
+              onClick={scrollToEditor}
+              className="shrink-0 rounded-full border border-[#d8c6ab] bg-white px-3 py-1.5 text-xs font-semibold text-[#806b4f]"
+            >
+              편집으로 이동
+            </button>
           </div>
           <div className="overflow-hidden rounded-[1.6rem] bg-[#eee5da] p-3 shadow-[0_20px_60px_rgba(91,70,42,0.18)]">
             <div className="max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[1.15rem] bg-white">
@@ -3114,6 +3141,22 @@ export function EditInvitation({
           />
         </div>
       ) : null}
+      <div className="fixed bottom-5 right-4 z-[70] flex flex-col gap-2 lg:hidden">
+        <button
+          type="button"
+          onClick={scrollToPreview}
+          className="rounded-full bg-[#2f2a25] px-4 py-3 text-xs font-semibold text-white shadow-[0_12px_30px_rgba(47,42,37,0.22)]"
+        >
+          미리보기
+        </button>
+        <button
+          type="button"
+          onClick={scrollToEditor}
+          className="rounded-full border border-[#d8c6ab] bg-white px-4 py-3 text-xs font-semibold text-[#806b4f] shadow-[0_12px_30px_rgba(47,42,37,0.12)]"
+        >
+          편집
+        </button>
+      </div>
     </div>
   );
 }
