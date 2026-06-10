@@ -21,6 +21,8 @@ const COVER_IMAGE_MAX_SIZE = 1200;
 const GALLERY_IMAGE_MAX_SIZE = 1000;
 const IMAGE_EXPORT_QUALITY = 0.62;
 const LOCAL_DRAFT_MAX_LENGTH = 3_500_000;
+const PHOTO_PROCESS_ERROR_MESSAGE =
+  "사진을 미리보기에 표시하지 못했어요. JPG, PNG, WebP 사진으로 다시 넣어주세요. 아이폰 HEIC 사진은 사진 앱에서 JPG로 저장한 뒤 올려주세요.";
 
 const MUSIC_OPTIONS: Array<WeddingMusic | null> = [
   null,
@@ -487,7 +489,7 @@ function loadImageFromFile(file: File) {
 
 async function compressImageFile(file: File, maxSize: number) {
   if (!file.type.startsWith("image/")) {
-    return fileToDataUrl(file);
+    throw new Error(PHOTO_PROCESS_ERROR_MESSAGE);
   }
 
   try {
@@ -512,12 +514,19 @@ async function compressImageFile(file: File, maxSize: number) {
 
     return canvas.toDataURL("image/jpeg", IMAGE_EXPORT_QUALITY);
   } catch {
-    return fileToDataUrl(file);
+    throw new Error(PHOTO_PROCESS_ERROR_MESSAGE);
   }
 }
 
 function isInlineImage(src: string) {
   return src.startsWith("data:image/") || src.startsWith("blob:");
+}
+
+function galleryPhotosToText(photos: WeddingData["photos"]["gallery"]) {
+  return photos
+    .map((photo) => photo.src)
+    .filter((src) => src && !isInlineImage(src))
+    .join("\n");
 }
 
 function createLocalStorageDraft(draft: WeddingData) {
@@ -808,9 +817,7 @@ export function EditInvitation({
   const storageKey = mode === "public" ? PUBLIC_MAKE_STORAGE_KEY : EDITOR_STORAGE_KEY;
   const [draft, setDraft] = useState<WeddingData>(initialDraft);
   const [dateValue, setDateValue] = useState(getDateInputValue(initialDraft));
-  const [galleryText, setGalleryText] = useState(
-    initialDraft.photos.gallery.map((photo) => photo.src).join("\n"),
-  );
+  const [galleryText, setGalleryText] = useState(galleryPhotosToText(initialDraft.photos.gallery));
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [processingPhotoCount, setProcessingPhotoCount] = useState(0);
@@ -839,7 +846,7 @@ export function EditInvitation({
         const parsed = normalizeWeddingData(initialData);
         setDraft(parsed);
         setDateValue(getDateInputValue(parsed));
-        setGalleryText(parsed.photos.gallery.map((photo) => photo.src).join("\n"));
+        setGalleryText(galleryPhotosToText(parsed.photos.gallery));
         setShareUrl(`${window.location.origin}/w/${slug}`);
         setEditUrl("");
       }
@@ -861,7 +868,7 @@ export function EditInvitation({
         }
         setDraft(parsed);
         setDateValue(getDateInputValue(parsed));
-        setGalleryText(parsed.photos.gallery.map((photo) => photo.src).join("\n"));
+        setGalleryText(galleryPhotosToText(parsed.photos.gallery));
       } catch {
         window.localStorage.removeItem(storageKey);
       }
@@ -1031,7 +1038,7 @@ export function EditInvitation({
       });
       setSaveMessage("메인 사진을 바꿨어요.");
     } catch {
-      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+      setSaveMessage(PHOTO_PROCESS_ERROR_MESSAGE);
     } finally {
       URL.revokeObjectURL(previewUrl);
       setProcessingPhotoCount((count) => Math.max(0, count - 1));
@@ -1069,7 +1076,7 @@ export function EditInvitation({
       });
       setSaveMessage(`${label}을 바꿨어요.`);
     } catch {
-      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+      setSaveMessage(PHOTO_PROCESS_ERROR_MESSAGE);
     } finally {
       URL.revokeObjectURL(previewUrl);
       setProcessingPhotoCount((count) => Math.max(0, count - 1));
@@ -1107,7 +1114,7 @@ export function EditInvitation({
       });
       setSaveMessage("어릴 적 사진이 바뀌었어요.");
     } catch {
-      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+      setSaveMessage(PHOTO_PROCESS_ERROR_MESSAGE);
     } finally {
       URL.revokeObjectURL(previewUrl);
       setProcessingPhotoCount((count) => Math.max(0, count - 1));
@@ -1147,7 +1154,7 @@ export function EditInvitation({
       });
       setSaveMessage("이야기 사진을 바꿨어요.");
     } catch {
-      setSaveMessage("이 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+      setSaveMessage(PHOTO_PROCESS_ERROR_MESSAGE);
     } finally {
       URL.revokeObjectURL(previewUrl);
       setProcessingPhotoCount((count) => Math.max(0, count - 1));
@@ -1171,7 +1178,7 @@ export function EditInvitation({
 
     update((current) => {
       current.photos.gallery = previewPhotos.slice(0, 50);
-      setGalleryText(current.photos.gallery.map((photo) => photo.src).join("\n"));
+      setGalleryText(galleryPhotosToText(current.photos.gallery));
       return current;
     });
     setProcessingPhotoCount((count) => count + selectedFiles.length);
@@ -1187,7 +1194,7 @@ export function EditInvitation({
     ).catch(() => null);
 
     if (!compressedPhotos) {
-      setSaveMessage("일부 사진을 처리하지 못했어요. JPG 또는 PNG 사진으로 다시 넣어주세요.");
+      setSaveMessage(PHOTO_PROCESS_ERROR_MESSAGE);
       setProcessingPhotoCount((count) => Math.max(0, count - selectedFiles.length));
       return;
     }
@@ -1197,7 +1204,7 @@ export function EditInvitation({
         const compressed = compressedPhotos.find((item) => item.previewSrc === photo.src);
         return compressed ? { src: compressed.src, alt: compressed.alt, ratio: compressed.ratio } : photo;
       });
-      setGalleryText(current.photos.gallery.map((photo) => photo.src).join("\n"));
+      setGalleryText(galleryPhotosToText(current.photos.gallery));
       return current;
     });
     previewPhotos.forEach((photo) => URL.revokeObjectURL(photo.src));
@@ -1800,7 +1807,7 @@ export function EditInvitation({
     const nextInitial = getInitialWeddingData(mode);
     setDraft(nextInitial);
     setDateValue(getDateInputValue(nextInitial));
-    setGalleryText(nextInitial.photos.gallery.map((photo) => photo.src).join("\n"));
+    setGalleryText(galleryPhotosToText(nextInitial.photos.gallery));
     setSaveMessage("");
     setShareUrl("");
     setEditUrl("");
@@ -1845,7 +1852,7 @@ export function EditInvitation({
       const nextEditUrl = `${window.location.origin}/edit/${saved.row.slug}?key=${saved.editSecret}`;
 
       setDraft(nextData);
-      setGalleryText(nextData.photos.gallery.map((photo) => photo.src).join("\n"));
+      setGalleryText(galleryPhotosToText(nextData.photos.gallery));
       setCurrentSlug(saved.row.slug);
       setEditSecret(saved.editSecret);
       setShareUrl(nextShareUrl);
@@ -1902,7 +1909,7 @@ export function EditInvitation({
       const nextShareUrl = `${window.location.origin}/w/${saved.row.slug}`;
 
       setDraft(nextData);
-      setGalleryText(nextData.photos.gallery.map((photo) => photo.src).join("\n"));
+      setGalleryText(galleryPhotosToText(nextData.photos.gallery));
       setCurrentSlug(saved.row.slug);
       setEditSecret(saved.editSecret);
       setShareUrl(nextShareUrl);
@@ -1952,7 +1959,7 @@ export function EditInvitation({
       const nextShareUrl = `${window.location.origin}/w/${body.row.slug}`;
 
       setDraft(nextData);
-      setGalleryText(nextData.photos.gallery.map((photo) => photo.src).join("\n"));
+      setGalleryText(galleryPhotosToText(nextData.photos.gallery));
       setCurrentSlug(body.row.slug);
       setEditSecret(body.editSecret);
       setShareUrl(nextShareUrl);
@@ -2977,6 +2984,9 @@ export function EditInvitation({
               rows={7}
               onChange={updateGallery}
             />
+            <p className="-mt-2 text-xs leading-5 text-[#8a7a6a]">
+              파일로 첨부한 사진은 이 URL 칸에 표시되지 않아도 정상이에요.
+            </p>
           </FormSection>
 
           <FormSection title="8. 음악 설정">
