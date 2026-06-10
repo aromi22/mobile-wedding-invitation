@@ -1812,6 +1812,7 @@ export function EditInvitation({
     setEditUrl("");
     setCurrentSlug("");
     setEditSecret("");
+    setSaveMessage("처음 샘플 상태로 돌아왔어요. 새로 내용을 입력해 주세요.");
     window.localStorage.removeItem(storageKey);
   }
 
@@ -1999,6 +2000,16 @@ export function EditInvitation({
                   ? "제작본 저장하고 링크 받기"
                   : "Supabase에 저장"}
             </button>
+            {isPublicMakePage ? (
+              <button
+                type="button"
+                onClick={resetDraft}
+                disabled={isSaving || isProcessingPhoto}
+                className="ml-2 mt-4 rounded-full border border-[#d8c6ab] bg-white px-4 py-2 text-sm font-semibold text-[#806b4f] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                처음부터 새로 만들기
+              </button>
+            ) : null}
             {isCustomerEditPage && canMarkPaid ? (
               <div className="mt-3 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
