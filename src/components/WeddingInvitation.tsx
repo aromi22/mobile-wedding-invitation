@@ -1270,7 +1270,7 @@ export function WeddingInvitation({
   useScrollReveal(revealKey);
 
   return (
-    <main className="kitsch-paper relative mx-auto min-h-screen max-w-[430px] overflow-hidden text-[#4a2224] shadow-[0_0_80px_rgba(91,70,42,0.12)]">
+    <main className="kitsch-paper relative mx-auto min-h-screen w-full max-w-[430px] overflow-hidden text-[#4a2224] shadow-[0_0_80px_rgba(91,70,42,0.12)]">
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
         <span className="ambient-petal ambient-petal-1" />
         <span className="ambient-petal ambient-petal-2" />
