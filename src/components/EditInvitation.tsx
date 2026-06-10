@@ -823,6 +823,7 @@ export function EditInvitation({
   const [processingPhotoCount, setProcessingPhotoCount] = useState(0);
   const [isUnlockingPayment, setIsUnlockingPayment] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
   const [paymentOrderNumber, setPaymentOrderNumber] = useState("");
   const [paymentMessage, setPaymentMessage] = useState("");
   const [shareUrl, setShareUrl] = useState("");
@@ -836,6 +837,28 @@ export function EditInvitation({
   const isCustomerEditPage = Boolean(slug);
   const isPublicMakePage = mode === "public" && !slug;
   const isProcessingPhoto = processingPhotoCount > 0;
+
+  function showToast(message: string) {
+    setToastMessage(message);
+  }
+
+  async function copyToClipboard(text: string, label = "복사") {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast(`${label} 완료`);
+    } catch {
+      showToast("복사하지 못했어요. 링크를 길게 눌러 직접 복사해 주세요.");
+    }
+  }
+
+  useEffect(() => {
+    if (!toastMessage) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setToastMessage(""), 2200);
+    return () => window.clearTimeout(timeout);
+  }, [toastMessage]);
 
   useEffect(() => {
     if (slug) {
@@ -1819,6 +1842,7 @@ export function EditInvitation({
   async function saveToSupabase() {
     setIsSaving(true);
     setSaveMessage("청첩장을 저장하고 있어요.");
+    showToast("저장 중이에요...");
 
     try {
       const dataToSave = structuredClone(draft);
@@ -1862,12 +1886,14 @@ export function EditInvitation({
           ? "저장 완료! 워터마크가 포함된 제작본 링크가 생성됐어요."
           : "저장 완료! 아래 공유 링크가 생성됐어요.",
       );
+      showToast("저장됐습니다");
     } catch (error) {
       setSaveMessage(
         error instanceof Error
           ? error.message
           : "저장 중 문제가 생겼어요. Supabase 설정을 확인해주세요.",
       );
+      showToast("저장에 실패했어요");
     } finally {
       setIsSaving(false);
     }
@@ -2045,7 +2071,7 @@ export function EditInvitation({
                     </a>
                     <button
                       type="button"
-                      onClick={() => void navigator.clipboard.writeText(shareUrl)}
+                      onClick={() => void copyToClipboard(shareUrl, "링크 복사")}
                       className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
                     >
                       링크 복사
@@ -2081,7 +2107,7 @@ export function EditInvitation({
                           </a>
                           <button
                             type="button"
-                            onClick={() => void navigator.clipboard.writeText(shareUrl)}
+                            onClick={() => void copyToClipboard(shareUrl, "최종 링크 복사")}
                             className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
                           >
                             최종 링크 복사
@@ -2150,7 +2176,7 @@ export function EditInvitation({
                     </a>
                     <button
                       type="button"
-                      onClick={() => void navigator.clipboard.writeText(shareUrl)}
+                      onClick={() => void copyToClipboard(shareUrl, "공유 링크 복사")}
                       className="justify-self-start rounded-full bg-[#2f2a25] px-4 py-2 text-xs font-semibold text-white"
                     >
                       공유 링크 복사
@@ -2192,7 +2218,7 @@ export function EditInvitation({
                     {isPublicMakePage ? (
                       <button
                         type="button"
-                        onClick={() => void navigator.clipboard.writeText(editUrl)}
+                        onClick={() => void copyToClipboard(editUrl, "고객 수정 링크 복사")}
                         className="justify-self-start rounded-full border border-[#d8c6ab] px-4 py-2 text-xs font-semibold text-[#806b4f]"
                       >
                         고객 수정 링크 복사
@@ -3049,6 +3075,11 @@ export function EditInvitation({
           </div>
         </aside>
       </div>
+      {toastMessage ? (
+        <div className="fixed bottom-5 left-1/2 z-[80] -translate-x-1/2 rounded-full bg-[#2f2a25] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(47,42,37,0.24)]">
+          {toastMessage}
+        </div>
+      ) : null}
     </div>
   );
 }
