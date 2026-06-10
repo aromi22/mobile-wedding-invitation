@@ -2023,8 +2023,8 @@ export function EditInvitation({
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f0e8]">
-      <div className="mx-auto grid max-w-[1180px] gap-8 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#f6f0e8]">
+      <div className="mx-auto grid w-full max-w-[1180px] gap-8 px-4 py-6 sm:px-5 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
         <div
           ref={editorRef}
           className="rounded-lg bg-[#fffdf8] px-5 shadow-[0_18px_50px_rgba(91,70,42,0.12)]"
@@ -3092,7 +3092,7 @@ export function EditInvitation({
           </FormSection>
         </div>
 
-        <aside ref={previewRef} className="scroll-mt-6 lg:sticky lg:top-6">
+        <aside ref={previewRef} className="w-full max-w-full scroll-mt-6 lg:sticky lg:top-6">
           <div className="mb-3 flex items-center justify-between gap-3 px-1 text-sm text-[#7c6e62]">
             <span>오른쪽은 고객이 보는 모바일 청첩장 미리보기입니다.</span>
             <button
@@ -3103,7 +3103,7 @@ export function EditInvitation({
               편집으로 이동
             </button>
           </div>
-          <div className="overflow-hidden rounded-[1.6rem] bg-[#eee5da] p-3 shadow-[0_20px_60px_rgba(91,70,42,0.18)]">
+          <div className="mx-auto w-full max-w-[430px] overflow-hidden rounded-[1.6rem] bg-[#eee5da] p-2 shadow-[0_20px_60px_rgba(91,70,42,0.18)] sm:p-3">
             <div className="max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[1.15rem] bg-white">
               <WeddingInvitation data={preview} />
             </div>
