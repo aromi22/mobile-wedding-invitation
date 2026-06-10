@@ -199,6 +199,8 @@ export async function uploadInvitationImages(data: WeddingData, slug: string): P
   const next = structuredClone(data);
 
   next.photos.cover.src = await uploadDataUrlImage(next.photos.cover.src, slug, "cover");
+  next.photos.intro.src = await uploadDataUrlImage(next.photos.intro.src, slug, "intro");
+  next.photos.venue.src = await uploadDataUrlImage(next.photos.venue.src, slug, "venue");
   if (next.photos.groomChildPhoto?.src) {
     next.photos.groomChildPhoto.src = await uploadDataUrlImage(
       next.photos.groomChildPhoto.src,
@@ -217,6 +219,12 @@ export async function uploadInvitationImages(data: WeddingData, slug: string): P
     next.photos.gallery.map(async (photo, index) => ({
       ...photo,
       src: await uploadDataUrlImage(photo.src, slug, `gallery-${index + 1}`),
+    })),
+  );
+  next.stories = await Promise.all(
+    next.stories.map(async (story, index) => ({
+      ...story,
+      image: await uploadDataUrlImage(story.image, slug, `story-${index + 1}`),
     })),
   );
 
