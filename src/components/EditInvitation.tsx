@@ -824,6 +824,7 @@ export function EditInvitation({
   const [isUnlockingPayment, setIsUnlockingPayment] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
+  const [manualCopyText, setManualCopyText] = useState("");
   const [paymentOrderNumber, setPaymentOrderNumber] = useState("");
   const [paymentMessage, setPaymentMessage] = useState("");
   const [shareUrl, setShareUrl] = useState("");
@@ -843,11 +844,18 @@ export function EditInvitation({
   }
 
   async function copyToClipboard(text: string, label = "복사") {
+    setManualCopyText("");
+
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        throw new Error("Clipboard API unavailable");
+      }
       showToast(`${label} 완료`);
     } catch {
-      showToast("복사하지 못했어요. 링크를 길게 눌러 직접 복사해 주세요.");
+      setManualCopyText(text);
+      showToast("자동 복사가 막혔어요. 아래 링크 칸에서 복사해 주세요.");
     }
   }
 
@@ -3078,6 +3086,32 @@ export function EditInvitation({
       {toastMessage ? (
         <div className="fixed bottom-5 left-1/2 z-[80] -translate-x-1/2 rounded-full bg-[#2f2a25] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(47,42,37,0.24)]">
           {toastMessage}
+        </div>
+      ) : null}
+      {manualCopyText ? (
+        <div className="fixed inset-x-4 bottom-20 z-[80] mx-auto max-w-[30rem] rounded-2xl border border-[#eadfcd] bg-white p-4 text-sm shadow-[0_18px_44px_rgba(47,42,37,0.18)]">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="font-semibold text-[#332b24]">직접 복사하기</p>
+              <p className="mt-1 text-xs leading-5 text-[#806b4f]">
+                아래 링크 칸을 누르면 전체 선택돼요. 선택된 상태에서 복사해 주세요.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setManualCopyText("")}
+              className="rounded-full border border-[#eadfcd] px-3 py-1 text-xs font-semibold text-[#806b4f]"
+            >
+              닫기
+            </button>
+          </div>
+          <input
+            readOnly
+            value={manualCopyText}
+            onFocus={(event) => event.currentTarget.select()}
+            onClick={(event) => event.currentTarget.select()}
+            className="mt-3 w-full rounded-lg border border-[#d8c6ab] bg-[#fffaf3] px-3 py-3 text-sm font-semibold text-[#2f2a25] outline-none"
+          />
         </div>
       ) : null}
     </div>
