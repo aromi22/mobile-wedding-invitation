@@ -24,7 +24,6 @@
 
 html {
   width: 100%;
-  max-width: 100%;
   overflow-x: hidden;
   scroll-behavior: smooth;
   background: var(--background);
@@ -35,7 +34,6 @@ html {
 body {
   margin: 0;
   width: 100%;
-  max-width: 100%;
   overflow-x: hidden;
   min-height: 100vh;
   background: #ffffff;
@@ -45,16 +43,6 @@ body {
 
 body::before {
   content: none;
-}
-
-img,
-video,
-canvas,
-svg,
-input,
-textarea,
-select {
-  max-width: 100%;
 }
 
 button,
