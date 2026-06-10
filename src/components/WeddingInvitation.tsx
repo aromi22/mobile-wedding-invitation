@@ -755,7 +755,7 @@ function GallerySection({ data }: { data: WeddingData }) {
             key={photo.src}
             type="button"
             onClick={() => setSelectedIndex(index)}
-            className="reveal relative aspect-square overflow-hidden bg-[#eee7de] transition duration-300 active:scale-[0.98]"
+            className="reveal is-visible relative aspect-square overflow-hidden bg-[#eee7de] transition duration-300 active:scale-[0.98]"
             style={revealDelay(index, 35)}
             aria-label={`갤러리 사진 ${index + 1} 보기`}
           >

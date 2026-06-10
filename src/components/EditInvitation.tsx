@@ -1162,10 +1162,9 @@ export function EditInvitation({
   }
 
   async function appendGalleryFiles(files: FileList) {
-    const remainingSlots = Math.max(0, 50 - draft.photos.gallery.length);
-    const selectedFiles = Array.from(files).slice(0, remainingSlots);
+    const selectedFiles = Array.from(files).slice(0, 50);
 
-    if (remainingSlots === 0) {
+    if (selectedFiles.length === 0) {
       setSaveMessage("갤러리는 최대 50장까지 등록할 수 있어요.");
       return;
     }
