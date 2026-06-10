@@ -311,7 +311,7 @@ function Field({
   required?: boolean;
 }) {
   return (
-    <label className="grid gap-2 text-sm text-[#5f5349]">
+    <label className="grid min-w-0 gap-2 text-sm text-[#5f5349]">
       <span>
         {label}
         {required ? <span className="ml-1 text-[#b29467]">*</span> : null}
@@ -321,7 +321,7 @@ function Field({
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
+        className="w-full min-w-0 rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
       />
     </label>
   );
@@ -339,13 +339,13 @@ function TextArea({
   rows?: number;
 }) {
   return (
-    <label className="grid gap-2 text-sm text-[#5f5349]">
+    <label className="grid min-w-0 gap-2 text-sm text-[#5f5349]">
       <span>{label}</span>
       <textarea
         value={value}
         rows={rows}
         onChange={(event) => onChange(event.target.value)}
-        className="resize-y rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base leading-7 text-[#332b24] outline-none transition focus:border-[#b29467]"
+        className="w-full min-w-0 resize-y rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base leading-7 text-[#332b24] outline-none transition focus:border-[#b29467]"
       />
     </label>
   );
@@ -363,7 +363,7 @@ function ColorField({
   const pickerValue = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#ffffff";
 
   return (
-    <label className="grid gap-2 text-sm text-[#5f5349]">
+    <label className="grid min-w-0 gap-2 text-sm text-[#5f5349]">
       <span>{label}</span>
       <div className="flex items-center gap-2 rounded-md border border-[#e5dacb] bg-white px-3 py-2">
         <input
@@ -403,7 +403,7 @@ function RangeField({
   onChange: (value: number) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm text-[#5f5349]">
+    <label className="grid min-w-0 gap-2 text-sm text-[#5f5349]">
       <span className="flex items-center justify-between gap-3">
         <span>{label}</span>
         <strong className="rounded-full bg-[#f2eadf] px-2.5 py-1 text-xs font-medium text-[#806b4f]">
@@ -434,7 +434,7 @@ function ToggleField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between gap-4 rounded-md border border-[#eadfcd] bg-white px-4 py-3 text-sm text-[#5f5349]">
+    <label className="flex min-w-0 items-center justify-between gap-4 rounded-md border border-[#eadfcd] bg-white px-4 py-3 text-sm text-[#5f5349]">
       <span>{label}</span>
       <input
         type="checkbox"
@@ -454,9 +454,9 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-b border-[#eadfcd] py-7">
+    <section className="min-w-0 border-b border-[#eadfcd] py-7">
       <h2 className="mb-5 text-lg font-semibold text-[#332b24]">{title}</h2>
-      <div className="grid gap-4">{children}</div>
+      <div className="grid min-w-0 gap-4">{children}</div>
     </section>
   );
 }
@@ -2024,46 +2024,48 @@ export function EditInvitation({
 
   return (
     <div className="min-h-screen bg-[#f6f0e8]">
-      <div className="mx-auto grid max-w-[1180px] gap-8 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
+      <div className="mx-auto grid w-full max-w-[1180px] gap-8 px-3 py-5 sm:px-5 sm:py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
         <div
           ref={editorRef}
-          className="rounded-lg bg-[#fffdf8] px-5 shadow-[0_18px_50px_rgba(91,70,42,0.12)]"
+          className="min-w-0 rounded-lg bg-[#fffdf8] px-4 shadow-[0_18px_50px_rgba(91,70,42,0.12)] sm:px-5"
         >
-          <header className="sticky top-0 z-10 -mx-5 border-b border-[#eadfcd] bg-[#fffdf8]/95 px-5 py-5 backdrop-blur">
+          <header className="sticky top-0 z-10 -mx-4 border-b border-[#eadfcd] bg-[#fffdf8]/95 px-4 py-5 backdrop-blur sm:-mx-5 sm:px-5">
             <p className="text-xs uppercase tracking-[0.24em] text-[#b29467]">
               {isPublicMakePage ? "Invitation Maker" : "Invitation Editor"}
             </p>
-            <button
-              type="button"
-              onClick={saveToSupabase}
-              disabled={isSaving || isProcessingPhoto}
-              className="mt-4 rounded-full bg-[#2f2a25] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isProcessingPhoto
-                ? "사진 처리 중"
-                : isSaving
-                ? "저장 중"
-                : isPublicMakePage
-                  ? "제작본 저장하고 링크 받기"
-                  : "Supabase에 저장"}
-            </button>
-            {isPublicMakePage ? (
+            <div className="mt-4 grid gap-2 sm:flex sm:flex-wrap">
               <button
                 type="button"
-                onClick={resetDraft}
+                onClick={saveToSupabase}
                 disabled={isSaving || isProcessingPhoto}
-                className="ml-2 mt-4 rounded-full border border-[#d8c6ab] bg-white px-4 py-2 text-sm font-semibold text-[#806b4f] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-full bg-[#2f2a25] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
-                처음부터 새로 만들기
+                {isProcessingPhoto
+                  ? "사진 처리 중"
+                  : isSaving
+                  ? "저장 중"
+                  : isPublicMakePage
+                    ? "제작본 저장하고 링크 받기"
+                    : "Supabase에 저장"}
               </button>
-            ) : null}
-            <button
-              type="button"
-              onClick={scrollToPreview}
-              className="ml-2 mt-4 rounded-full border border-[#2f2a25]/20 bg-[#fffaf3] px-4 py-2 text-sm font-semibold text-[#2f2a25]"
-            >
-              미리보기로 이동
-            </button>
+              {isPublicMakePage ? (
+                <button
+                  type="button"
+                  onClick={resetDraft}
+                  disabled={isSaving || isProcessingPhoto}
+                  className="w-full rounded-full border border-[#d8c6ab] bg-white px-4 py-2 text-sm font-semibold text-[#806b4f] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                >
+                  처음부터 새로 만들기
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={scrollToPreview}
+                className="w-full rounded-full border border-[#2f2a25]/20 bg-[#fffaf3] px-4 py-2 text-sm font-semibold text-[#2f2a25] sm:w-auto"
+              >
+                미리보기로 이동
+              </button>
+            </div>
             {isCustomerEditPage && canMarkPaid ? (
               <div className="mt-3 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -3092,7 +3094,7 @@ export function EditInvitation({
           </FormSection>
         </div>
 
-        <aside ref={previewRef} className="scroll-mt-6 lg:sticky lg:top-6">
+        <aside ref={previewRef} className="min-w-0 scroll-mt-6 lg:sticky lg:top-6">
           <div className="mb-3 flex items-center justify-between gap-3 px-1 text-sm text-[#7c6e62]">
             <span>오른쪽은 고객이 보는 모바일 청첩장 미리보기입니다.</span>
             <button
@@ -3103,7 +3105,7 @@ export function EditInvitation({
               편집으로 이동
             </button>
           </div>
-          <div className="overflow-hidden rounded-[1.6rem] bg-[#eee5da] p-3 shadow-[0_20px_60px_rgba(91,70,42,0.18)]">
+          <div className="mx-auto w-full max-w-[430px] overflow-hidden rounded-[1.6rem] bg-[#eee5da] p-2 shadow-[0_20px_60px_rgba(91,70,42,0.18)] sm:p-3">
             <div className="max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[1.15rem] bg-white">
               <WeddingInvitation data={preview} />
             </div>
