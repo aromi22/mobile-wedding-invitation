@@ -2500,14 +2500,14 @@ export function EditInvitation({
 
             <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
               <div className="mb-4">
-                <p className="text-sm font-semibold text-[#332b24]">메인 텍스트</p>
+                <p className="text-sm font-semibold text-[#332b24]">커버 소개 문구</p>
                 <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
-                  첫 화면 아래쪽에 보이는 짧은 소개 문구예요.
+                  첫 화면 커버 사진 위에 보이는 짧은 소개 문구예요.
                 </p>
               </div>
               <div className="grid gap-4">
                 <TextArea
-                  label="메인 텍스트"
+                  label="커버 소개 문구"
                   value={draft.hero.mainText}
                   rows={2}
                   onChange={(value) =>
@@ -2520,7 +2520,7 @@ export function EditInvitation({
                 />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <ColorField
-                    label="메인 텍스트 색상"
+                    label="커버 소개 문구 색상"
                     value={draft.hero.mainTextColor}
                     onChange={(value) =>
                       update((current) => {
@@ -2530,7 +2530,7 @@ export function EditInvitation({
                     }
                   />
                   <RangeField
-                    label="메인 텍스트 위치"
+                    label="커버 소개 문구 위치"
                     value={draft.hero.mainTextTop}
                     min={55}
                     max={92}

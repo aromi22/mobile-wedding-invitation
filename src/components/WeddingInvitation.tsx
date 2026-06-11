@@ -262,6 +262,7 @@ function Cover({ data }: { data: WeddingData }) {
   const hero = data.hero;
   const openingVenue = data.event.venue;
   const letteringText = hero.letteringText.replace(/\s+/g, " ").trim() || "Our Wedding Day";
+  const mainText = hero.mainText.replace(/\s+/g, " ").trim();
   const letteringColor = ["#fff", "#ffffff", "white"].includes(
     hero.letteringColor.trim().toLowerCase(),
   )
@@ -299,22 +300,36 @@ function Cover({ data }: { data: WeddingData }) {
             >
               {letteringText}
             </p>
+            {mainText ? (
+              <p
+                className="pointer-events-none absolute inset-x-5 z-10 mx-auto max-w-[15rem] break-keep text-center font-display text-[0.78rem] leading-5 tracking-[0.08em] drop-shadow-[0_1px_8px_rgba(0,0,0,0.18)]"
+                style={{
+                  top: `${hero.mainTextTop}%`,
+                  color: hero.mainTextColor,
+                  transform: "translateY(-50%)",
+                }}
+              >
+                {mainText}
+              </p>
+            ) : null}
           </div>
 
-          <div className="mt-6 text-[#2f2924]">
-            <p className="font-display text-[0.58rem] tracking-[0.08em] text-[#2f2924]/48">
-              The marriage of
-            </p>
-            <h1 className="mt-2 break-keep font-display text-[1.08rem] font-medium capitalize leading-tight tracking-[0.02em]">
-              {groom.englishName} &amp; {bride.englishName}
-            </h1>
-            <p className="mt-3 break-keep text-[0.62rem] leading-5 tracking-[0.08em] text-[#2f2924]/64">
-              {openingVenue}
-            </p>
-            <p className="mt-1 text-[0.62rem] uppercase tracking-[0.12em] text-[#2f2924]/58">
-              {data.event.calendarText.replaceAll(" ", " | ")}
-            </p>
-          </div>
+          {hero.showEventInfo ? (
+            <div className="mt-6 text-[#2f2924]">
+              <p className="font-display text-[0.58rem] tracking-[0.08em] text-[#2f2924]/48">
+                The marriage of
+              </p>
+              <h1 className="mt-2 break-keep font-display text-[1.08rem] font-medium capitalize leading-tight tracking-[0.02em]">
+                {groom.englishName} &amp; {bride.englishName}
+              </h1>
+              <p className="mt-3 break-keep text-[0.62rem] leading-5 tracking-[0.08em] text-[#2f2924]/64">
+                {openingVenue}
+              </p>
+              <p className="mt-1 text-[0.62rem] uppercase tracking-[0.12em] text-[#2f2924]/58">
+                {data.event.calendarText.replaceAll(" ", " | ")}
+              </p>
+            </div>
+          ) : null}
         </div>
 
         {hero.showScrollHint ? (
