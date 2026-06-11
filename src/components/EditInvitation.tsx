@@ -2498,54 +2498,6 @@ export function EditInvitation({
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-[#332b24]">커버 소개 문구</p>
-                <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
-                  첫 화면 커버 사진 위에 보이는 짧은 소개 문구예요.
-                </p>
-              </div>
-              <div className="grid gap-4">
-                <TextArea
-                  label="커버 소개 문구"
-                  value={draft.hero.mainText}
-                  rows={2}
-                  onChange={(value) =>
-                    update((current) => {
-                      current.hero.mainText = value;
-                      current.message.coverLine = value;
-                      return current;
-                    })
-                  }
-                />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <ColorField
-                    label="커버 소개 문구 색상"
-                    value={draft.hero.mainTextColor}
-                    onChange={(value) =>
-                      update((current) => {
-                        current.hero.mainTextColor = value;
-                        return current;
-                      })
-                    }
-                  />
-                  <RangeField
-                    label="커버 소개 문구 위치"
-                    value={draft.hero.mainTextTop}
-                    min={55}
-                    max={92}
-                    suffix="%"
-                    onChange={(value) =>
-                      update((current) => {
-                        current.hero.mainTextTop = value;
-                        return current;
-                      })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
             <div className="grid gap-3 sm:grid-cols-2">
               <ToggleField
                 label="메인 하단 예식 정보 표시"

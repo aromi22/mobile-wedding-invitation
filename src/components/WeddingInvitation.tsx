@@ -262,7 +262,6 @@ function Cover({ data }: { data: WeddingData }) {
   const hero = data.hero;
   const openingVenue = data.event.venue;
   const letteringText = hero.letteringText.replace(/\s+/g, " ").trim() || "Our Wedding Day";
-  const mainText = hero.mainText.replace(/\s+/g, " ").trim();
   const letteringColor = ["#fff", "#ffffff", "white"].includes(
     hero.letteringColor.trim().toLowerCase(),
   )
@@ -300,18 +299,6 @@ function Cover({ data }: { data: WeddingData }) {
             >
               {letteringText}
             </p>
-            {mainText ? (
-              <p
-                className="pointer-events-none absolute inset-x-5 z-10 mx-auto max-w-[15rem] break-keep text-center font-display text-[0.78rem] leading-5 tracking-[0.08em] drop-shadow-[0_1px_8px_rgba(0,0,0,0.18)]"
-                style={{
-                  top: `${hero.mainTextTop}%`,
-                  color: hero.mainTextColor,
-                  transform: "translateY(-50%)",
-                }}
-              >
-                {mainText}
-              </p>
-            ) : null}
           </div>
 
           {hero.showEventInfo ? (
