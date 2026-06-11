@@ -244,7 +244,7 @@ function Section({
       ) : null}
       {title ? (
         <h2
-          className="kitsch-title kitsch-scribble reveal mt-4 text-[2.45rem] leading-snug"
+          className="kitsch-title kitsch-scribble reveal mt-4 whitespace-nowrap text-[clamp(1.8rem,7vw,2.28rem)] leading-snug"
           style={revealDelay(1)}
         >
           {title}
