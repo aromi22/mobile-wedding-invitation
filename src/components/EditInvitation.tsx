@@ -55,6 +55,19 @@ const LETTERING_FONT_OPTIONS = [
   { label: "Freestyle Script", value: "freestyle-script" },
 ] as const;
 
+const COVER_TEMPLATE_OPTIONS = [
+  {
+    label: "폴라로이드형",
+    value: "polaroid",
+    description: "사진이 필름 카드 안에 들어가는 기존 첫 화면",
+  },
+  {
+    label: "풀스크린 사진형",
+    value: "fullscreen",
+    description: "사진이 화면 가득 시작하는 감성적인 첫 화면",
+  },
+] as const;
+
 type SectionToggleKey = keyof WeddingData["sections"];
 
 const SECTION_TOGGLE_OPTIONS: Array<{
@@ -203,6 +216,7 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
   merged.hero = {
     ...merged.hero,
     ...source.hero,
+    coverTemplate: source.hero?.coverTemplate ?? merged.hero.coverTemplate ?? "polaroid",
     mainText: source.hero?.mainText ?? source.message?.coverLine ?? merged.hero.mainText,
   };
   merged.sections = {
@@ -2318,6 +2332,45 @@ export function EditInvitation({
           </FormSection>
 
           <FormSection title="1. 메인 화면 설정">
+            <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-[#332b24]">첫 화면 디자인</p>
+                <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
+                  청첩장을 열었을 때 가장 먼저 보이는 오프닝 스타일이에요.
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {COVER_TEMPLATE_OPTIONS.map((template) => {
+                  const isSelected = draft.hero.coverTemplate === template.value;
+
+                  return (
+                    <button
+                      key={template.value}
+                      type="button"
+                      onClick={() =>
+                        update((current) => {
+                          current.hero.coverTemplate = template.value;
+                          return current;
+                        })
+                      }
+                      className={`rounded-xl border px-4 py-4 text-left transition ${
+                        isSelected
+                          ? "border-[#b29467] bg-[#fff8ec] shadow-[0_10px_24px_rgba(178,148,103,0.14)]"
+                          : "border-[#eadfcd] bg-white"
+                      }`}
+                    >
+                      <span className="block text-sm font-semibold text-[#332b24]">
+                        {template.label}
+                      </span>
+                      <span className="mt-2 block break-keep text-xs leading-5 text-[#8a7a6a]">
+                        {template.description}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">메인 사진</p>

@@ -190,6 +190,7 @@ export const wedding: WeddingData = {
     ],
   },
   hero: {
+    coverTemplate: "polaroid",
     letteringText: "Our Wedding Day",
     letteringFont: "segoe-print",
     letteringColor: "#ffffff",

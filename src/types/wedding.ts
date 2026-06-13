@@ -78,6 +78,7 @@ export type WeddingTimelineItem = {
 };
 
 export type WeddingLetteringFont = "segoe-print" | "freestyle-script";
+export type WeddingCoverTemplate = "polaroid" | "fullscreen";
 
 export type WeddingFamilySettings = {
   align: "center" | "left";
@@ -88,6 +89,7 @@ export type WeddingFamilySettings = {
 };
 
 export type WeddingHeroSettings = {
+  coverTemplate: WeddingCoverTemplate;
   letteringText: string;
   letteringFont: WeddingLetteringFont;
   letteringColor: string;
