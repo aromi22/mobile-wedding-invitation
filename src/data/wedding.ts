@@ -191,6 +191,12 @@ export const wedding: WeddingData = {
   },
   hero: {
     coverTemplate: "polaroid",
+    fullscreenCalligraphyEnabled: false,
+    fullscreenCalligraphyText: "Our Wedding Day",
+    fullscreenCalligraphyColor: "#ffffff",
+    fullscreenCalligraphyTop: 42,
+    fullscreenCalligraphyLeft: 50,
+    fullscreenCalligraphySize: 64,
     letteringText: "Our Wedding Day",
     letteringFont: "segoe-print",
     letteringColor: "#ffffff",

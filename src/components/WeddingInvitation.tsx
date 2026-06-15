@@ -280,6 +280,8 @@ function Cover({ data }: { data: WeddingData }) {
   } satisfies CSSProperties;
 
   if (hero.coverTemplate === "fullscreen") {
+    const calligraphyText = hero.fullscreenCalligraphyText.replace(/\s+/g, " ").trim();
+
     return (
       <section className="relative min-h-screen overflow-hidden bg-[#1f1b18]">
         <div className="absolute inset-0 scale-[0.94]">
@@ -291,6 +293,19 @@ function Cover({ data }: { data: WeddingData }) {
           />
         </div>
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.02)_45%,rgba(0,0,0,0.22)_100%)]" />
+        {hero.fullscreenCalligraphyEnabled && calligraphyText ? (
+          <p
+            className="cover-reveal pointer-events-none absolute z-10 max-w-[82%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center font-['Great_Vibes'] font-light leading-none opacity-90 drop-shadow-[0_2px_14px_rgba(0,0,0,0.24)]"
+            style={{
+              left: `${hero.fullscreenCalligraphyLeft}%`,
+              top: `${hero.fullscreenCalligraphyTop}%`,
+              color: hero.fullscreenCalligraphyColor,
+              fontSize: `${hero.fullscreenCalligraphySize}px`,
+            }}
+          >
+            {calligraphyText}
+          </p>
+        ) : null}
         {hero.showScrollHint ? (
           <div className="cover-reveal cover-reveal-delay-2 absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5 text-white/70">
             <span className="text-[0.56rem] tracking-[0.26em]">SCROLL</span>

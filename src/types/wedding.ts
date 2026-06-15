@@ -90,6 +90,12 @@ export type WeddingFamilySettings = {
 
 export type WeddingHeroSettings = {
   coverTemplate: WeddingCoverTemplate;
+  fullscreenCalligraphyEnabled: boolean;
+  fullscreenCalligraphyText: string;
+  fullscreenCalligraphyColor: string;
+  fullscreenCalligraphyTop: number;
+  fullscreenCalligraphyLeft: number;
+  fullscreenCalligraphySize: number;
   letteringText: string;
   letteringFont: WeddingLetteringFont;
   letteringColor: string;

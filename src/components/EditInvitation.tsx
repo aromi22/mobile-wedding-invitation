@@ -217,6 +217,18 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
     ...merged.hero,
     ...source.hero,
     coverTemplate: source.hero?.coverTemplate ?? merged.hero.coverTemplate ?? "polaroid",
+    fullscreenCalligraphyEnabled:
+      source.hero?.fullscreenCalligraphyEnabled ?? merged.hero.fullscreenCalligraphyEnabled ?? false,
+    fullscreenCalligraphyText:
+      source.hero?.fullscreenCalligraphyText ?? merged.hero.fullscreenCalligraphyText ?? "Our Wedding Day",
+    fullscreenCalligraphyColor:
+      source.hero?.fullscreenCalligraphyColor ?? merged.hero.fullscreenCalligraphyColor ?? "#ffffff",
+    fullscreenCalligraphyTop:
+      source.hero?.fullscreenCalligraphyTop ?? merged.hero.fullscreenCalligraphyTop ?? 42,
+    fullscreenCalligraphyLeft:
+      source.hero?.fullscreenCalligraphyLeft ?? merged.hero.fullscreenCalligraphyLeft ?? 50,
+    fullscreenCalligraphySize:
+      source.hero?.fullscreenCalligraphySize ?? merged.hero.fullscreenCalligraphySize ?? 64,
     mainText: source.hero?.mainText ?? source.message?.coverLine ?? merged.hero.mainText,
   };
   merged.sections = {
@@ -2453,6 +2465,114 @@ export function EditInvitation({
                 </div>
               </div>
             </div>
+
+            {draft.hero.coverTemplate === "fullscreen" ? (
+              <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-[#332b24]">
+                    풀스크린 캘리그래피 문구
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
+                    풀스크린 사진형 첫 화면에만 올라가는 손글씨 문구예요.
+                  </p>
+                </div>
+                <div className="grid gap-4">
+                  <ToggleField
+                    label="캘리그래피 문구 표시"
+                    checked={draft.hero.fullscreenCalligraphyEnabled}
+                    onChange={(checked) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphyEnabled = checked;
+                        return current;
+                      })
+                    }
+                  />
+                  {draft.hero.fullscreenCalligraphyEnabled ? (
+                    <>
+                      <Field
+                        label="캘리그래피 문구"
+                        value={draft.hero.fullscreenCalligraphyText}
+                        placeholder="Our Wedding Day"
+                        onChange={(value) =>
+                          update((current) => {
+                            current.hero.fullscreenCalligraphyText = value;
+                            return current;
+                          })
+                        }
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        {weddingHandwritingPhrases.map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onClick={() =>
+                              update((current) => {
+                                current.hero.fullscreenCalligraphyText = suggestion;
+                                return current;
+                              })
+                            }
+                            className="rounded-full border border-[#dfd2bf] bg-white px-3 py-2 text-xs font-medium text-[#806b4f]"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                      <ColorField
+                        label="캘리그래피 색상"
+                        value={draft.hero.fullscreenCalligraphyColor}
+                        onChange={(value) =>
+                          update((current) => {
+                            current.hero.fullscreenCalligraphyColor = value;
+                            return current;
+                          })
+                        }
+                      />
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <RangeField
+                          label="위아래 위치"
+                          value={draft.hero.fullscreenCalligraphyTop}
+                          min={12}
+                          max={82}
+                          suffix="%"
+                          onChange={(value) =>
+                            update((current) => {
+                              current.hero.fullscreenCalligraphyTop = value;
+                              return current;
+                            })
+                          }
+                        />
+                        <RangeField
+                          label="좌우 위치"
+                          value={draft.hero.fullscreenCalligraphyLeft}
+                          min={18}
+                          max={82}
+                          suffix="%"
+                          onChange={(value) =>
+                            update((current) => {
+                              current.hero.fullscreenCalligraphyLeft = value;
+                              return current;
+                            })
+                          }
+                        />
+                      </div>
+                      <RangeField
+                        label="글씨 크기"
+                        value={draft.hero.fullscreenCalligraphySize}
+                        min={28}
+                        max={92}
+                        suffix="px"
+                        onChange={(value) =>
+                          update((current) => {
+                            current.hero.fullscreenCalligraphySize = value;
+                            return current;
+                          })
+                        }
+                      />
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
 
             <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
               <div className="mb-4">
