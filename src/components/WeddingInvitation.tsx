@@ -284,7 +284,7 @@ function Cover({ data }: { data: WeddingData }) {
 
     return (
       <section className="relative min-h-screen overflow-hidden bg-[#1f1b18]">
-        <div className="absolute inset-0 scale-[0.94]">
+        <div className="absolute inset-0">
           <InvitationImage
             photo={data.photos.cover}
             priority

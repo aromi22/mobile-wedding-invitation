@@ -218,7 +218,7 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
     ...source.hero,
     coverTemplate: source.hero?.coverTemplate ?? merged.hero.coverTemplate ?? "polaroid",
     fullscreenCalligraphyEnabled:
-      source.hero?.fullscreenCalligraphyEnabled ?? merged.hero.fullscreenCalligraphyEnabled ?? false,
+      source.hero?.fullscreenCalligraphyEnabled ?? merged.hero.fullscreenCalligraphyEnabled ?? true,
     fullscreenCalligraphyText:
       source.hero?.fullscreenCalligraphyText ?? merged.hero.fullscreenCalligraphyText ?? "Our Wedding Day",
     fullscreenCalligraphyColor:
@@ -2362,6 +2362,11 @@ export function EditInvitation({
                       onClick={() =>
                         update((current) => {
                           current.hero.coverTemplate = template.value;
+                          if (template.value === "fullscreen") {
+                            current.hero.fullscreenCalligraphyEnabled = true;
+                            current.hero.fullscreenCalligraphyText =
+                              current.hero.fullscreenCalligraphyText || selectedPhrase;
+                          }
                           return current;
                         })
                       }
@@ -2487,89 +2492,86 @@ export function EditInvitation({
                       })
                     }
                   />
-                  {draft.hero.fullscreenCalligraphyEnabled ? (
-                    <>
-                      <Field
-                        label="캘리그래피 문구"
-                        value={draft.hero.fullscreenCalligraphyText}
-                        placeholder="Our Wedding Day"
-                        onChange={(value) =>
+                  <Field
+                    label="캘리그래피 문구"
+                    value={draft.hero.fullscreenCalligraphyText}
+                    placeholder="Our Wedding Day"
+                    onChange={(value) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphyText = value;
+                        return current;
+                      })
+                    }
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {weddingHandwritingPhrases.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() =>
                           update((current) => {
-                            current.hero.fullscreenCalligraphyText = value;
+                            current.hero.fullscreenCalligraphyText = suggestion;
+                            current.hero.fullscreenCalligraphyEnabled = true;
                             return current;
                           })
                         }
-                      />
-                      <div className="flex flex-wrap gap-2">
-                        {weddingHandwritingPhrases.map((suggestion) => (
-                          <button
-                            key={suggestion}
-                            type="button"
-                            onClick={() =>
-                              update((current) => {
-                                current.hero.fullscreenCalligraphyText = suggestion;
-                                return current;
-                              })
-                            }
-                            className="rounded-full border border-[#dfd2bf] bg-white px-3 py-2 text-xs font-medium text-[#806b4f]"
-                          >
-                            {suggestion}
-                          </button>
-                        ))}
-                      </div>
-                      <ColorField
-                        label="캘리그래피 색상"
-                        value={draft.hero.fullscreenCalligraphyColor}
-                        onChange={(value) =>
-                          update((current) => {
-                            current.hero.fullscreenCalligraphyColor = value;
-                            return current;
-                          })
-                        }
-                      />
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <RangeField
-                          label="위아래 위치"
-                          value={draft.hero.fullscreenCalligraphyTop}
-                          min={12}
-                          max={82}
-                          suffix="%"
-                          onChange={(value) =>
-                            update((current) => {
-                              current.hero.fullscreenCalligraphyTop = value;
-                              return current;
-                            })
-                          }
-                        />
-                        <RangeField
-                          label="좌우 위치"
-                          value={draft.hero.fullscreenCalligraphyLeft}
-                          min={18}
-                          max={82}
-                          suffix="%"
-                          onChange={(value) =>
-                            update((current) => {
-                              current.hero.fullscreenCalligraphyLeft = value;
-                              return current;
-                            })
-                          }
-                        />
-                      </div>
-                      <RangeField
-                        label="글씨 크기"
-                        value={draft.hero.fullscreenCalligraphySize}
-                        min={28}
-                        max={92}
-                        suffix="px"
-                        onChange={(value) =>
-                          update((current) => {
-                            current.hero.fullscreenCalligraphySize = value;
-                            return current;
-                          })
-                        }
-                      />
-                    </>
-                  ) : null}
+                        className="rounded-full border border-[#dfd2bf] bg-white px-3 py-2 text-xs font-medium text-[#806b4f]"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                  <ColorField
+                    label="캘리그래피 색상"
+                    value={draft.hero.fullscreenCalligraphyColor}
+                    onChange={(value) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphyColor = value;
+                        return current;
+                      })
+                    }
+                  />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <RangeField
+                      label="위아래 위치"
+                      value={draft.hero.fullscreenCalligraphyTop}
+                      min={12}
+                      max={82}
+                      suffix="%"
+                      onChange={(value) =>
+                        update((current) => {
+                          current.hero.fullscreenCalligraphyTop = value;
+                          return current;
+                        })
+                      }
+                    />
+                    <RangeField
+                      label="좌우 위치"
+                      value={draft.hero.fullscreenCalligraphyLeft}
+                      min={18}
+                      max={82}
+                      suffix="%"
+                      onChange={(value) =>
+                        update((current) => {
+                          current.hero.fullscreenCalligraphyLeft = value;
+                          return current;
+                        })
+                      }
+                    />
+                  </div>
+                  <RangeField
+                    label="글씨 크기"
+                    value={draft.hero.fullscreenCalligraphySize}
+                    min={28}
+                    max={92}
+                    suffix="px"
+                    onChange={(value) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphySize = value;
+                        return current;
+                      })
+                    }
+                  />
                 </div>
               </div>
             ) : null}
