@@ -3250,7 +3250,10 @@ export function EditInvitation({
           </FormSection>
         </div>
 
-        <aside ref={previewRef} className="min-w-0 scroll-mt-6 lg:sticky lg:top-4 lg:self-start">
+        <aside
+          ref={previewRef}
+          className="min-w-0 scroll-mt-6 lg:fixed lg:right-[max(1.25rem,calc((100vw-1180px)/2+1.25rem))] lg:top-4 lg:z-30 lg:w-[450px]"
+        >
           <div className="mb-3 flex items-center justify-between gap-3 px-1 text-sm text-[#7c6e62]">
             <span>오른쪽은 고객이 보는 모바일 청첩장 미리보기입니다.</span>
             <button
