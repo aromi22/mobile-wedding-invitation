@@ -18,6 +18,13 @@ const LETTERING_FONTS = {
   "freestyle-script": '"Freestyle Script", "French Script MT", "Great Vibes", cursive',
 };
 
+const FULLSCREEN_CALLIGRAPHY_FONTS = {
+  "great-vibes": '"Great Vibes", "Freestyle Script", "French Script MT", cursive',
+  cormorant: '"Cormorant Garamond", "Times New Roman", serif',
+  caveat: '"Caveat", "Segoe Print", cursive',
+  "freestyle-script": '"Freestyle Script", "French Script MT", "Great Vibes", cursive',
+};
+
 const CHILD_PHOTO_FRAME_CONFIG = {
   groom: {
     top: "10.85%",
@@ -300,6 +307,7 @@ function Cover({ data }: { data: WeddingData }) {
               left: `${hero.fullscreenCalligraphyLeft}%`,
               top: `${hero.fullscreenCalligraphyTop}%`,
               color: hero.fullscreenCalligraphyColor,
+              fontFamily: FULLSCREEN_CALLIGRAPHY_FONTS[hero.fullscreenCalligraphyFont],
               fontSize: `${hero.fullscreenCalligraphySize}px`,
             }}
           >

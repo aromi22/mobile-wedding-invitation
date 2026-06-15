@@ -55,6 +55,13 @@ const LETTERING_FONT_OPTIONS = [
   { label: "Freestyle Script", value: "freestyle-script" },
 ] as const;
 
+const FULLSCREEN_CALLIGRAPHY_FONT_OPTIONS = [
+  { label: "Great Vibes", value: "great-vibes" },
+  { label: "Cormorant Italic", value: "cormorant" },
+  { label: "Caveat", value: "caveat" },
+  { label: "Freestyle Script", value: "freestyle-script" },
+] as const;
+
 const COVER_TEMPLATE_OPTIONS = [
   {
     label: "폴라로이드형",
@@ -221,6 +228,8 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
       source.hero?.fullscreenCalligraphyEnabled ?? merged.hero.fullscreenCalligraphyEnabled ?? true,
     fullscreenCalligraphyText:
       source.hero?.fullscreenCalligraphyText ?? merged.hero.fullscreenCalligraphyText ?? "Our Wedding Day",
+    fullscreenCalligraphyFont:
+      source.hero?.fullscreenCalligraphyFont ?? merged.hero.fullscreenCalligraphyFont ?? "great-vibes",
     fullscreenCalligraphyColor:
       source.hero?.fullscreenCalligraphyColor ?? merged.hero.fullscreenCalligraphyColor ?? "#ffffff",
     fullscreenCalligraphyTop:
@@ -2388,6 +2397,131 @@ export function EditInvitation({
               </div>
             </div>
 
+            {draft.hero.coverTemplate === "fullscreen" ? (
+              <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-[#332b24]">
+                    풀스크린 캘리그래피 문구
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
+                    풀스크린 사진형 첫 화면에만 올라가는 손글씨 문구예요.
+                  </p>
+                </div>
+                <div className="grid gap-4">
+                  <ToggleField
+                    label="캘리그래피 문구 표시"
+                    checked={draft.hero.fullscreenCalligraphyEnabled}
+                    onChange={(checked) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphyEnabled = checked;
+                        return current;
+                      })
+                    }
+                  />
+                  <Field
+                    label="캘리그래피 문구"
+                    value={draft.hero.fullscreenCalligraphyText}
+                    placeholder="Our Wedding Day"
+                    onChange={(value) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphyText = value;
+                        return current;
+                      })
+                    }
+                  />
+                  <label className="grid min-w-0 gap-2 text-sm text-[#5f5349]">
+                    <span>캘리그래피 글꼴</span>
+                    <select
+                      value={draft.hero.fullscreenCalligraphyFont}
+                      onChange={(event) =>
+                        update((current) => {
+                          current.hero.fullscreenCalligraphyFont =
+                            event.target.value as WeddingData["hero"]["fullscreenCalligraphyFont"];
+                          return current;
+                        })
+                      }
+                      className="w-full min-w-0 rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
+                    >
+                      {FULLSCREEN_CALLIGRAPHY_FONT_OPTIONS.map((font) => (
+                        <option key={font.value} value={font.value}>
+                          {font.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {weddingHandwritingPhrases.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() =>
+                          update((current) => {
+                            current.hero.fullscreenCalligraphyText = suggestion;
+                            current.hero.fullscreenCalligraphyEnabled = true;
+                            return current;
+                          })
+                        }
+                        className="rounded-full border border-[#dfd2bf] bg-white px-3 py-2 text-xs font-medium text-[#806b4f]"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                  <ColorField
+                    label="캘리그래피 색상"
+                    value={draft.hero.fullscreenCalligraphyColor}
+                    onChange={(value) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphyColor = value;
+                        return current;
+                      })
+                    }
+                  />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <RangeField
+                      label="위아래 위치"
+                      value={draft.hero.fullscreenCalligraphyTop}
+                      min={12}
+                      max={82}
+                      suffix="%"
+                      onChange={(value) =>
+                        update((current) => {
+                          current.hero.fullscreenCalligraphyTop = value;
+                          return current;
+                        })
+                      }
+                    />
+                    <RangeField
+                      label="좌우 위치"
+                      value={draft.hero.fullscreenCalligraphyLeft}
+                      min={18}
+                      max={82}
+                      suffix="%"
+                      onChange={(value) =>
+                        update((current) => {
+                          current.hero.fullscreenCalligraphyLeft = value;
+                          return current;
+                        })
+                      }
+                    />
+                  </div>
+                  <RangeField
+                    label="글씨 크기"
+                    value={draft.hero.fullscreenCalligraphySize}
+                    min={28}
+                    max={92}
+                    suffix="px"
+                    onChange={(value) =>
+                      update((current) => {
+                        current.hero.fullscreenCalligraphySize = value;
+                        return current;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            ) : null}
+
             <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">메인 사진</p>
@@ -2470,111 +2604,6 @@ export function EditInvitation({
                 </div>
               </div>
             </div>
-
-            {draft.hero.coverTemplate === "fullscreen" ? (
-              <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
-                <div className="mb-4">
-                  <p className="text-sm font-semibold text-[#332b24]">
-                    풀스크린 캘리그래피 문구
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
-                    풀스크린 사진형 첫 화면에만 올라가는 손글씨 문구예요.
-                  </p>
-                </div>
-                <div className="grid gap-4">
-                  <ToggleField
-                    label="캘리그래피 문구 표시"
-                    checked={draft.hero.fullscreenCalligraphyEnabled}
-                    onChange={(checked) =>
-                      update((current) => {
-                        current.hero.fullscreenCalligraphyEnabled = checked;
-                        return current;
-                      })
-                    }
-                  />
-                  <Field
-                    label="캘리그래피 문구"
-                    value={draft.hero.fullscreenCalligraphyText}
-                    placeholder="Our Wedding Day"
-                    onChange={(value) =>
-                      update((current) => {
-                        current.hero.fullscreenCalligraphyText = value;
-                        return current;
-                      })
-                    }
-                  />
-                  <div className="flex flex-wrap gap-2">
-                    {weddingHandwritingPhrases.map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        type="button"
-                        onClick={() =>
-                          update((current) => {
-                            current.hero.fullscreenCalligraphyText = suggestion;
-                            current.hero.fullscreenCalligraphyEnabled = true;
-                            return current;
-                          })
-                        }
-                        className="rounded-full border border-[#dfd2bf] bg-white px-3 py-2 text-xs font-medium text-[#806b4f]"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                  <ColorField
-                    label="캘리그래피 색상"
-                    value={draft.hero.fullscreenCalligraphyColor}
-                    onChange={(value) =>
-                      update((current) => {
-                        current.hero.fullscreenCalligraphyColor = value;
-                        return current;
-                      })
-                    }
-                  />
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <RangeField
-                      label="위아래 위치"
-                      value={draft.hero.fullscreenCalligraphyTop}
-                      min={12}
-                      max={82}
-                      suffix="%"
-                      onChange={(value) =>
-                        update((current) => {
-                          current.hero.fullscreenCalligraphyTop = value;
-                          return current;
-                        })
-                      }
-                    />
-                    <RangeField
-                      label="좌우 위치"
-                      value={draft.hero.fullscreenCalligraphyLeft}
-                      min={18}
-                      max={82}
-                      suffix="%"
-                      onChange={(value) =>
-                        update((current) => {
-                          current.hero.fullscreenCalligraphyLeft = value;
-                          return current;
-                        })
-                      }
-                    />
-                  </div>
-                  <RangeField
-                    label="글씨 크기"
-                    value={draft.hero.fullscreenCalligraphySize}
-                    min={28}
-                    max={92}
-                    suffix="px"
-                    onChange={(value) =>
-                      update((current) => {
-                        current.hero.fullscreenCalligraphySize = value;
-                        return current;
-                      })
-                    }
-                  />
-                </div>
-              </div>
-            ) : null}
 
             <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
               <div className="mb-4">
@@ -3221,7 +3250,7 @@ export function EditInvitation({
           </FormSection>
         </div>
 
-        <aside ref={previewRef} className="min-w-0 scroll-mt-6 lg:sticky lg:top-6">
+        <aside ref={previewRef} className="min-w-0 scroll-mt-6 lg:sticky lg:top-4 lg:self-start">
           <div className="mb-3 flex items-center justify-between gap-3 px-1 text-sm text-[#7c6e62]">
             <span>오른쪽은 고객이 보는 모바일 청첩장 미리보기입니다.</span>
             <button
@@ -3233,7 +3262,7 @@ export function EditInvitation({
             </button>
           </div>
           <div className="mx-auto w-full max-w-[430px] overflow-hidden rounded-[1.6rem] bg-[#eee5da] p-2 shadow-[0_20px_60px_rgba(91,70,42,0.18)] sm:p-3">
-            <div className="max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[1.15rem] bg-white">
+            <div className="max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[1.15rem] bg-white">
               <WeddingInvitation data={preview} />
             </div>
           </div>

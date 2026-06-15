@@ -193,6 +193,7 @@ export const wedding: WeddingData = {
     coverTemplate: "polaroid",
     fullscreenCalligraphyEnabled: false,
     fullscreenCalligraphyText: "Our Wedding Day",
+    fullscreenCalligraphyFont: "great-vibes",
     fullscreenCalligraphyColor: "#ffffff",
     fullscreenCalligraphyTop: 42,
     fullscreenCalligraphyLeft: 50,

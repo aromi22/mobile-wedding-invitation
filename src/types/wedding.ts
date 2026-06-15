@@ -79,6 +79,11 @@ export type WeddingTimelineItem = {
 
 export type WeddingLetteringFont = "segoe-print" | "freestyle-script";
 export type WeddingCoverTemplate = "polaroid" | "fullscreen";
+export type WeddingCalligraphyFont =
+  | "great-vibes"
+  | "cormorant"
+  | "caveat"
+  | "freestyle-script";
 
 export type WeddingFamilySettings = {
   align: "center" | "left";
@@ -92,6 +97,7 @@ export type WeddingHeroSettings = {
   coverTemplate: WeddingCoverTemplate;
   fullscreenCalligraphyEnabled: boolean;
   fullscreenCalligraphyText: string;
+  fullscreenCalligraphyFont: WeddingCalligraphyFont;
   fullscreenCalligraphyColor: string;
   fullscreenCalligraphyTop: number;
   fullscreenCalligraphyLeft: number;
