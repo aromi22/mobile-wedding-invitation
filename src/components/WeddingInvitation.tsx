@@ -282,7 +282,7 @@ function Cover({ data }: { data: WeddingData }) {
   if (hero.coverTemplate === "fullscreen") {
     return (
       <section className="relative min-h-screen overflow-hidden bg-[#1f1b18]">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 scale-110 opacity-55 blur-xl">
           <InvitationImage
             photo={data.photos.cover}
             priority
@@ -290,7 +290,15 @@ function Cover({ data }: { data: WeddingData }) {
             sizes="430px"
           />
         </div>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.02)_45%,rgba(0,0,0,0.22)_100%)]" />
+        <div className="absolute inset-0">
+          <InvitationImage
+            photo={data.photos.cover}
+            priority
+            className="object-contain"
+            sizes="430px"
+          />
+        </div>
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0)_45%,rgba(0,0,0,0.2)_100%)]" />
         {hero.showScrollHint ? (
           <div className="cover-reveal cover-reveal-delay-2 absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5 text-white/70">
             <span className="text-[0.56rem] tracking-[0.26em]">SCROLL</span>
