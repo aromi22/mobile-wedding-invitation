@@ -251,13 +251,14 @@ button {
 
 .cover-petal {
   position: absolute;
-  top: -12%;
+  top: -14%;
   display: block;
-  border-radius: 999px 999px 999px 0;
-  filter: blur(0.15px);
+  border-radius: 78% 0 78% 0;
+  filter: blur(0.1px);
   opacity: 0;
-  transform: translate3d(0, -10vh, 0) rotate(18deg);
-  animation: cover-petal-fall 3.4s ease-in forwards;
+  transform: translate3d(0, -12vh, 0) rotate(var(--petal-rotate, 18deg));
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.16);
+  animation: cover-petal-fall 5.4s cubic-bezier(0.38, 0, 0.52, 1) forwards;
 }
 
 @keyframes cover-script-in {
@@ -277,20 +278,20 @@ button {
 @keyframes cover-petal-fall {
   0% {
     opacity: 0;
-    transform: translate3d(0, -12vh, 0) rotate(18deg);
+    transform: translate3d(0, -14vh, 0) rotate(var(--petal-rotate, 18deg)) scale(0.78);
   }
 
   12% {
-    opacity: 0.56;
+    opacity: 0.5;
   }
 
   72% {
-    opacity: 0.42;
+    opacity: 0.38;
   }
 
   100% {
     opacity: 0;
-    transform: translate3d(var(--petal-drift), 84vh, 0) rotate(250deg);
+    transform: translate3d(var(--petal-drift), 88vh, 0) rotate(calc(var(--petal-rotate, 18deg) + 190deg)) scale(1.02);
   }
 }
 

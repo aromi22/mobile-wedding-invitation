@@ -26,18 +26,19 @@ const FULLSCREEN_CALLIGRAPHY_FONTS = {
 };
 
 const COVER_PETALS = Array.from({ length: 24 }, (_, index) => ({
-  left: `${(index * 17 + 8) % 96}%`,
-  delay: `${(index % 8) * 0.16}s`,
-  duration: `${2.8 + (index % 6) * 0.22}s`,
-  drift: `${index % 2 === 0 ? 18 + index : -18 - index}px`,
-  size: `${6 + (index % 4)}px`,
+  left: `${(index * 19 + 6) % 96}%`,
+  delay: `${(index % 10) * 0.18}s`,
+  duration: `${4.6 + (index % 6) * 0.35}s`,
+  drift: `${index % 2 === 0 ? 22 + index * 1.4 : -22 - index * 1.2}px`,
+  rotate: `${index % 2 === 0 ? 18 + index * 7 : -22 - index * 5}deg`,
+  size: `${7 + (index % 5)}px`,
 }));
 
 const PETAL_COLORS = {
   none: "",
-  soft: "rgba(255,255,255,0.58)",
-  pink: "rgba(250,196,210,0.52)",
-  sky: "rgba(245,232,214,0.62)",
+  soft: "rgba(255,255,255,0.68)",
+  pink: "rgba(248,210,218,0.62)",
+  sky: "rgba(246,235,219,0.66)",
 };
 
 const CHILD_PHOTO_FRAME_CONFIG = {
@@ -75,6 +76,7 @@ function CoverPetalEffect({ variant }: { variant: WeddingData["hero"]["petalEffe
               animationDelay: petal.delay,
               animationDuration: petal.duration,
               "--petal-drift": petal.drift,
+              "--petal-rotate": petal.rotate,
             } as CSSProperties
           }
         />

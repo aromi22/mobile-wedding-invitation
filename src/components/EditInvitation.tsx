@@ -81,10 +81,10 @@ const COVER_TEMPLATE_OPTIONS = [
 ] as const;
 
 const PETAL_EFFECT_OPTIONS = [
-  { label: "없음", value: "none", description: "첫 화면을 가장 깔끔하게 보여줘요." },
-  { label: "화이트 꽃잎", value: "soft", description: "하얀 꽃잎이 아주 천천히 흩날려요." },
-  { label: "연핑크 꽃잎", value: "pink", description: "웨딩 느낌이 살짝 더해지는 부드러운 핑크 톤이에요." },
-  { label: "아이보리 꽃가루", value: "sky", description: "차분한 아이보리 톤으로 은은하게 흩날려요." },
+  { label: "없음", value: "none", description: "꽃잎 없이 가장 미니멀하게 시작해요." },
+  { label: "화이트 꽃잎", value: "soft", description: "하얀 꽃잎이 천천히 내려오는 깨끗한 분위기예요." },
+  { label: "연핑크 꽃잎", value: "pink", description: "아주 옅은 핑크 톤으로 로맨틱하게 흩날려요." },
+  { label: "아이보리 꽃잎", value: "sky", description: "종이 청첩장처럼 차분한 아이보리 톤이에요." },
 ] as const;
 
 type EditorTabKey = "basic" | "design" | "photos" | "copy" | "accounts" | "share";
