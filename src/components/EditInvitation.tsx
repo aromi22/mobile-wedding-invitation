@@ -114,7 +114,6 @@ const SECTION_TOGGLE_OPTIONS: Array<{
   { key: "qa", label: "Q&A" },
   { key: "timeline", label: "타임라인" },
   { key: "family", label: "신랑 신부 소개" },
-  { key: "profile", label: "프로필 문구" },
   { key: "calendar", label: "달력 / 예식 날짜" },
   { key: "location", label: "예식 장소 / 지도" },
   { key: "gallery", label: "갤러리" },
@@ -1603,8 +1602,8 @@ export function EditInvitation({
               const sideLabel = side === "groom" ? "신랑" : "신부";
 
               return (
-                <div key={side} className="grid gap-3 rounded-lg border border-[#eadfcd] p-3">
-                  <p className="text-sm font-semibold text-[#332b24]">{sideLabel} 프로필</p>
+                <div key={side} className="grid gap-3 rounded-[14px] border border-[#ededed] bg-[#fafafa] p-4">
+                  <p className="text-sm font-semibold text-[#191919]">{sideLabel} 프로필 정보</p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field
                       label="출생년도"
@@ -2904,67 +2903,6 @@ export function EditInvitation({
                     })
                   }
                 />
-                <div className="grid gap-3 rounded-lg border border-[#eadfcd] bg-[#fbf8f2] p-3">
-                  <p className="text-sm font-semibold text-[#332b24]">
-                    액자 일러스트 어릴 적 사진
-                  </p>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="grid gap-3">
-                      <FileField
-                        label="신랑 어릴 적 사진 첨부"
-                        onSelect={(files) => updateChildPhotoFile("groom", files)}
-                      />
-                      <Field
-                        label="신랑 어릴 적 사진 URL"
-                        value={draft.photos.groomChildPhoto?.src ?? ""}
-                        onChange={(value) =>
-                          update((current) => {
-                            current.photos.groomChildPhoto.src = value;
-                            current.photos.groomChildPhoto.scale =
-                              current.photos.groomChildPhoto.scale ?? 1;
-                            return current;
-                          })
-                        }
-                      />
-                      <RangeField
-                        label="신랑 사진 확대"
-                        value={draft.photos.groomChildPhoto?.scale ?? 1}
-                        min={1}
-                        max={2.4}
-                        step={0.05}
-                        suffix="x"
-                        onChange={(value) => updateChildPhotoScale("groom", value)}
-                      />
-                    </div>
-                    <div className="grid gap-3">
-                      <FileField
-                        label="신부 어릴 적 사진 첨부"
-                        onSelect={(files) => updateChildPhotoFile("bride", files)}
-                      />
-                      <Field
-                        label="신부 어릴 적 사진 URL"
-                        value={draft.photos.brideChildPhoto?.src ?? ""}
-                        onChange={(value) =>
-                          update((current) => {
-                            current.photos.brideChildPhoto.src = value;
-                            current.photos.brideChildPhoto.scale =
-                              current.photos.brideChildPhoto.scale ?? 1;
-                            return current;
-                          })
-                        }
-                      />
-                      <RangeField
-                        label="신부 사진 확대"
-                        value={draft.photos.brideChildPhoto?.scale ?? 1}
-                        min={1}
-                        max={2.4}
-                        step={0.05}
-                        suffix="x"
-                        onChange={(value) => updateChildPhotoScale("bride", value)}
-                      />
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -3279,6 +3217,107 @@ export function EditInvitation({
           </FormSection>
 
           <FormSection title="사진" isVisible={activeEditorTab === "photos"}>
+            <div className="grid gap-5 rounded-[18px] border border-[#dedede] bg-white p-6">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-[#191919]">어릴 적 액자 & 프로필</p>
+                  <p className="mt-1 text-xs leading-5 text-[#777]">
+                    액자 속 어릴 적 사진과 MBTI, 별명, 해시태그를 한 묶음으로 보여줘요.
+                  </p>
+                </div>
+                <label className="relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center">
+                  <input
+                    type="checkbox"
+                    checked={draft.sections.profile}
+                    onChange={(event) =>
+                      update((current) => {
+                        current.sections = {
+                          ...wedding.sections,
+                          ...current.sections,
+                          profile: event.target.checked,
+                        };
+                        return current;
+                      })
+                    }
+                    className="peer sr-only"
+                    aria-label="어릴 적 액자와 프로필 표시 여부"
+                  />
+                  <span className="absolute inset-0 rounded-full bg-[#cfcfcf] transition peer-checked:bg-[#191919]" />
+                  <span className="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition peer-checked:translate-x-6" />
+                </label>
+              </div>
+
+              {draft.sections.profile ? (
+                <div className="grid gap-5">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-3 rounded-[14px] border border-[#ededed] bg-[#fafafa] p-4">
+                      <p className="text-sm font-semibold text-[#191919]">신랑 어릴 적 사진</p>
+                      <FileField
+                        label="사진 첨부"
+                        onSelect={(files) => updateChildPhotoFile("groom", files)}
+                      />
+                      <Field
+                        label="사진 URL"
+                        value={draft.photos.groomChildPhoto?.src ?? ""}
+                        onChange={(value) =>
+                          update((current) => {
+                            current.photos.groomChildPhoto.src = value;
+                            current.photos.groomChildPhoto.scale =
+                              current.photos.groomChildPhoto.scale ?? 1;
+                            return current;
+                          })
+                        }
+                      />
+                      <RangeField
+                        label="사진 확대"
+                        value={draft.photos.groomChildPhoto?.scale ?? 1}
+                        min={1}
+                        max={2.4}
+                        step={0.05}
+                        suffix="x"
+                        onChange={(value) => updateChildPhotoScale("groom", value)}
+                      />
+                    </div>
+                    <div className="grid gap-3 rounded-[14px] border border-[#ededed] bg-[#fafafa] p-4">
+                      <p className="text-sm font-semibold text-[#191919]">신부 어릴 적 사진</p>
+                      <FileField
+                        label="사진 첨부"
+                        onSelect={(files) => updateChildPhotoFile("bride", files)}
+                      />
+                      <Field
+                        label="사진 URL"
+                        value={draft.photos.brideChildPhoto?.src ?? ""}
+                        onChange={(value) =>
+                          update((current) => {
+                            current.photos.brideChildPhoto.src = value;
+                            current.photos.brideChildPhoto.scale =
+                              current.photos.brideChildPhoto.scale ?? 1;
+                            return current;
+                          })
+                        }
+                      />
+                      <RangeField
+                        label="사진 확대"
+                        value={draft.photos.brideChildPhoto?.scale ?? 1}
+                        min={1}
+                        max={2.4}
+                        step={0.05}
+                        suffix="x"
+                        onChange={(value) => updateChildPhotoScale("bride", value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="rounded-[14px] border border-[#ededed] bg-white p-4">
+                    {renderSectionEditor("profile")}
+                  </div>
+                </div>
+              ) : (
+                <p className="rounded-[14px] bg-[#fafafa] px-4 py-3 text-xs leading-5 text-[#777]">
+                  꺼두면 청첩장에 어릴 적 액자와 프로필 문구가 모두 표시되지 않아요.
+                </p>
+              )}
+            </div>
+
             <div className="grid gap-4 rounded-lg border border-[#eadfcd] bg-white p-4">
               <p className="text-sm font-semibold text-[#332b24]">본문 사진</p>
               <FileField

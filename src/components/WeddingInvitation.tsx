@@ -505,7 +505,9 @@ function CoupleProfileCard({ person }: { person: Person }) {
       <p className="mt-1 text-[0.92rem] leading-7">
         {[profile.birthYear, profile.hometown].filter(Boolean).join(", ")}
       </p>
-      <p className="text-[0.92rem] leading-7">{profile.intro}</p>
+      <p className="text-[0.92rem] leading-7">
+        {[profile.intro, profile.mbti].filter(Boolean).join(" ")}
+      </p>
       <p className="text-[0.92rem] leading-7">
         {profile.relationship}
         {profile.relationship ? <span className="ml-1 text-[#b5121b]">♥</span> : null}
@@ -1406,7 +1408,7 @@ export function WeddingInvitation({
         <span className="ambient-glow ambient-glow-1" />
       </div>
       <Cover data={data} />
-      <ChildhoodFrameSection data={data} />
+      {sections.profile ? <ChildhoodFrameSection data={data} /> : null}
       {sections.openingMessage ? <InvitationMessage data={data} /> : null}
       {sections.story && data.storyStyle.type === "default" ? <StorySection data={data} /> : null}
       {sections.qa ? <QASection data={data} /> : null}
