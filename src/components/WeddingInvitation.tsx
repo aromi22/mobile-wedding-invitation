@@ -25,13 +25,13 @@ const FULLSCREEN_CALLIGRAPHY_FONTS = {
   "freestyle-script": '"Freestyle Script", "French Script MT", "Great Vibes", cursive',
 };
 
-const COVER_PETALS = Array.from({ length: 24 }, (_, index) => ({
+const COVER_PETALS = Array.from({ length: 14 }, (_, index) => ({
   left: `${(index * 19 + 6) % 96}%`,
-  delay: `${(index % 10) * 0.18}s`,
-  duration: `${4.6 + (index % 6) * 0.35}s`,
-  drift: `${index % 2 === 0 ? 22 + index * 1.4 : -22 - index * 1.2}px`,
+  delay: `${(index % 7) * 0.32}s`,
+  duration: `${8.4 + (index % 5) * 0.85}s`,
+  drift: `${index % 2 === 0 ? 28 + index * 1.7 : -28 - index * 1.5}px`,
   rotate: `${index % 2 === 0 ? 18 + index * 7 : -22 - index * 5}deg`,
-  size: `${7 + (index % 5)}px`,
+  size: `${7 + (index % 4)}px`,
 }));
 
 const PETAL_COLORS = {

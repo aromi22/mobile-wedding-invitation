@@ -87,7 +87,7 @@ const PETAL_EFFECT_OPTIONS = [
   { label: "아이보리 꽃잎", value: "sky", description: "종이 청첩장처럼 차분한 아이보리 톤이에요." },
 ] as const;
 
-type EditorTabKey = "basic" | "design" | "photos" | "copy" | "accounts" | "share";
+type EditorTabKey = "basic" | "design" | "accounts" | "share";
 
 const EDITOR_TABS: Array<{
   key: EditorTabKey;
@@ -96,11 +96,9 @@ const EDITOR_TABS: Array<{
   icon: string;
 }> = [
   { key: "basic", label: "기본 정보", description: "이름, 예식, 가족 정보", icon: "01" },
-  { key: "design", label: "디자인", description: "첫 화면과 구성", icon: "02" },
-  { key: "photos", label: "사진", description: "커버, 갤러리, 본문 사진", icon: "03" },
-  { key: "copy", label: "문구", description: "초대글과 이야기", icon: "04" },
-  { key: "accounts", label: "계좌·참석", description: "마음 전하실 곳과 RSVP", icon: "05" },
-  { key: "share", label: "공유 설정", description: "음악, 지도, 링크", icon: "06" },
+  { key: "design", label: "디자인", description: "화면, 사진, 문구", icon: "02" },
+  { key: "accounts", label: "계좌·참석", description: "마음 전하실 곳과 RSVP", icon: "03" },
+  { key: "share", label: "공유 설정", description: "음악, 지도, 링크", icon: "04" },
 ];
 
 type SectionToggleKey = keyof WeddingData["sections"];
@@ -2104,15 +2102,13 @@ export function EditInvitation({
     <div className="min-h-screen bg-[#f6f6f6] text-[#191919]">
       <div className="border-b border-[#e7e7e7] bg-white">
         <div className="mx-auto flex h-[68px] w-full max-w-[1600px] items-center justify-between px-5 lg:px-10">
-          <div className="font-serif text-2xl font-bold italic tracking-[-0.04em]">Dear Moment</div>
+          <a href="/" className="text-2xl font-semibold tracking-[-0.05em]">
+            moink
+          </a>
           <nav className="hidden items-center gap-9 text-sm text-[#222] lg:flex">
-            <a href="/demo" className="hover:text-[#d6a2ad]">둘러보기</a>
-            <a href="/make" className="font-semibold hover:text-[#d6a2ad]">청첩장</a>
-            <span>영상</span>
-            <span>이벤트</span>
-            <span>가이드</span>
-            <span>FAQ</span>
-            <span>고객센터</span>
+            <a href="/guide" className="hover:text-[#d6a2ad]">가이드</a>
+            <a href="/faq" className="hover:text-[#d6a2ad]">FAQ</a>
+            <a href="/support" className="hover:text-[#d6a2ad]">고객센터</a>
           </nav>
           <div className="flex items-center gap-3">
             <span className="hidden text-sm font-semibold sm:inline">내 작업</span>
@@ -2156,7 +2152,7 @@ export function EditInvitation({
         </div>
       </div>
 
-      <div className="mx-auto grid w-full max-w-[1600px] gap-0 lg:grid-cols-[240px_minmax(0,760px)_minmax(420px,1fr)]">
+      <div className="mx-auto grid w-full max-w-[1600px] gap-0 lg:h-[calc(100vh-137px)] lg:grid-cols-[240px_minmax(0,760px)_minmax(420px,1fr)] lg:overflow-hidden">
         <nav className="hidden min-h-[calc(100vh-137px)] border-r border-[#e7e7e7] bg-white px-8 py-10 lg:block">
           <div className="sticky top-8 space-y-4">
             {EDITOR_TABS.map((tab) => {
@@ -2181,7 +2177,7 @@ export function EditInvitation({
 
         <main
           ref={editorRef}
-          className="min-w-0 space-y-5 px-5 py-8 lg:px-8"
+          className="min-w-0 space-y-5 px-5 py-8 lg:h-[calc(100vh-137px)] lg:overflow-y-auto lg:px-8"
         >
           <header className="rounded-[18px] border border-[#dedede] bg-white p-5">
             <p className="text-[13px] font-semibold text-[#191919]">
@@ -3080,7 +3076,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="문구" isVisible={activeEditorTab === "copy"}>
+          <FormSection title="문구" isVisible={activeEditorTab === "design"}>
             <TextArea
               label="초대 문구"
               value={draft.message.body}
@@ -3104,7 +3100,7 @@ export function EditInvitation({
             />
           </FormSection>
 
-          <FormSection title="스토리 타입" isVisible={activeEditorTab === "copy"}>
+          <FormSection title="스토리 타입" isVisible={activeEditorTab === "design"}>
             <label className="grid gap-2 text-sm text-[#5f5349]">
               <span>청첩장 스타일</span>
               <select
@@ -3216,7 +3212,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="사진" isVisible={activeEditorTab === "photos"}>
+          <FormSection title="사진" isVisible={activeEditorTab === "design"}>
             <div className="grid gap-5 rounded-[18px] border border-[#dedede] bg-white p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -3365,28 +3361,47 @@ export function EditInvitation({
           </FormSection>
 
           <FormSection title="음악" isVisible={activeEditorTab === "share"}>
-            <label className="grid gap-2 text-sm text-[#5f5349]">
-              <span>배경음악 선택</span>
-              <select
-                value={draft.music?.src ?? ""}
-                onChange={(event) => {
-                  const nextMusic =
-                    MUSIC_OPTIONS.find((music) => (music?.src ?? "") === event.target.value) ??
-                    null;
-                  update((current) => {
-                    current.music = nextMusic;
-                    return current;
-                  });
-                }}
-                className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
-              >
-                {MUSIC_OPTIONS.map((music) => (
-                  <option key={music?.src ?? "none"} value={music?.src ?? ""}>
-                    {music?.title ?? "음악 없음"}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="grid gap-3">
+              {MUSIC_OPTIONS.map((music) => {
+                const isSelected = (draft.music?.src ?? "") === (music?.src ?? "");
+
+                return (
+                  <div
+                    key={music?.src ?? "none"}
+                    className={`rounded-[14px] border p-4 transition ${
+                      isSelected ? "border-[#191919] bg-white" : "border-[#dedede] bg-[#fafafa]"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update((current) => {
+                            current.music = music;
+                            return current;
+                          })
+                        }
+                        className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                          isSelected ? "bg-[#191919] text-white" : "border border-[#dedede] bg-white text-[#191919]"
+                        }`}
+                      >
+                        {isSelected ? "선택됨" : "선택하기"}
+                      </button>
+                      <span className="text-sm font-semibold text-[#191919]">
+                        {music?.title ?? "음악 없음"}
+                      </span>
+                    </div>
+                    {music?.src ? (
+                      <audio controls preload="none" className="mt-3 w-full">
+                        <source src={music.src} type="audio/mpeg" />
+                      </audio>
+                    ) : (
+                      <p className="mt-3 text-xs text-[#777]">배경음악 없이 깔끔하게 보여줘요.</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </FormSection>
 
           <FormSection title="공유 설정" isVisible={activeEditorTab === "share"}>
@@ -3405,7 +3420,7 @@ export function EditInvitation({
 
         <aside
           ref={previewRef}
-          className="min-w-0 scroll-mt-6 bg-[#444] px-5 py-8 lg:sticky lg:top-0 lg:min-h-[calc(100vh-137px)] lg:self-start lg:px-10"
+          className="min-w-0 scroll-mt-6 bg-[#444] px-5 py-8 lg:h-[calc(100vh-137px)] lg:px-10"
         >
           <div className="mb-6 flex items-center justify-between gap-3 px-1 text-sm text-white/72">
             <span>모바일 청첩장 미리보기</span>
