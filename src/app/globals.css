@@ -249,6 +249,17 @@ button {
   animation: glow-pulse 5s ease-in-out infinite;
 }
 
+.cover-petal {
+  position: absolute;
+  top: -12%;
+  display: block;
+  border-radius: 999px 999px 999px 0;
+  filter: blur(0.15px);
+  opacity: 0;
+  transform: translate3d(0, -10vh, 0) rotate(18deg);
+  animation: cover-petal-fall 14s linear infinite;
+}
+
 @keyframes cover-script-in {
   to {
     opacity: 1;
@@ -260,6 +271,22 @@ button {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes cover-petal-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10vh, 0) rotate(18deg);
+  }
+
+  12% {
+    opacity: 0.52;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--petal-drift), 116vh, 0) rotate(250deg);
   }
 }
 
@@ -293,6 +320,7 @@ button {
   .reveal,
   .cover-reveal,
   .cover-script,
+  .cover-petal,
   .ambient-petal,
   .ambient-glow {
     animation: none;

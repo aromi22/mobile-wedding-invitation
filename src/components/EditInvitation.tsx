@@ -80,6 +80,13 @@ const COVER_TEMPLATE_OPTIONS = [
   },
 ] as const;
 
+const PETAL_EFFECT_OPTIONS = [
+  { label: "없음", value: "none", description: "첫 화면을 가장 깔끔하게 보여줘요." },
+  { label: "은은한 화이트", value: "soft", description: "하얀 꽃잎이 아주 천천히 흩날려요." },
+  { label: "연핑크 꽃잎", value: "pink", description: "웨딩 느낌이 살짝 더해지는 부드러운 핑크 톤이에요." },
+  { label: "하늘빛 꽃잎", value: "sky", description: "맑고 청량한 분위기의 옅은 블루 톤이에요." },
+] as const;
+
 type SectionToggleKey = keyof WeddingData["sections"];
 
 const SECTION_TOGGLE_OPTIONS: Array<{
@@ -229,6 +236,7 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
     ...merged.hero,
     ...source.hero,
     coverTemplate: source.hero?.coverTemplate ?? merged.hero.coverTemplate ?? "polaroid",
+    petalEffect: source.hero?.petalEffect ?? merged.hero.petalEffect ?? "none",
     fullscreenCalligraphyEnabled:
       source.hero?.fullscreenCalligraphyEnabled ?? merged.hero.fullscreenCalligraphyEnabled ?? true,
     fullscreenCalligraphyText:
@@ -2063,14 +2071,14 @@ export function EditInvitation({
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f0e8]">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto grid w-full max-w-[1180px] gap-8 px-3 py-5 sm:px-5 sm:py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
         <div
           ref={editorRef}
-          className="min-w-0 rounded-lg bg-[#fffdf8] px-4 shadow-[0_18px_50px_rgba(91,70,42,0.12)] sm:px-5"
+          className="min-w-0 rounded-lg bg-white px-4 shadow-[0_18px_50px_rgba(117,97,83,0.08)] sm:px-5"
         >
-          <header className="sticky top-0 z-10 -mx-4 border-b border-[#eadfcd] bg-[#fffdf8]/95 px-4 py-5 backdrop-blur sm:-mx-5 sm:px-5">
-            <p className="text-xs uppercase tracking-[0.24em] text-[#b29467]">
+          <header className="sticky top-0 z-10 -mx-4 border-b border-[#f1dde5] bg-white/95 px-4 py-5 backdrop-blur sm:-mx-5 sm:px-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-[#df8fa8]">
               {isPublicMakePage ? "Invitation Maker" : "Invitation Editor"}
             </p>
             <div className="mt-4 grid gap-2 sm:flex sm:flex-wrap">
@@ -2304,60 +2312,245 @@ export function EditInvitation({
             ) : null}
           </header>
 
-          <FormSection title="섹션별 사용 설정">
-            <div className="grid gap-2">
-              {SECTION_TOGGLE_OPTIONS.map((option) => {
-                const isOpen = openSectionKey === option.key;
-
-                return (
-                  <div
-                    key={option.key}
-                    className="overflow-hidden rounded-xl border border-[#eadfcd] bg-white shadow-[0_8px_24px_rgba(91,70,42,0.05)]"
-                  >
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <label className="relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center">
-                        <input
-                          type="checkbox"
-                          checked={draft.sections[option.key]}
-                          onChange={(event) =>
-                            update((current) => {
-                              current.sections = {
-                                ...wedding.sections,
-                                ...current.sections,
-                                [option.key]: event.target.checked,
-                              };
-                              return current;
-                            })
-                          }
-                          className="peer sr-only"
-                          aria-label={`${option.label} 표시 여부`}
-                        />
-                        <span className="absolute inset-0 rounded-full bg-[#d4d4d4] transition peer-checked:bg-[#f3d489]" />
-                        <span className="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition peer-checked:translate-x-6" />
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setOpenSectionKey(isOpen ? "openingMessage" : option.key)}
-                        className="flex flex-1 items-center justify-between gap-4 py-1 text-left text-base font-medium text-[#332b24]"
-                      >
-                        <span>{option.label}</span>
-                        <span className="text-2xl font-light leading-none text-[#2f2924]">
-                          {isOpen ? "⌃" : "⌄"}
-                        </span>
-                      </button>
-                    </div>
-                    {isOpen ? (
-                      <div className="border-t border-[#eadfcd] px-4 py-5">
-                        {renderSectionEditor(option.key)}
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              })}
+          <FormSection title="1. 기본 정보 입력">
+            <div className="rounded-xl border border-[#f1dde5] bg-[#fffafe] p-4 shadow-[0_12px_30px_rgba(226,143,166,0.08)]">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-[#332b24]">처음 한 번만 입력하면 전체 청첩장에 반영돼요.</p>
+                <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
+                  이름, 예식 정보, 부모님 정보는 아래에서 관리하고 뒤쪽에서는 반복 입력하지 않게 정리했어요.
+                </p>
+              </div>
+              <div className="grid gap-4">
+                <div className="grid gap-3 sm:grid-cols-4">
+                  <Field
+                    label="신랑 성"
+                    required
+                    value={draft.couple.groom.familyName}
+                    onChange={(value) => updatePersonName("groom", value, draft.couple.groom.givenName)}
+                  />
+                  <Field
+                    label="신랑 이름"
+                    required
+                    value={draft.couple.groom.givenName}
+                    onChange={(value) => updatePersonName("groom", draft.couple.groom.familyName, value)}
+                  />
+                  <Field
+                    label="신부 성"
+                    required
+                    value={draft.couple.bride.familyName}
+                    onChange={(value) => updatePersonName("bride", value, draft.couple.bride.givenName)}
+                  />
+                  <Field
+                    label="신부 이름"
+                    required
+                    value={draft.couple.bride.givenName}
+                    onChange={(value) => updatePersonName("bride", draft.couple.bride.familyName, value)}
+                  />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="예식 날짜" type="date" value={dateValue} onChange={updateDate} />
+                  <Field label="예식 시간" type="time" value={draft.event.time} onChange={updateTime} />
+                </div>
+                <Field
+                  label="예식장"
+                  value={draft.event.venue}
+                  onChange={(value) =>
+                    update((current) => {
+                      current.event.venue = value;
+                      return current;
+                    })
+                  }
+                />
+                <Field
+                  label="주소"
+                  value={draft.event.address}
+                  onChange={(value) =>
+                    update((current) => {
+                      current.event.address = value;
+                      return current;
+                    })
+                  }
+                />
+              </div>
             </div>
+
+            <details open className="rounded-xl border border-[#dcecf8] bg-[#f8fcff] p-4 shadow-[0_12px_30px_rgba(126,177,209,0.08)]">
+              <summary className="cursor-pointer text-sm font-semibold text-[#332b24]">
+                부모님 및 가족 표시 정보
+              </summary>
+              <div className="mt-5 grid gap-5">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4">
+                    <p className="text-sm font-semibold text-[#332b24]">신랑측</p>
+                    <ParentNameFields
+                      title="신랑 아버지"
+                      familyName={draft.couple.groom.parents.fatherFamilyName}
+                      givenName={draft.couple.groom.parents.fatherGivenName}
+                      deceased={draft.couple.groom.parents.fatherDeceased}
+                      onFamilyNameChange={(value) =>
+                        updateParentName("groom", "father", value, draft.couple.groom.parents.fatherGivenName)
+                      }
+                      onGivenNameChange={(value) =>
+                        updateParentName("groom", "father", draft.couple.groom.parents.fatherFamilyName, value)
+                      }
+                      onDeceasedChange={(checked) =>
+                        update((current) => {
+                          current.couple.groom.parents.fatherDeceased = checked;
+                          return current;
+                        })
+                      }
+                    />
+                    <ParentNameFields
+                      title="신랑 어머니"
+                      familyName={draft.couple.groom.parents.motherFamilyName}
+                      givenName={draft.couple.groom.parents.motherGivenName}
+                      deceased={draft.couple.groom.parents.motherDeceased}
+                      onFamilyNameChange={(value) =>
+                        updateParentName("groom", "mother", value, draft.couple.groom.parents.motherGivenName)
+                      }
+                      onGivenNameChange={(value) =>
+                        updateParentName("groom", "mother", draft.couple.groom.parents.motherFamilyName, value)
+                      }
+                      onDeceasedChange={(checked) =>
+                        update((current) => {
+                          current.couple.groom.parents.motherDeceased = checked;
+                          return current;
+                        })
+                      }
+                    />
+                    <Field
+                      label="신랑 관계명"
+                      required
+                      placeholder="예: 아들, 장남, 차남"
+                      value={draft.couple.groom.parents.relation}
+                      onChange={(value) =>
+                        update((current) => {
+                          current.couple.groom.parents.relation = value;
+                          return current;
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4">
+                    <p className="text-sm font-semibold text-[#332b24]">신부측</p>
+                    <ParentNameFields
+                      title="신부 아버지"
+                      familyName={draft.couple.bride.parents.fatherFamilyName}
+                      givenName={draft.couple.bride.parents.fatherGivenName}
+                      deceased={draft.couple.bride.parents.fatherDeceased}
+                      onFamilyNameChange={(value) =>
+                        updateParentName("bride", "father", value, draft.couple.bride.parents.fatherGivenName)
+                      }
+                      onGivenNameChange={(value) =>
+                        updateParentName("bride", "father", draft.couple.bride.parents.fatherFamilyName, value)
+                      }
+                      onDeceasedChange={(checked) =>
+                        update((current) => {
+                          current.couple.bride.parents.fatherDeceased = checked;
+                          return current;
+                        })
+                      }
+                    />
+                    <ParentNameFields
+                      title="신부 어머니"
+                      familyName={draft.couple.bride.parents.motherFamilyName}
+                      givenName={draft.couple.bride.parents.motherGivenName}
+                      deceased={draft.couple.bride.parents.motherDeceased}
+                      onFamilyNameChange={(value) =>
+                        updateParentName("bride", "mother", value, draft.couple.bride.parents.motherGivenName)
+                      }
+                      onGivenNameChange={(value) =>
+                        updateParentName("bride", "mother", draft.couple.bride.parents.motherFamilyName, value)
+                      }
+                      onDeceasedChange={(checked) =>
+                        update((current) => {
+                          current.couple.bride.parents.motherDeceased = checked;
+                          return current;
+                        })
+                      }
+                    />
+                    <Field
+                      label="신부 관계명"
+                      required
+                      placeholder="예: 딸, 장녀, 차녀"
+                      value={draft.couple.bride.parents.relation}
+                      onChange={(value) =>
+                        update((current) => {
+                          current.couple.bride.parents.relation = value;
+                          return current;
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-4 border-t border-[#e4d8cc] pt-4 sm:grid-cols-2">
+                  <ToggleField
+                    label="부모님 이름 표시"
+                    checked={draft.familySettings.showParents}
+                    onChange={(checked) =>
+                      update((current) => {
+                        current.familySettings.showParents = checked;
+                        return current;
+                      })
+                    }
+                  />
+                  <label className="grid gap-2 text-sm text-[#5f5349]">
+                    <span>고인 표식 선택</span>
+                    <select
+                      value={draft.familySettings.deceasedMarker}
+                      onChange={(event) =>
+                        update((current) => {
+                          current.familySettings.deceasedMarker =
+                            event.target.value as WeddingData["familySettings"]["deceasedMarker"];
+                          return current;
+                        })
+                      }
+                      className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#e9a8ba]"
+                    >
+                      <option value="hanja">한자 故</option>
+                      <option value="flower">국화꽃 이미지</option>
+                      <option value="lineart">국화꽃 블랙 라인아트</option>
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm text-[#5f5349]">
+                    <span>고인 표시 방식</span>
+                    <select
+                      value={draft.familySettings.deceasedFormat}
+                      onChange={(event) =>
+                        update((current) => {
+                          current.familySettings.deceasedFormat =
+                            event.target.value as WeddingData["familySettings"]["deceasedFormat"];
+                          return current;
+                        })
+                      }
+                      className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#e9a8ba]"
+                    >
+                      <option value="prefix">故 홍길동</option>
+                      <option value="suffix">홍길동(故)</option>
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm text-[#5f5349]">
+                    <span>가족 정보 정렬</span>
+                    <select
+                      value={draft.familySettings.align}
+                      onChange={(event) =>
+                        update((current) => {
+                          current.familySettings.align = event.target.value as WeddingData["familySettings"]["align"];
+                          return current;
+                        })
+                      }
+                      className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#e9a8ba]"
+                    >
+                      <option value="center">중앙 정렬</option>
+                      <option value="left">왼쪽 정렬</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </details>
           </FormSection>
 
-          <FormSection title="1. 메인 화면 설정">
+          <FormSection title="2. 메인 화면 설정">
             <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">첫 화면 디자인</p>
@@ -2386,8 +2579,8 @@ export function EditInvitation({
                       }
                       className={`rounded-xl border px-4 py-4 text-left transition ${
                         isSelected
-                          ? "border-[#b29467] bg-[#fff8ec] shadow-[0_10px_24px_rgba(178,148,103,0.14)]"
-                          : "border-[#eadfcd] bg-white"
+                          ? "border-[#e9a8ba] bg-[#fff6fa] shadow-[0_10px_24px_rgba(226,143,166,0.14)]"
+                          : "border-[#f1dde5] bg-white"
                       }`}
                     >
                       <span className="block text-sm font-semibold text-[#332b24]">
@@ -2395,6 +2588,45 @@ export function EditInvitation({
                       </span>
                       <span className="mt-2 block break-keep text-xs leading-5 text-[#8a7a6a]">
                         {template.description}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-[#dcecf8] bg-[#f8fcff] p-4 shadow-[0_12px_30px_rgba(126,177,209,0.08)]">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-[#332b24]">첫 화면 꽃가루 효과</p>
+                <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
+                  첫 화면에 아주 은은하게 흩날리는 꽃잎 모션을 넣거나 끌 수 있어요.
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {PETAL_EFFECT_OPTIONS.map((effect) => {
+                  const isSelected = draft.hero.petalEffect === effect.value;
+
+                  return (
+                    <button
+                      key={effect.value}
+                      type="button"
+                      onClick={() =>
+                        update((current) => {
+                          current.hero.petalEffect = effect.value;
+                          return current;
+                        })
+                      }
+                      className={`rounded-xl border px-4 py-4 text-left transition ${
+                        isSelected
+                          ? "border-[#95c9ec] bg-[#f0f9ff] shadow-[0_10px_24px_rgba(126,177,209,0.16)]"
+                          : "border-[#e5edf3] bg-white"
+                      }`}
+                    >
+                      <span className="block text-sm font-semibold text-[#332b24]">
+                        {effect.label}
+                      </span>
+                      <span className="mt-2 block break-keep text-xs leading-5 text-[#8a7a6a]">
+                        {effect.description}
                       </span>
                     </button>
                   );
@@ -2731,61 +2963,57 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="2. 기본 정보">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field
-                label="신랑 이름"
-                value={draft.couple.groom.name}
-                onChange={(value) =>
-                  update((current) => {
-                    const next = splitName(value);
-                    current.couple.groom.familyName = next.familyName;
-                    current.couple.groom.givenName = next.givenName;
-                    current.couple.groom.name = value;
-                    current.couple.groom.account.holder = value;
-                    return current;
-                  })
-                }
-              />
-              <Field
-                label="신부 이름"
-                value={draft.couple.bride.name}
-                onChange={(value) =>
-                  update((current) => {
-                    const next = splitName(value);
-                    current.couple.bride.familyName = next.familyName;
-                    current.couple.bride.givenName = next.givenName;
-                    current.couple.bride.name = value;
-                    current.couple.bride.account.holder = value;
-                    return current;
-                  })
-                }
-              />
+          <FormSection title="섹션별 사용 설정">
+            <div className="grid gap-2">
+              {SECTION_TOGGLE_OPTIONS.map((option) => {
+                const isOpen = openSectionKey === option.key;
+
+                return (
+                  <div
+                    key={option.key}
+                    className="overflow-hidden rounded-xl border border-[#f1dde5] bg-white shadow-[0_8px_24px_rgba(226,143,166,0.05)]"
+                  >
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <label className="relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          checked={draft.sections[option.key]}
+                          onChange={(event) =>
+                            update((current) => {
+                              current.sections = {
+                                ...wedding.sections,
+                                ...current.sections,
+                                [option.key]: event.target.checked,
+                              };
+                              return current;
+                            })
+                          }
+                          className="peer sr-only"
+                          aria-label={`${option.label} 표시 여부`}
+                        />
+                        <span className="absolute inset-0 rounded-full bg-[#d4d4d4] transition peer-checked:bg-[#f6c8d6]" />
+                        <span className="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition peer-checked:translate-x-6" />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setOpenSectionKey(isOpen ? "openingMessage" : option.key)}
+                        className="flex flex-1 items-center justify-between gap-4 py-1 text-left text-base font-medium text-[#332b24]"
+                      >
+                        <span>{option.label}</span>
+                        <span className="text-2xl font-light leading-none text-[#2f2924]">
+                          {isOpen ? "⌃" : "⌄"}
+                        </span>
+                      </button>
+                    </div>
+                    {isOpen ? (
+                      <div className="border-t border-[#f1dde5] px-4 py-5">
+                        {renderSectionEditor(option.key)}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="예식 날짜" type="date" value={dateValue} onChange={updateDate} />
-              <Field label="예식 시간" value={draft.event.time} onChange={updateTime} />
-            </div>
-            <Field
-              label="예식 장소"
-              value={draft.event.venue}
-              onChange={(value) =>
-                update((current) => {
-                  current.event.venue = value;
-                  return current;
-                })
-              }
-            />
-            <Field
-              label="주소"
-              value={draft.event.address}
-              onChange={(value) =>
-                update((current) => {
-                  current.event.address = value;
-                  return current;
-                })
-              }
-            />
           </FormSection>
 
           <FormSection title="3. 문구 입력">
@@ -2895,261 +3123,7 @@ export function EditInvitation({
             ) : null}
           </FormSection>
 
-          <FormSection title="5. 가족 정보">
-            <details open className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
-              <summary className="cursor-pointer text-sm font-semibold text-[#332b24]">
-                신랑 정보
-              </summary>
-              <div className="mt-5 grid gap-4">
-                <div className="grid grid-cols-[0.8fr_1.2fr] gap-3">
-                  <Field
-                    label="신랑 성"
-                    required
-                    value={draft.couple.groom.familyName}
-                    onChange={(value) => updatePersonName("groom", value, draft.couple.groom.givenName)}
-                  />
-                  <Field
-                    label="신랑 이름"
-                    required
-                    value={draft.couple.groom.givenName}
-                    onChange={(value) => updatePersonName("groom", draft.couple.groom.familyName, value)}
-                  />
-                </div>
-                <div className="rounded-md bg-[#f8f2ea] px-4 py-3 text-sm text-[#806b4f]">
-                  미리보기 이름: {draft.couple.groom.name || "신랑 이름"}
-                </div>
-                <ParentNameFields
-                  title="신랑 아버지"
-                  familyName={draft.couple.groom.parents.fatherFamilyName}
-                  givenName={draft.couple.groom.parents.fatherGivenName}
-                  deceased={draft.couple.groom.parents.fatherDeceased}
-                  onFamilyNameChange={(value) =>
-                    updateParentName("groom", "father", value, draft.couple.groom.parents.fatherGivenName)
-                  }
-                  onGivenNameChange={(value) =>
-                    updateParentName("groom", "father", draft.couple.groom.parents.fatherFamilyName, value)
-                  }
-                  onDeceasedChange={(checked) =>
-                    update((current) => {
-                      current.couple.groom.parents.fatherDeceased = checked;
-                      return current;
-                    })
-                  }
-                />
-                <ParentNameFields
-                  title="신랑 어머니"
-                  familyName={draft.couple.groom.parents.motherFamilyName}
-                  givenName={draft.couple.groom.parents.motherGivenName}
-                  deceased={draft.couple.groom.parents.motherDeceased}
-                  onFamilyNameChange={(value) =>
-                    updateParentName("groom", "mother", value, draft.couple.groom.parents.motherGivenName)
-                  }
-                  onGivenNameChange={(value) =>
-                    updateParentName("groom", "mother", draft.couple.groom.parents.motherFamilyName, value)
-                  }
-                  onDeceasedChange={(checked) =>
-                    update((current) => {
-                      current.couple.groom.parents.motherDeceased = checked;
-                      return current;
-                    })
-                  }
-                />
-                <Field
-                  label="신랑 관계명"
-                  required
-                  placeholder="예: 아들, 장남, 차남"
-                  value={draft.couple.groom.parents.relation}
-                  onChange={(value) =>
-                    update((current) => {
-                      current.couple.groom.parents.relation = value;
-                      return current;
-                    })
-                  }
-                />
-                <Field
-                  label="신랑 연락처"
-                  value={draft.couple.groom.phone}
-                  onChange={(value) =>
-                    update((current) => {
-                      current.couple.groom.phone = value;
-                      return current;
-                    })
-                  }
-                />
-              </div>
-            </details>
-
-            <details open className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
-              <summary className="cursor-pointer text-sm font-semibold text-[#332b24]">
-                신부 정보
-              </summary>
-              <div className="mt-5 grid gap-4">
-                <div className="grid grid-cols-[0.8fr_1.2fr] gap-3">
-                  <Field
-                    label="신부 성"
-                    required
-                    value={draft.couple.bride.familyName}
-                    onChange={(value) => updatePersonName("bride", value, draft.couple.bride.givenName)}
-                  />
-                  <Field
-                    label="신부 이름"
-                    required
-                    value={draft.couple.bride.givenName}
-                    onChange={(value) => updatePersonName("bride", draft.couple.bride.familyName, value)}
-                  />
-                </div>
-                <div className="rounded-md bg-[#f8f2ea] px-4 py-3 text-sm text-[#806b4f]">
-                  미리보기 이름: {draft.couple.bride.name || "신부 이름"}
-                </div>
-                <ParentNameFields
-                  title="신부 아버지"
-                  familyName={draft.couple.bride.parents.fatherFamilyName}
-                  givenName={draft.couple.bride.parents.fatherGivenName}
-                  deceased={draft.couple.bride.parents.fatherDeceased}
-                  onFamilyNameChange={(value) =>
-                    updateParentName("bride", "father", value, draft.couple.bride.parents.fatherGivenName)
-                  }
-                  onGivenNameChange={(value) =>
-                    updateParentName("bride", "father", draft.couple.bride.parents.fatherFamilyName, value)
-                  }
-                  onDeceasedChange={(checked) =>
-                    update((current) => {
-                      current.couple.bride.parents.fatherDeceased = checked;
-                      return current;
-                    })
-                  }
-                />
-                <ParentNameFields
-                  title="신부 어머니"
-                  familyName={draft.couple.bride.parents.motherFamilyName}
-                  givenName={draft.couple.bride.parents.motherGivenName}
-                  deceased={draft.couple.bride.parents.motherDeceased}
-                  onFamilyNameChange={(value) =>
-                    updateParentName("bride", "mother", value, draft.couple.bride.parents.motherGivenName)
-                  }
-                  onGivenNameChange={(value) =>
-                    updateParentName("bride", "mother", draft.couple.bride.parents.motherFamilyName, value)
-                  }
-                  onDeceasedChange={(checked) =>
-                    update((current) => {
-                      current.couple.bride.parents.motherDeceased = checked;
-                      return current;
-                    })
-                  }
-                />
-                <Field
-                  label="신부 관계명"
-                  required
-                  placeholder="예: 딸, 장녀, 차녀"
-                  value={draft.couple.bride.parents.relation}
-                  onChange={(value) =>
-                    update((current) => {
-                      current.couple.bride.parents.relation = value;
-                      return current;
-                    })
-                  }
-                />
-                <Field
-                  label="신부 연락처"
-                  value={draft.couple.bride.phone}
-                  onChange={(value) =>
-                    update((current) => {
-                      current.couple.bride.phone = value;
-                      return current;
-                    })
-                  }
-                />
-              </div>
-            </details>
-
-            <details open className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
-              <summary className="cursor-pointer text-sm font-semibold text-[#332b24]">
-                표시 옵션
-              </summary>
-              <div className="mt-5 grid gap-4">
-                <label className="grid gap-2 text-sm text-[#5f5349]">
-                  <span>가족 정보 정렬</span>
-                  <select
-                    value={draft.familySettings.align}
-                    onChange={(event) =>
-                      update((current) => {
-                        current.familySettings.align = event.target.value as WeddingData["familySettings"]["align"];
-                        return current;
-                      })
-                    }
-                    className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
-                  >
-                    <option value="center">중앙 정렬</option>
-                    <option value="left">왼쪽 정렬</option>
-                  </select>
-                </label>
-                <ToggleField
-                  label="부모님 이름 표시"
-                  checked={draft.familySettings.showParents}
-                  onChange={(checked) =>
-                    update((current) => {
-                      current.familySettings.showParents = checked;
-                      return current;
-                    })
-                  }
-                />
-                <label className="grid gap-2 text-sm text-[#5f5349]">
-                  <span>고인 표시 방식</span>
-                  <select
-                    value={draft.familySettings.deceasedFormat}
-                    onChange={(event) =>
-                      update((current) => {
-                        current.familySettings.deceasedFormat =
-                          event.target.value as WeddingData["familySettings"]["deceasedFormat"];
-                        return current;
-                      })
-                    }
-                    className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
-                  >
-                    <option value="prefix">故 홍길동</option>
-                    <option value="suffix">홍길동(故)</option>
-                  </select>
-                </label>
-                <label className="grid gap-2 text-sm text-[#5f5349]">
-                  <span>고인 표식 선택</span>
-                  <select
-                    value={draft.familySettings.deceasedMarker}
-                    onChange={(event) =>
-                      update((current) => {
-                        current.familySettings.deceasedMarker =
-                          event.target.value as WeddingData["familySettings"]["deceasedMarker"];
-                        return current;
-                      })
-                    }
-                    className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
-                  >
-                    <option value="hanja">한자 故</option>
-                    <option value="flower">국화꽃 이미지</option>
-                    <option value="lineart">국화꽃 블랙 라인아트</option>
-                  </select>
-                </label>
-                <label className="grid gap-2 text-sm text-[#5f5349]">
-                  <span>신랑신부 이름 표시 방식</span>
-                  <select
-                    value={draft.familySettings.coupleNameSeparator}
-                    onChange={(event) =>
-                      update((current) => {
-                        current.familySettings.coupleNameSeparator =
-                          event.target.value as WeddingData["familySettings"]["coupleNameSeparator"];
-                        return current;
-                      })
-                    }
-                    className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
-                  >
-                    <option value="dot">김민우 · 이수연</option>
-                    <option value="heart">김민우 ♥ 이수연</option>
-                  </select>
-                </label>
-              </div>
-            </details>
-          </FormSection>
-
-          <FormSection title="6. 계좌 정보">
+          <FormSection title="5. 계좌 정보">
             <div className="grid gap-4">
               {draft.accounts.map((account, index) => (
                 <AccountEditor
@@ -3169,7 +3143,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="7. 이미지 설정">
+          <FormSection title="6. 이미지 설정">
             <div className="grid gap-4 rounded-lg border border-[#eadfcd] bg-white p-4">
               <p className="text-sm font-semibold text-[#332b24]">본문 사진</p>
               <FileField
@@ -3216,7 +3190,7 @@ export function EditInvitation({
             </p>
           </FormSection>
 
-          <FormSection title="8. 음악 설정">
+          <FormSection title="7. 음악 설정">
             <label className="grid gap-2 text-sm text-[#5f5349]">
               <span>배경음악 선택</span>
               <select
@@ -3241,7 +3215,7 @@ export function EditInvitation({
             </label>
           </FormSection>
 
-          <FormSection title="9. 링크 설정">
+          <FormSection title="8. 링크 설정">
             <Field
               label="지도 링크"
               value={draft.event.mapUrl}

@@ -191,6 +191,7 @@ export const wedding: WeddingData = {
   },
   hero: {
     coverTemplate: "polaroid",
+    petalEffect: "none",
     fullscreenCalligraphyEnabled: false,
     fullscreenCalligraphyText: "Our Wedding Day",
     fullscreenCalligraphyFont: "great-vibes",
@@ -203,7 +204,7 @@ export const wedding: WeddingData = {
     letteringColor: "#ffffff",
     letteringTop: 48,
     letteringDuration: 1.45,
-    mainText: "우리가 함께 걷게 될 모든 계절에",
+    mainText: "",
     mainTextColor: "#ffffff",
     mainTextTop: 84,
     showEventInfo: true,

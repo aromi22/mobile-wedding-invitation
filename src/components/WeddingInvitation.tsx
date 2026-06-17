@@ -25,6 +25,21 @@ const FULLSCREEN_CALLIGRAPHY_FONTS = {
   "freestyle-script": '"Freestyle Script", "French Script MT", "Great Vibes", cursive',
 };
 
+const COVER_PETALS = Array.from({ length: 16 }, (_, index) => ({
+  left: `${(index * 17 + 8) % 96}%`,
+  delay: `${(index % 8) * -1.7}s`,
+  duration: `${12 + (index % 5) * 1.4}s`,
+  drift: `${index % 2 === 0 ? 26 + index * 2 : -24 - index}px`,
+  size: `${6 + (index % 4)}px`,
+}));
+
+const PETAL_COLORS = {
+  none: "",
+  soft: "rgba(255,255,255,0.58)",
+  pink: "rgba(250,196,210,0.52)",
+  sky: "rgba(195,226,247,0.5)",
+};
+
 const CHILD_PHOTO_FRAME_CONFIG = {
   groom: {
     top: "10.85%",
@@ -39,6 +54,34 @@ const CHILD_PHOTO_FRAME_CONFIG = {
     height: "26.75%",
   },
 } satisfies Record<string, CSSProperties>;
+
+function CoverPetalEffect({ variant }: { variant: WeddingData["hero"]["petalEffect"] }) {
+  if (variant === "none") {
+    return null;
+  }
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden" aria-hidden="true">
+      {COVER_PETALS.map((petal, index) => (
+        <span
+          key={index}
+          className="cover-petal"
+          style={
+            {
+              left: petal.left,
+              width: petal.size,
+              height: `calc(${petal.size} * 1.55)`,
+              background: PETAL_COLORS[variant],
+              animationDelay: petal.delay,
+              animationDuration: petal.duration,
+              "--petal-drift": petal.drift,
+            } as CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
+}
 
 const DEFAULT_RSVP_FIELDS: Record<WeddingRsvpFieldKey, boolean> = {
   category: true,
@@ -291,6 +334,7 @@ function Cover({ data }: { data: WeddingData }) {
 
     return (
       <section className="relative min-h-screen overflow-hidden bg-[#1f1b18]">
+        <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
         <div className="absolute inset-0">
           <InvitationImage
             photo={data.photos.cover}
@@ -327,6 +371,7 @@ function Cover({ data }: { data: WeddingData }) {
   if (hero.coverTemplate === "clean") {
     return (
       <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-7 py-8 text-center">
+        <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
         <div className="cover-reveal w-full max-w-[21.5rem]">
           <div>
             <h1 className="break-keep font-sans text-[1.02rem] font-light uppercase leading-7 tracking-[0.05em] text-[#2f2a25]">
@@ -356,6 +401,7 @@ function Cover({ data }: { data: WeddingData }) {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-7 py-9 text-center">
+      <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
       <div className="cover-reveal w-full max-w-[20rem]">
         <div className="bg-white px-3.5 pb-12 pt-3.5 shadow-[0_24px_54px_rgba(42,34,30,0.1)] ring-1 ring-[#2f2924]/5">
           <div className="relative mx-auto overflow-hidden bg-[#fffefe] px-4 pb-20 pt-4 shadow-[0_22px_38px_rgba(34,28,24,0.16),0_2px_8px_rgba(34,28,24,0.08)] ring-1 ring-black/[0.035]">
