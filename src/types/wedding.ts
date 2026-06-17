@@ -78,7 +78,7 @@ export type WeddingTimelineItem = {
 };
 
 export type WeddingLetteringFont = "segoe-print" | "freestyle-script";
-export type WeddingCoverTemplate = "polaroid" | "fullscreen";
+export type WeddingCoverTemplate = "polaroid" | "fullscreen" | "clean";
 export type WeddingCalligraphyFont =
   | "great-vibes"
   | "cormorant"

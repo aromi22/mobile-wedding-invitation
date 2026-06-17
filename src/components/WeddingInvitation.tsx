@@ -324,6 +324,36 @@ function Cover({ data }: { data: WeddingData }) {
     );
   }
 
+  if (hero.coverTemplate === "clean") {
+    return (
+      <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4f0ea] px-4 py-5 text-center">
+        <div className="cover-reveal flex min-h-[calc(100vh-2.5rem)] w-full max-w-[24rem] flex-col justify-between rounded-[1.75rem] bg-white px-5 pb-5 pt-9 shadow-[0_18px_45px_rgba(48,40,34,0.12)]">
+          <div>
+            <h1 className="break-keep font-sans text-[1.08rem] font-light uppercase leading-7 tracking-[0.04em] text-[#2f2a25]">
+              {groom.englishName} &amp; {bride.englishName}
+            </h1>
+            <div className="mx-auto mt-10 h-px w-[82%] bg-[#2f2a25]/26" />
+            {hero.showEventInfo ? (
+              <div className="mt-5 space-y-2 break-keep text-[0.86rem] leading-6 text-[#514a43]">
+                <p>{data.event.dateText}</p>
+                <p>{openingVenue}</p>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="relative mt-10 aspect-[4/5.6] w-full overflow-hidden rounded-lg bg-[#ede7df]">
+            <InvitationImage
+              photo={data.photos.cover}
+              priority
+              className="object-cover"
+              sizes="430px"
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-7 py-9 text-center">
       <div className="cover-reveal w-full max-w-[20rem]">

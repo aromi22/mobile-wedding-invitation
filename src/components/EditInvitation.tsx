@@ -73,6 +73,11 @@ const COVER_TEMPLATE_OPTIONS = [
     value: "fullscreen",
     description: "사진이 화면 가득 시작하는 감성적인 첫 화면",
   },
+  {
+    label: "깔끔 카드형",
+    value: "clean",
+    description: "이름과 예식 정보를 먼저 보여주는 미니멀 카드 첫 화면",
+  },
 ] as const;
 
 type SectionToggleKey = keyof WeddingData["sections"];
