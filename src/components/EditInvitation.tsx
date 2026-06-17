@@ -82,10 +82,25 @@ const COVER_TEMPLATE_OPTIONS = [
 
 const PETAL_EFFECT_OPTIONS = [
   { label: "없음", value: "none", description: "첫 화면을 가장 깔끔하게 보여줘요." },
-  { label: "은은한 화이트", value: "soft", description: "하얀 꽃잎이 아주 천천히 흩날려요." },
+  { label: "화이트 꽃잎", value: "soft", description: "하얀 꽃잎이 아주 천천히 흩날려요." },
   { label: "연핑크 꽃잎", value: "pink", description: "웨딩 느낌이 살짝 더해지는 부드러운 핑크 톤이에요." },
-  { label: "하늘빛 꽃잎", value: "sky", description: "맑고 청량한 분위기의 옅은 블루 톤이에요." },
+  { label: "아이보리 꽃가루", value: "sky", description: "차분한 아이보리 톤으로 은은하게 흩날려요." },
 ] as const;
+
+type EditorTabKey = "basic" | "design" | "photos" | "copy" | "accounts" | "share";
+
+const EDITOR_TABS: Array<{
+  key: EditorTabKey;
+  label: string;
+  description: string;
+}> = [
+  { key: "basic", label: "기본 정보", description: "이름, 예식, 가족 정보" },
+  { key: "design", label: "디자인", description: "첫 화면과 구성" },
+  { key: "photos", label: "사진", description: "커버, 갤러리, 본문 사진" },
+  { key: "copy", label: "문구", description: "초대글과 이야기" },
+  { key: "accounts", label: "계좌·참석", description: "마음 전하실 곳과 RSVP" },
+  { key: "share", label: "공유 설정", description: "음악, 지도, 링크" },
+];
 
 type SectionToggleKey = keyof WeddingData["sections"];
 
@@ -497,13 +512,19 @@ function ToggleField({
 function FormSection({
   title,
   children,
+  isVisible = true,
 }: {
   title: string;
   children: React.ReactNode;
+  isVisible?: boolean;
 }) {
+  if (!isVisible) {
+    return null;
+  }
+
   return (
-    <section className="min-w-0 border-b border-[#eadfcd] py-7">
-      <h2 className="mb-5 text-lg font-semibold text-[#332b24]">{title}</h2>
+    <section className="min-w-0">
+      <h2 className="mb-4 text-xl font-semibold tracking-[-0.02em] text-[#2F2A26]">{title}</h2>
       <div className="grid min-w-0 gap-4">{children}</div>
     </section>
   );
@@ -883,6 +904,7 @@ export function EditInvitation({
   const [rsvpResponseMessage, setRsvpResponseMessage] = useState("");
   const [rsvpRefreshKey, setRsvpRefreshKey] = useState(0);
   const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
+  const [activeEditorTab, setActiveEditorTab] = useState<EditorTabKey>("basic");
   const isCustomerEditPage = Boolean(slug);
   const isPublicMakePage = mode === "public" && !slug;
   const isProcessingPhoto = processingPhotoCount > 0;
@@ -899,6 +921,11 @@ export function EditInvitation({
 
   function showToast(message: string) {
     setToastMessage(message);
+  }
+
+  function saveDraftNow() {
+    setSaveMessage("임시 저장됐어요. 이 브라우저에서 이어서 수정할 수 있어요.");
+    showToast("저장됐어요.");
   }
 
   async function copyToClipboard(text: string, label = "복사") {
@@ -2071,48 +2098,61 @@ export function EditInvitation({
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto grid w-full max-w-[1180px] gap-8 px-3 py-5 sm:px-5 sm:py-6 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-start">
+    <div className="min-h-screen bg-[#FAF7F2] text-[#2F2A26]">
+      <div className="mx-auto grid w-full max-w-[1280px] gap-8 px-4 py-5 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start">
         <div
           ref={editorRef}
-          className="min-w-0 rounded-lg bg-white px-4 shadow-[0_18px_50px_rgba(117,97,83,0.08)] sm:px-5"
+          className="min-w-0 space-y-5"
         >
-          <header className="sticky top-0 z-10 -mx-4 border-b border-[#f1dde5] bg-white/95 px-4 py-5 backdrop-blur sm:-mx-5 sm:px-5">
-            <p className="text-xs uppercase tracking-[0.24em] text-[#df8fa8]">
+          <header className="rounded-[28px] border border-[#E8DED4] bg-white p-5 shadow-[0_18px_50px_rgba(117,97,83,0.08)] sm:p-7">
+            <p className="text-xs uppercase tracking-[0.24em] text-[#B89B7D]">
               {isPublicMakePage ? "Invitation Maker" : "Invitation Editor"}
             </p>
-            <div className="mt-4 grid gap-2 sm:flex sm:flex-wrap">
-              <button
-                type="button"
-                onClick={saveToSupabase}
-                disabled={isSaving || isProcessingPhoto}
-                className="w-full rounded-full bg-[#2f2a25] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-              >
-                {isProcessingPhoto
-                  ? "사진 처리 중"
-                  : isSaving
-                  ? "저장 중"
-                  : isPublicMakePage
-                    ? "제작본 저장하고 링크 받기"
-                    : "Supabase에 저장"}
-              </button>
+            <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-[#2F2A26] sm:text-3xl">
+                  우리의 청첩장을 완성해볼까요?
+                </h1>
+                <p className="mt-2 text-sm leading-6 text-[#8B8178]">
+                  예식 정보와 사진을 입력하면 바로 미리보기로 확인할 수 있어요.
+                </p>
+              </div>
+              <div className="grid gap-2 sm:flex sm:flex-wrap sm:justify-end">
+                <button
+                  type="button"
+                  onClick={scrollToPreview}
+                  className="w-full rounded-full border border-[#E8DED4] bg-white px-4 py-2.5 text-sm font-semibold text-[#2F2A26] transition hover:border-[#C7A27A] sm:w-auto"
+                >
+                  미리보기
+                </button>
+                <button
+                  type="button"
+                  onClick={saveDraftNow}
+                  className="w-full rounded-full border border-[#E8DED4] bg-white px-4 py-2.5 text-sm font-semibold text-[#2F2A26] transition hover:border-[#C7A27A] sm:w-auto"
+                >
+                  저장하기
+                </button>
+                <button
+                  type="button"
+                  onClick={saveToSupabase}
+                  disabled={isSaving || isProcessingPhoto}
+                  className="w-full rounded-full bg-[#2F2A26] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(47,42,38,0.18)] transition hover:bg-[#3D352F] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                >
+                  {isProcessingPhoto ? "사진 처리 중" : isSaving ? "저장 중" : "링크 만들기"}
+                </button>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               {isPublicMakePage ? (
                 <button
                   type="button"
                   onClick={resetDraft}
                   disabled={isSaving || isProcessingPhoto}
-                  className="w-full rounded-full border border-[#d8c6ab] bg-white px-4 py-2 text-sm font-semibold text-[#806b4f] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                  className="rounded-full border border-[#E8DED4] bg-[#FAF7F2] px-4 py-2 text-xs font-semibold text-[#8B8178] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   처음부터 새로 만들기
                 </button>
               ) : null}
-              <button
-                type="button"
-                onClick={scrollToPreview}
-                className="w-full rounded-full border border-[#2f2a25]/20 bg-[#fffaf3] px-4 py-2 text-sm font-semibold text-[#2f2a25] sm:w-auto"
-              >
-                미리보기로 이동
-              </button>
             </div>
             {isCustomerEditPage && canMarkPaid ? (
               <div className="mt-3 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
@@ -2220,18 +2260,8 @@ export function EditInvitation({
                 </div>
               </div>
             ) : null}
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-              <h1 className="text-2xl font-semibold text-[#332b24]">모바일 청첩장 편집</h1>
-              <button
-                type="button"
-                onClick={resetDraft}
-                className="rounded-full border border-[#d8c6ab] px-4 py-2 text-sm text-[#806b4f]"
-              >
-                기본값으로 되돌리기
-              </button>
-            </div>
             {isPublicMakePage ? (
-              <div className="mt-4 rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-sm leading-6 text-[#6f6258]">
+              <div className="mt-4 rounded-2xl border border-[#E8DED4] bg-[#FAF7F2] px-4 py-3 text-sm leading-6 text-[#8B8178]">
                 지금 만드는 청첩장은 워터마크가 포함된 제작본입니다. 결제 확인 후
                 워터마크가 제거된 최종 링크로 사용할 수 있어요.
               </div>
@@ -2312,12 +2342,40 @@ export function EditInvitation({
             ) : null}
           </header>
 
-          <FormSection title="1. 기본 정보 입력">
-            <div className="rounded-xl border border-[#f1dde5] bg-[#fffafe] p-4 shadow-[0_12px_30px_rgba(226,143,166,0.08)]">
+          <nav className="sticky top-0 z-20 -mx-1 overflow-x-auto border-y border-[#E8DED4] bg-[#FAF7F2]/95 py-3 backdrop-blur">
+            <div className="flex min-w-max gap-2 px-1 lg:grid lg:min-w-0 lg:grid-cols-6">
+              {EDITOR_TABS.map((tab) => {
+                const isSelected = activeEditorTab === tab.key;
+
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveEditorTab(tab.key)}
+                    className={`rounded-2xl border px-4 py-3 text-left transition ${
+                      isSelected
+                        ? "border-[#C7A27A] bg-white shadow-[0_12px_28px_rgba(184,155,125,0.18)]"
+                        : "border-[#E8DED4] bg-white/72 hover:border-[#C7A27A]"
+                    }`}
+                  >
+                    <span className="block whitespace-nowrap text-sm font-semibold text-[#2F2A26]">
+                      {tab.label}
+                    </span>
+                    <span className="mt-1 hidden text-xs leading-4 text-[#8B8178] xl:block">
+                      {tab.description}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
+          <FormSection title="기본 정보" isVisible={activeEditorTab === "basic"}>
+            <div className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
               <div className="mb-4">
-                <p className="text-sm font-semibold text-[#332b24]">처음 한 번만 입력하면 전체 청첩장에 반영돼요.</p>
-                <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
-                  이름, 예식 정보, 부모님 정보는 아래에서 관리하고 뒤쪽에서는 반복 입력하지 않게 정리했어요.
+                <p className="text-sm font-semibold text-[#2F2A26]">처음 한 번만 입력하면 전체 청첩장에 반영돼요.</p>
+                <p className="mt-1 text-xs leading-5 text-[#8B8178]">
+                  이름, 예식 정보, 부모님 정보는 여기에서 관리해요.
                 </p>
               </div>
               <div className="grid gap-4">
@@ -2374,8 +2432,8 @@ export function EditInvitation({
               </div>
             </div>
 
-            <details open className="rounded-xl border border-[#dcecf8] bg-[#f8fcff] p-4 shadow-[0_12px_30px_rgba(126,177,209,0.08)]">
-              <summary className="cursor-pointer text-sm font-semibold text-[#332b24]">
+            <details open className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
+              <summary className="cursor-pointer text-sm font-semibold text-[#2F2A26]">
                 부모님 및 가족 표시 정보
               </summary>
               <div className="mt-5 grid gap-5">
@@ -2494,26 +2552,41 @@ export function EditInvitation({
                       })
                     }
                   />
-                  <label className="grid gap-2 text-sm text-[#5f5349]">
-                    <span>고인 표식 선택</span>
-                    <select
-                      value={draft.familySettings.deceasedMarker}
-                      onChange={(event) =>
-                        update((current) => {
-                          current.familySettings.deceasedMarker =
-                            event.target.value as WeddingData["familySettings"]["deceasedMarker"];
-                          return current;
-                        })
-                      }
-                      className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#e9a8ba]"
-                    >
-                      <option value="hanja">한자 故</option>
-                      <option value="flower">국화꽃 이미지</option>
-                      <option value="lineart">국화꽃 블랙 라인아트</option>
-                    </select>
-                  </label>
-                  <label className="grid gap-2 text-sm text-[#5f5349]">
+                  <div className="grid gap-2 text-sm text-[#5f5349] sm:col-span-2">
                     <span>고인 표시 방식</span>
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {[
+                        { label: "표시 안 함", value: "none" },
+                        { label: "꽃 아이콘 표시", value: "flower" },
+                        { label: "작은 텍스트 표시", value: "hanja" },
+                      ].map((option) => {
+                        const isSelected = draft.familySettings.deceasedMarker === option.value;
+
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() =>
+                              update((current) => {
+                                current.familySettings.deceasedMarker =
+                                  option.value as WeddingData["familySettings"]["deceasedMarker"];
+                                return current;
+                              })
+                            }
+                            className={`rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition ${
+                              isSelected
+                                ? "border-[#C7A27A] bg-[#FAF7F2] text-[#2F2A26]"
+                                : "border-[#E8DED4] bg-white text-[#8B8178]"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <label className="grid gap-2 text-sm text-[#5f5349]">
+                    <span>고인 표기 위치</span>
                     <select
                       value={draft.familySettings.deceasedFormat}
                       onChange={(event) =>
@@ -2550,8 +2623,8 @@ export function EditInvitation({
             </details>
           </FormSection>
 
-          <FormSection title="2. 메인 화면 설정">
-            <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
+          <FormSection title="디자인" isVisible={activeEditorTab === "design"}>
+            <div className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">첫 화면 디자인</p>
                 <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
@@ -2579,8 +2652,8 @@ export function EditInvitation({
                       }
                       className={`rounded-xl border px-4 py-4 text-left transition ${
                         isSelected
-                          ? "border-[#e9a8ba] bg-[#fff6fa] shadow-[0_10px_24px_rgba(226,143,166,0.14)]"
-                          : "border-[#f1dde5] bg-white"
+                          ? "border-[#C7A27A] bg-[#FAF7F2] shadow-[0_10px_24px_rgba(184,155,125,0.14)]"
+                          : "border-[#E8DED4] bg-white"
                       }`}
                     >
                       <span className="block text-sm font-semibold text-[#332b24]">
@@ -2595,7 +2668,7 @@ export function EditInvitation({
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#dcecf8] bg-[#f8fcff] p-4 shadow-[0_12px_30px_rgba(126,177,209,0.08)]">
+            <div className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">첫 화면 꽃가루 효과</p>
                 <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
@@ -2618,8 +2691,8 @@ export function EditInvitation({
                       }
                       className={`rounded-xl border px-4 py-4 text-left transition ${
                         isSelected
-                          ? "border-[#95c9ec] bg-[#f0f9ff] shadow-[0_10px_24px_rgba(126,177,209,0.16)]"
-                          : "border-[#e5edf3] bg-white"
+                          ? "border-[#C7A27A] bg-[#FAF7F2] shadow-[0_10px_24px_rgba(184,155,125,0.14)]"
+                          : "border-[#E8DED4] bg-white"
                       }`}
                     >
                       <span className="block text-sm font-semibold text-[#332b24]">
@@ -2635,7 +2708,7 @@ export function EditInvitation({
             </div>
 
             {draft.hero.coverTemplate === "fullscreen" ? (
-              <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
+              <div className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
                 <div className="mb-4">
                   <p className="text-sm font-semibold text-[#332b24]">
                     풀스크린 캘리그래피 문구
@@ -2759,7 +2832,7 @@ export function EditInvitation({
               </div>
             ) : null}
 
-            <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
+            <div className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">메인 사진</p>
                 <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
@@ -2842,7 +2915,7 @@ export function EditInvitation({
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#eadfcd] bg-white/72 p-4 shadow-[0_12px_30px_rgba(91,70,42,0.06)]">
+            <div className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">레터링</p>
                 <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
@@ -2963,7 +3036,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="섹션별 사용 설정">
+          <FormSection title="섹션 구성" isVisible={activeEditorTab === "design"}>
             <div className="grid gap-2">
               {SECTION_TOGGLE_OPTIONS.map((option) => {
                 const isOpen = openSectionKey === option.key;
@@ -2971,7 +3044,7 @@ export function EditInvitation({
                 return (
                   <div
                     key={option.key}
-                    className="overflow-hidden rounded-xl border border-[#f1dde5] bg-white shadow-[0_8px_24px_rgba(226,143,166,0.05)]"
+                    className="overflow-hidden rounded-2xl border border-[#E8DED4] bg-white shadow-[0_8px_24px_rgba(117,97,83,0.05)]"
                   >
                     <div className="flex items-center gap-3 px-4 py-3">
                       <label className="relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center">
@@ -2991,7 +3064,7 @@ export function EditInvitation({
                           className="peer sr-only"
                           aria-label={`${option.label} 표시 여부`}
                         />
-                        <span className="absolute inset-0 rounded-full bg-[#d4d4d4] transition peer-checked:bg-[#f6c8d6]" />
+                        <span className="absolute inset-0 rounded-full bg-[#d4d4d4] transition peer-checked:bg-[#C7A27A]" />
                         <span className="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition peer-checked:translate-x-6" />
                       </label>
                       <button
@@ -3006,7 +3079,7 @@ export function EditInvitation({
                       </button>
                     </div>
                     {isOpen ? (
-                      <div className="border-t border-[#f1dde5] px-4 py-5">
+                      <div className="border-t border-[#E8DED4] px-4 py-5">
                         {renderSectionEditor(option.key)}
                       </div>
                     ) : null}
@@ -3016,7 +3089,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="3. 문구 입력">
+          <FormSection title="문구" isVisible={activeEditorTab === "copy"}>
             <TextArea
               label="초대 문구"
               value={draft.message.body}
@@ -3040,7 +3113,7 @@ export function EditInvitation({
             />
           </FormSection>
 
-          <FormSection title="4. 스토리 타입 선택">
+          <FormSection title="스토리 타입" isVisible={activeEditorTab === "copy"}>
             <label className="grid gap-2 text-sm text-[#5f5349]">
               <span>청첩장 스타일</span>
               <select
@@ -3123,7 +3196,7 @@ export function EditInvitation({
             ) : null}
           </FormSection>
 
-          <FormSection title="5. 계좌 정보">
+          <FormSection title="계좌·참석" isVisible={activeEditorTab === "accounts"}>
             <div className="grid gap-4">
               {draft.accounts.map((account, index) => (
                 <AccountEditor
@@ -3141,9 +3214,18 @@ export function EditInvitation({
                 계좌 추가하기
               </button>
             </div>
+            <div className="rounded-[24px] border border-[#E8DED4] bg-white p-5 shadow-[0_14px_34px_rgba(117,97,83,0.08)]">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-[#2F2A26]">참석 여부 전달</p>
+                <p className="mt-1 text-xs leading-5 text-[#8B8178]">
+                  하객이 남긴 참석 여부를 고객 편집 링크에서 확인할 수 있어요.
+                </p>
+              </div>
+              {renderSectionEditor("rsvp")}
+            </div>
           </FormSection>
 
-          <FormSection title="6. 이미지 설정">
+          <FormSection title="사진" isVisible={activeEditorTab === "photos"}>
             <div className="grid gap-4 rounded-lg border border-[#eadfcd] bg-white p-4">
               <p className="text-sm font-semibold text-[#332b24]">본문 사진</p>
               <FileField
@@ -3190,7 +3272,7 @@ export function EditInvitation({
             </p>
           </FormSection>
 
-          <FormSection title="7. 음악 설정">
+          <FormSection title="음악" isVisible={activeEditorTab === "share"}>
             <label className="grid gap-2 text-sm text-[#5f5349]">
               <span>배경음악 선택</span>
               <select
@@ -3215,7 +3297,7 @@ export function EditInvitation({
             </label>
           </FormSection>
 
-          <FormSection title="8. 링크 설정">
+          <FormSection title="공유 설정" isVisible={activeEditorTab === "share"}>
             <Field
               label="지도 링크"
               value={draft.event.mapUrl}
@@ -3231,20 +3313,21 @@ export function EditInvitation({
 
         <aside
           ref={previewRef}
-          className="min-w-0 scroll-mt-6 lg:fixed lg:right-6 lg:top-6 lg:z-[90] lg:w-[450px]"
+          className="min-w-0 scroll-mt-6 lg:sticky lg:top-6 lg:self-start"
         >
-          <div className="mb-3 flex items-center justify-between gap-3 px-1 text-sm text-[#7c6e62]">
+          <div className="mb-3 flex items-center justify-between gap-3 px-1 text-sm text-[#8B8178]">
             <span>오른쪽은 고객이 보는 모바일 청첩장 미리보기입니다.</span>
             <button
               type="button"
               onClick={scrollToEditor}
-              className="shrink-0 rounded-full border border-[#d8c6ab] bg-white px-3 py-1.5 text-xs font-semibold text-[#806b4f]"
+              className="shrink-0 rounded-full border border-[#E8DED4] bg-white px-3 py-1.5 text-xs font-semibold text-[#2F2A26]"
             >
               편집으로 이동
             </button>
           </div>
-          <div className="mx-auto w-full max-w-[430px] overflow-hidden rounded-[1.6rem] bg-[#eee5da] p-2 shadow-[0_20px_60px_rgba(91,70,42,0.18)] sm:p-3">
-            <div className="max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[1.15rem] bg-white">
+          <div className="mx-auto w-full max-w-[410px] overflow-hidden rounded-[2.2rem] border border-[#E8DED4] bg-[#2F2A26] p-3 shadow-[0_24px_70px_rgba(47,42,38,0.22)]">
+            <div className="mx-auto mb-2 h-1.5 w-16 rounded-full bg-white/25" />
+            <div className="max-h-[calc(100vh-5rem)] overflow-y-auto rounded-[1.65rem] bg-white">
               <WeddingInvitation data={preview} />
             </div>
           </div>

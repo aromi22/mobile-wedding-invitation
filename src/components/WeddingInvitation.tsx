@@ -25,11 +25,11 @@ const FULLSCREEN_CALLIGRAPHY_FONTS = {
   "freestyle-script": '"Freestyle Script", "French Script MT", "Great Vibes", cursive',
 };
 
-const COVER_PETALS = Array.from({ length: 16 }, (_, index) => ({
+const COVER_PETALS = Array.from({ length: 24 }, (_, index) => ({
   left: `${(index * 17 + 8) % 96}%`,
-  delay: `${(index % 8) * -1.7}s`,
-  duration: `${12 + (index % 5) * 1.4}s`,
-  drift: `${index % 2 === 0 ? 26 + index * 2 : -24 - index}px`,
+  delay: `${(index % 8) * 0.16}s`,
+  duration: `${2.8 + (index % 6) * 0.22}s`,
+  drift: `${index % 2 === 0 ? 18 + index : -18 - index}px`,
   size: `${6 + (index % 4)}px`,
 }));
 
@@ -37,7 +37,7 @@ const PETAL_COLORS = {
   none: "",
   soft: "rgba(255,255,255,0.58)",
   pink: "rgba(250,196,210,0.52)",
-  sky: "rgba(195,226,247,0.5)",
+  sky: "rgba(245,232,214,0.62)",
 };
 
 const CHILD_PHOTO_FRAME_CONFIG = {
@@ -162,6 +162,10 @@ function coupleSeparator(data: WeddingData) {
 }
 
 function DeceasedMarker({ data }: { data: WeddingData }) {
+  if (data.familySettings.deceasedMarker === "none") {
+    return null;
+  }
+
   if (data.familySettings.deceasedMarker === "flower") {
     return (
       <span className="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
@@ -286,21 +290,21 @@ function Section({
   className?: string;
 }) {
   return (
-    <section className={`relative px-7 py-16 text-center ${className}`}>
+    <section className={`relative px-7 py-20 text-center ${className}`}>
       {label ? (
-        <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#2f2924]/65">
+        <p className="reveal text-xs font-medium tracking-[0.28em] text-[#8B8178]">
           {label}
         </p>
       ) : null}
       {title ? (
         <h2
-          className="kitsch-title kitsch-scribble reveal mt-4 whitespace-nowrap text-[clamp(1.8rem,7vw,2.28rem)] leading-snug"
+          className="reveal mt-4 whitespace-nowrap text-[clamp(1.35rem,5.7vw,1.75rem)] font-medium leading-snug tracking-[-0.02em] text-[#2F2A26]"
           style={revealDelay(1)}
         >
           {title}
         </h2>
       ) : null}
-      <div className="reveal mx-auto mt-9 max-w-[22rem]" style={revealDelay(2)}>
+      <div className="reveal mx-auto mt-11 max-w-[22rem]" style={revealDelay(2)}>
         {children}
       </div>
     </section>
@@ -557,7 +561,7 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
 
 function InvitationMessage({ data }: { data: WeddingData }) {
   return (
-    <Section label="Invitation" title="소중한 분들을 초대합니다">
+    <Section label="초대 문구" title="소중한 분들을 초대합니다">
       <div className="mx-auto mb-9 h-9 w-px bg-[#2f2924]/18" />
       <p className="mx-auto max-w-[17rem] whitespace-pre-line break-keep text-center text-[1.02rem] leading-9 text-[#403a34]">
         {data.message.opening}
@@ -583,10 +587,10 @@ function StorySection({ data }: { data: WeddingData }) {
     <section className="kitsch-red-band relative px-7 py-16 text-center">
       <span className="kitsch-heart left-8 top-10 scale-75 brightness-0 invert" />
       <span className="kitsch-heart fill bottom-10 right-8 scale-90 brightness-0 invert" />
-      <p className="font-display text-[0.68rem] uppercase tracking-[0.36em] text-[#2f2924]/65">
-        Our Story
+      <p className="text-xs font-medium tracking-[0.28em] text-[#8B8178]">
+        우리의 이야기
       </p>
-      <h2 className="kitsch-title kitsch-scribble mt-4 text-[2.45rem] leading-snug">
+      <h2 className="mt-4 text-[1.65rem] font-medium leading-snug tracking-[-0.02em] text-[#2F2A26]">
         우리들의 이야기
       </h2>
       <div className="mx-auto mt-10 max-w-[23rem] space-y-5">
@@ -628,8 +632,8 @@ function QASection({ data }: { data: WeddingData }) {
 
   return (
     <section className="bg-white px-7 py-16 text-center">
-      <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#b29467]">
-        Q & A
+      <p className="reveal text-xs font-medium tracking-[0.28em] text-[#8B8178]">
+        웨딩 인터뷰
       </p>
       <h2 className="reveal mt-3 text-[1.48rem] font-medium text-[#2f2a25]" style={revealDelay(1)}>
         우리에게 묻고 답하다
@@ -668,8 +672,8 @@ function TimelineSection({ data }: { data: WeddingData }) {
 
   return (
     <section className="bg-white px-7 py-16 text-center">
-      <p className="font-display reveal text-[0.68rem] uppercase tracking-[0.36em] text-[#b29467]">
-        Our Timeline
+      <p className="reveal text-xs font-medium tracking-[0.28em] text-[#8B8178]">
+        우리의 시간
       </p>
       <h2 className="reveal mt-3 text-[1.48rem] font-medium text-[#2f2a25]" style={revealDelay(1)}>
         만남부터 오늘까지
@@ -729,7 +733,7 @@ function PersonLine({ person, data }: { person: Person; data: WeddingData }) {
 
 function FamilySection({ data }: { data: WeddingData }) {
   return (
-    <Section label="Bride & Groom" title="신랑 신부 소개">
+    <Section label="신랑 신부" title="신랑 신부 소개">
       <div className="border-y border-[#eee7de] px-2 py-2">
         <div className="reveal">
           <PersonLine person={data.couple.groom} data={data} />
@@ -782,7 +786,7 @@ function CalendarSection({ data }: { data: WeddingData }) {
   }, [data.event.day, data.event.month, data.event.year]);
 
   return (
-    <Section label="Wedding Day">
+    <Section label="예식일">
       <div className="mx-auto max-w-[19rem]">
         <div className="reveal mb-8 text-center" style={revealDelay(1)}>
           <p className="break-keep text-[1.18rem] font-light leading-8 tracking-[0.02em] text-[#2f2924]">
@@ -825,7 +829,7 @@ function CalendarSection({ data }: { data: WeddingData }) {
 
 function LocationSection({ data }: { data: WeddingData }) {
   return (
-    <Section label="Location" title="예식 장소 안내" className="pt-10">
+    <Section label="오시는 길" title="예식 장소 안내" className="pt-12">
       <div className="space-y-5">
         <div
           className={`photo-sticker reveal relative overflow-hidden ${photoAspectClass(
@@ -871,7 +875,7 @@ function GallerySection({ data }: { data: WeddingData }) {
   };
 
   return (
-    <Section label="Gallery" title="우리의 순간">
+    <Section label="갤러리" title="우리의 순간">
       <div className="grid grid-cols-3 gap-1.5">
         {gallery.map((photo, index) => (
           <button
@@ -1006,7 +1010,7 @@ function AccountSection({ data }: { data: WeddingData }) {
         ];
 
   return (
-    <Section label="Gift" title="마음 전하실 곳">
+    <Section label="계좌 안내" title="마음 전하실 곳">
       <div className="border-y border-[#eee7de] px-4 py-1">
         {accounts.map((account) => (
           <AccountRow key={account.id} account={account} />
@@ -1314,7 +1318,7 @@ function Footer({ data }: { data: WeddingData }) {
       <p className="mx-auto mt-8 max-w-[18rem] break-keep text-sm leading-7 text-[#76695e]">
         {data.message.footer}
       </p>
-      <p className="mt-8 font-['Great_Vibes'] text-4xl font-light text-[#2f2924]/75">Thank you</p>
+      <p className="mt-8 text-lg font-medium tracking-[-0.02em] text-[#2f2924]/80">감사합니다</p>
     </footer>
   );
 }
@@ -1419,4 +1423,3 @@ export function WeddingInvitation({
     </main>
   );
 }
-

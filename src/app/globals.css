@@ -257,7 +257,7 @@ button {
   filter: blur(0.15px);
   opacity: 0;
   transform: translate3d(0, -10vh, 0) rotate(18deg);
-  animation: cover-petal-fall 14s linear infinite;
+  animation: cover-petal-fall 3.4s ease-in forwards;
 }
 
 @keyframes cover-script-in {
@@ -277,16 +277,20 @@ button {
 @keyframes cover-petal-fall {
   0% {
     opacity: 0;
-    transform: translate3d(0, -10vh, 0) rotate(18deg);
+    transform: translate3d(0, -12vh, 0) rotate(18deg);
   }
 
   12% {
-    opacity: 0.52;
+    opacity: 0.56;
+  }
+
+  72% {
+    opacity: 0.42;
   }
 
   100% {
     opacity: 0;
-    transform: translate3d(var(--petal-drift), 116vh, 0) rotate(250deg);
+    transform: translate3d(var(--petal-drift), 84vh, 0) rotate(250deg);
   }
 }
 
@@ -335,4 +339,3 @@ button {
     padding: 28px 0;
   }
 }
-

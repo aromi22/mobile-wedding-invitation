@@ -90,7 +90,7 @@ export type WeddingFamilySettings = {
   align: "center" | "left";
   showParents: boolean;
   deceasedFormat: "prefix" | "suffix";
-  deceasedMarker: "hanja" | "flower" | "lineart";
+  deceasedMarker: "none" | "hanja" | "flower" | "lineart";
   coupleNameSeparator: "dot" | "heart";
 };
 
