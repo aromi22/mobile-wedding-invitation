@@ -2671,6 +2671,50 @@ export function EditInvitation({
             </details>
           </FormSection>
 
+          <FormSection title="음악" isVisible={activeEditorTab === "design"}>
+            <div className="grid gap-3">
+              {MUSIC_OPTIONS.map((music) => {
+                const isSelected = (draft.music?.src ?? "") === (music?.src ?? "");
+
+                return (
+                  <div
+                    key={music?.src ?? "none"}
+                    className={`rounded-[14px] border p-4 transition ${
+                      isSelected ? "border-[#191919] bg-white" : "border-[#dedede] bg-[#fafafa]"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update((current) => {
+                            current.music = music;
+                            return current;
+                          })
+                        }
+                        className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                          isSelected ? "bg-[#191919] text-white" : "border border-[#dedede] bg-white text-[#191919]"
+                        }`}
+                      >
+                        {isSelected ? "선택됨" : "선택하기"}
+                      </button>
+                      <span className="text-sm font-semibold text-[#191919]">
+                        {music?.title ?? "음악 없음"}
+                      </span>
+                    </div>
+                    {music?.src ? (
+                      <audio controls preload="none" className="mt-3 w-full">
+                        <source src={music.src} type="audio/mpeg" />
+                      </audio>
+                    ) : (
+                      <p className="mt-3 text-xs text-[#777]">배경음악 없이 깔끔하게 보여줘요.</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </FormSection>
+
           <FormSection title="디자인" isVisible={activeEditorTab === "design"}>
             <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
               <div className="mb-4">
@@ -2731,12 +2775,13 @@ export function EditInvitation({
                     <button
                       key={effect.value}
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
                         update((current) => {
                           current.hero.petalEffect = effect.value;
                           return current;
-                        })
-                      }
+                        });
+                        window.setTimeout(scrollToPreview, 80);
+                      }}
                       className={`rounded-xl border px-4 py-4 text-left transition ${
                         isSelected
                           ? "border-[#191919] bg-white shadow-[0_10px_24px_rgba(0,0,0,0.08)]"
@@ -3023,7 +3068,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="섹션 구성" isVisible={activeEditorTab === "design"}>
+          <FormSection title="섹션 구성" isVisible={false}>
             <div className="grid gap-2">
               {SECTION_TOGGLE_OPTIONS.map((option) => {
                 const isOpen = openSectionKey === option.key;
@@ -3100,7 +3145,7 @@ export function EditInvitation({
             />
           </FormSection>
 
-          <FormSection title="스토리 타입" isVisible={activeEditorTab === "design"}>
+          <FormSection title="스토리 타입" isVisible={false}>
             <label className="grid gap-2 text-sm text-[#5f5349]">
               <span>청첩장 스타일</span>
               <select
@@ -3360,7 +3405,143 @@ export function EditInvitation({
             </p>
           </FormSection>
 
-          <FormSection title="음악" isVisible={activeEditorTab === "share"}>
+          <FormSection title="스토리 타입" isVisible={activeEditorTab === "design"}>
+            <label className="grid gap-2 text-sm text-[#5f5349]">
+              <span>청첩장 스타일</span>
+              <select
+                value={draft.storyStyle.type}
+                onChange={(event) => updateStoryType(event.target.value as InvitationStoryType)}
+                className="rounded-md border border-[#e5dacb] bg-white px-3 py-3 text-base text-[#332b24] outline-none transition focus:border-[#b29467]"
+              >
+                <option value="default">기본형</option>
+                <option value="qa">Q&A형</option>
+                <option value="timeline">우리 이야기형</option>
+              </select>
+            </label>
+
+            {draft.storyStyle.type === "qa" ? (
+              <div className="grid gap-4">
+                <label className="flex items-center gap-3 rounded-md bg-white px-3 py-3 text-sm text-[#5f5349]">
+                  <input
+                    type="checkbox"
+                    checked={draft.storyStyle.qaEnabled}
+                    onChange={(event) =>
+                      update((current) => {
+                        current.storyStyle.qaEnabled = event.target.checked;
+                        return current;
+                      })
+                    }
+                  />
+                  Q&A 섹션 사용하기
+                </label>
+                {draft.qa.map((item, index) => (
+                  <QAEditor
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    onChange={(nextItem) => updateQA(index, nextItem)}
+                    onRemove={() => removeQA(index)}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={addQA}
+                  className="rounded-full border border-[#d8c6ab] bg-white px-5 py-3 text-sm font-semibold text-[#806b4f]"
+                >
+                  질문 추가하기
+                </button>
+              </div>
+            ) : null}
+
+            {draft.storyStyle.type === "timeline" ? (
+              <div className="grid gap-4">
+                <label className="flex items-center gap-3 rounded-md bg-white px-3 py-3 text-sm text-[#5f5349]">
+                  <input
+                    type="checkbox"
+                    checked={draft.storyStyle.timelineEnabled}
+                    onChange={(event) =>
+                      update((current) => {
+                        current.storyStyle.timelineEnabled = event.target.checked;
+                        return current;
+                      })
+                    }
+                  />
+                  우리 이야기 타임라인 사용하기
+                </label>
+                {draft.timeline.map((item, index) => (
+                  <TimelineEditor
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    onChange={(nextItem) => updateTimeline(index, nextItem)}
+                    onRemove={() => removeTimeline(index)}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={addTimeline}
+                  className="rounded-full border border-[#d8c6ab] bg-white px-5 py-3 text-sm font-semibold text-[#806b4f]"
+                >
+                  스토리 카드 추가하기
+                </button>
+              </div>
+            ) : null}
+          </FormSection>
+
+          <FormSection title="섹션 구성" isVisible={activeEditorTab === "design"}>
+            <div className="grid gap-2">
+              {SECTION_TOGGLE_OPTIONS.map((option) => {
+                const isOpen = openSectionKey === option.key;
+
+                return (
+                  <div
+                    key={option.key}
+                    className="overflow-hidden rounded-[16px] border border-[#dedede] bg-white"
+                  >
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <label className="relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          checked={draft.sections[option.key]}
+                          onChange={(event) =>
+                            update((current) => {
+                              current.sections = {
+                                ...wedding.sections,
+                                ...current.sections,
+                                [option.key]: event.target.checked,
+                              };
+                              return current;
+                            })
+                          }
+                          className="peer sr-only"
+                          aria-label={`${option.label} 표시 여부`}
+                        />
+                        <span className="absolute inset-0 rounded-full bg-[#cfcfcf] transition peer-checked:bg-[#191919]" />
+                        <span className="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition peer-checked:translate-x-6" />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setOpenSectionKey(isOpen ? "openingMessage" : option.key)}
+                        className="flex flex-1 items-center justify-between gap-4 py-1 text-left text-base font-medium text-[#332b24]"
+                      >
+                        <span>{option.label}</span>
+                        <span className="text-2xl font-light leading-none text-[#2f2924]">
+                          {isOpen ? "⌃" : "⌄"}
+                        </span>
+                      </button>
+                    </div>
+                    {isOpen ? (
+                      <div className="border-t border-[#ededed] px-4 py-5">
+                        {renderSectionEditor(option.key)}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </FormSection>
+
+          <FormSection title="음악" isVisible={false}>
             <div className="grid gap-3">
               {MUSIC_OPTIONS.map((music) => {
                 const isSelected = (draft.music?.src ?? "") === (music?.src ?? "");

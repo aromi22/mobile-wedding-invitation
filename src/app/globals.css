@@ -258,7 +258,7 @@ button {
   opacity: 0;
   transform: translate3d(0, -12vh, 0) rotate(var(--petal-rotate, 18deg));
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.16);
-  animation: cover-petal-fall 9.6s cubic-bezier(0.32, 0, 0.42, 1) forwards;
+  animation: cover-petal-fall 15s cubic-bezier(0.25, 0, 0.35, 1) forwards;
 }
 
 @keyframes cover-script-in {
@@ -278,20 +278,20 @@ button {
 @keyframes cover-petal-fall {
   0% {
     opacity: 0;
-    transform: translate3d(0, -14vh, 0) rotate(var(--petal-rotate, 18deg)) scale(0.78);
+    transform: translate3d(-18px, -16vh, 0) rotate(var(--petal-rotate, 18deg)) scale(0.78);
   }
 
-  12% {
-    opacity: 0.42;
+  18% {
+    opacity: 0.36;
   }
 
-  78% {
-    opacity: 0.32;
+  82% {
+    opacity: 0.28;
   }
 
   100% {
     opacity: 0;
-    transform: translate3d(var(--petal-drift), 102vh, 0) rotate(calc(var(--petal-rotate, 18deg) + 220deg)) scale(1.02);
+    transform: translate3d(var(--petal-drift), 108vh, 0) rotate(calc(var(--petal-rotate, 18deg) + 260deg)) scale(1.02);
   }
 }
 
