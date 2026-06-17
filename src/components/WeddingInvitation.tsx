@@ -328,16 +328,7 @@ function Cover({ data }: { data: WeddingData }) {
     return (
       <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-7 py-8 text-center">
         <div className="cover-reveal w-full max-w-[21.5rem]">
-          <div className="relative aspect-[4/5.45] w-full overflow-hidden bg-[#ede7df]">
-            <InvitationImage
-              photo={data.photos.cover}
-              priority
-              className="object-cover"
-              sizes="430px"
-            />
-          </div>
-
-          <div className="mt-9">
+          <div>
             <h1 className="break-keep font-sans text-[1.02rem] font-light uppercase leading-7 tracking-[0.05em] text-[#2f2a25]">
               {groom.englishName} &amp; {bride.englishName}
             </h1>
@@ -348,6 +339,15 @@ function Cover({ data }: { data: WeddingData }) {
                 <p>{openingVenue}</p>
               </div>
             ) : null}
+          </div>
+
+          <div className="relative mt-10 aspect-[4/5.45] w-full overflow-hidden bg-[#ede7df]">
+            <InvitationImage
+              photo={data.photos.cover}
+              priority
+              className="object-cover"
+              sizes="430px"
+            />
           </div>
         </div>
       </section>
