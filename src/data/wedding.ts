@@ -93,6 +93,9 @@ export const wedding: WeddingData = {
       src: "/images/sample-main-cover.png",
       alt: "신랑 신부 대표 사진",
       ratio: "portrait",
+      scale: 1,
+      positionX: 50,
+      positionY: 50,
     },
     intro: {
       src: "/images/sample-invitation-intro.png",

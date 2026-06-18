@@ -254,6 +254,9 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
     brideChildPhoto: { ...merged.photos.brideChildPhoto, ...source.photos?.brideChildPhoto },
     gallery: source.photos?.gallery?.length ? source.photos.gallery : merged.photos.gallery,
   };
+  merged.photos.cover.scale = merged.photos.cover.scale ?? 1;
+  merged.photos.cover.positionX = merged.photos.cover.positionX ?? 50;
+  merged.photos.cover.positionY = merged.photos.cover.positionY ?? 50;
   merged.hero = {
     ...merged.hero,
     ...source.hero,
@@ -1161,6 +1164,9 @@ export function EditInvitation({
     update((current) => {
       current.photos.cover.src = previewUrl;
       current.photos.cover.alt = file.name;
+      current.photos.cover.scale = current.photos.cover.scale ?? 1;
+      current.photos.cover.positionX = current.photos.cover.positionX ?? 50;
+      current.photos.cover.positionY = current.photos.cover.positionY ?? 50;
       return current;
     });
     setProcessingPhotoCount((count) => count + 1);
@@ -1171,6 +1177,9 @@ export function EditInvitation({
       update((current) => {
         current.photos.cover.src = dataUrl;
         current.photos.cover.alt = file.name;
+        current.photos.cover.scale = current.photos.cover.scale ?? 1;
+        current.photos.cover.positionX = current.photos.cover.positionX ?? 50;
+        current.photos.cover.positionY = current.photos.cover.positionY ?? 50;
         return current;
       });
       setSaveMessage("메인 사진을 바꿨어요.");
@@ -3011,10 +3020,103 @@ export function EditInvitation({
                   onChange={(value) =>
                     update((current) => {
                       current.photos.cover.src = value;
+                      current.photos.cover.scale = current.photos.cover.scale ?? 1;
+                      current.photos.cover.positionX = current.photos.cover.positionX ?? 50;
+                      current.photos.cover.positionY = current.photos.cover.positionY ?? 50;
                       return current;
                     })
                   }
                 />
+                {draft.hero.coverTemplate === "fullscreen" ? (
+                  <div className="grid gap-4 rounded-[14px] border border-[#ededed] bg-[#fafafa] p-4">
+                    <div>
+                      <p className="text-sm font-semibold text-[#332b24]">풀스크린 사진 위치 조절</p>
+                      <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
+                        자동 확대 없이 기본 1배로 시작해요. 얼굴이 잘 보이도록 직접 맞춰주세요.
+                      </p>
+                    </div>
+                    <label className="grid gap-2 text-sm text-[#5f5349]">
+                      <span className="flex items-center justify-between">
+                        확대/축소
+                        <strong className="rounded-full bg-white px-2 py-1 text-xs text-[#806b4f]">
+                          {(draft.photos.cover.scale ?? 1).toFixed(2)}x
+                        </strong>
+                      </span>
+                      <input
+                        type="range"
+                        min="1"
+                        max="2"
+                        step="0.01"
+                        value={draft.photos.cover.scale ?? 1}
+                        onChange={(event) =>
+                          update((current) => {
+                            current.photos.cover.scale = Number(event.target.value);
+                            return current;
+                          })
+                        }
+                        className="accent-[#2f2a25]"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm text-[#5f5349]">
+                      <span className="flex items-center justify-between">
+                        좌우 위치
+                        <strong className="rounded-full bg-white px-2 py-1 text-xs text-[#806b4f]">
+                          {Math.round(draft.photos.cover.positionX ?? 50)}%
+                        </strong>
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={draft.photos.cover.positionX ?? 50}
+                        onChange={(event) =>
+                          update((current) => {
+                            current.photos.cover.positionX = Number(event.target.value);
+                            return current;
+                          })
+                        }
+                        className="accent-[#2f2a25]"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm text-[#5f5349]">
+                      <span className="flex items-center justify-between">
+                        상하 위치
+                        <strong className="rounded-full bg-white px-2 py-1 text-xs text-[#806b4f]">
+                          {Math.round(draft.photos.cover.positionY ?? 50)}%
+                        </strong>
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={draft.photos.cover.positionY ?? 50}
+                        onChange={(event) =>
+                          update((current) => {
+                            current.photos.cover.positionY = Number(event.target.value);
+                            return current;
+                          })
+                        }
+                        className="accent-[#2f2a25]"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        update((current) => {
+                          current.photos.cover.scale = 1;
+                          current.photos.cover.positionX = 50;
+                          current.photos.cover.positionY = 50;
+                          return current;
+                        })
+                      }
+                      className="justify-self-start rounded-full border border-[#d8c6ab] bg-white px-4 py-2 text-xs font-semibold text-[#806b4f]"
+                    >
+                      기본값으로 되돌리기
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </div>
 

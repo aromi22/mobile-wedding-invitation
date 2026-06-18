@@ -199,16 +199,18 @@ function InvitationImage({
   priority = false,
   className = "object-cover",
   sizes = "430px",
+  style,
 }: {
   photo: Pick<WeddingPhoto, "src" | "alt">;
   priority?: boolean;
   className?: string;
   sizes?: string;
+  style?: CSSProperties;
 }) {
   const isPlainImage = /^(https?:|data:|blob:)/.test(photo.src);
 
   if (isPlainImage) {
-    return <img src={photo.src} alt={photo.alt} className={`h-full w-full ${className}`} />;
+    return <img src={photo.src} alt={photo.alt} className={`h-full w-full ${className}`} style={style} />;
   }
 
   return (
@@ -219,6 +221,7 @@ function InvitationImage({
       priority={priority}
       sizes={sizes}
       className={className}
+      style={style}
     />
   );
 }
@@ -444,7 +447,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
   const introScript = '"Great Vibes", "Allura", "Freestyle Script", "Segoe Script", cursive';
 
   return (
-    <section className="relative overflow-hidden bg-white px-0 py-0 text-[#222]">
+    <section className="relative overflow-hidden bg-white px-0 pb-0 pt-3 text-[#222]">
       <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
       <div
         className="cover-reveal relative aspect-[9/16] w-full max-w-[420px] overflow-hidden bg-white"
@@ -622,6 +625,9 @@ function Cover({ data }: { data: WeddingData }) {
 
   if (hero.coverTemplate === "fullscreen") {
     const calligraphyText = hero.fullscreenCalligraphyText.replace(/\s+/g, " ").trim();
+    const coverZoom = data.photos.cover.scale ?? 1;
+    const coverPositionX = data.photos.cover.positionX ?? 50;
+    const coverPositionY = data.photos.cover.positionY ?? 50;
 
     return (
       <section className="relative min-h-screen overflow-hidden bg-[#1f1b18]">
@@ -632,6 +638,11 @@ function Cover({ data }: { data: WeddingData }) {
             priority
             className="object-cover"
             sizes="430px"
+            style={{
+              objectPosition: `${coverPositionX}% ${coverPositionY}%`,
+              transform: `scale(${coverZoom})`,
+              transformOrigin: `${coverPositionX}% ${coverPositionY}%`,
+            }}
           />
         </div>
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08)_0%,rgba(0,0,0,0.02)_45%,rgba(0,0,0,0.22)_100%)]" />
@@ -661,7 +672,7 @@ function Cover({ data }: { data: WeddingData }) {
 
   if (hero.coverTemplate === "clean") {
     return (
-      <section className="relative flex items-start justify-center overflow-hidden bg-white px-7 pb-8 pt-0 text-center">
+      <section className="relative flex items-start justify-center overflow-hidden bg-white px-7 pb-8 pt-4 text-center">
         <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
         <div className="cover-reveal w-full max-w-[21.5rem]">
           <div>
@@ -691,7 +702,7 @@ function Cover({ data }: { data: WeddingData }) {
   }
 
   return (
-    <section className="relative flex items-start justify-center overflow-hidden bg-white px-7 pb-9 pt-0 text-center">
+    <section className="relative flex items-start justify-center overflow-hidden bg-white px-7 pb-9 pt-4 text-center">
       <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
       <div className="cover-reveal w-full max-w-[20rem]">
         <div className="bg-white px-3.5 pb-12 pt-3.5 shadow-[0_24px_54px_rgba(42,34,30,0.1)] ring-1 ring-[#2f2924]/5">
