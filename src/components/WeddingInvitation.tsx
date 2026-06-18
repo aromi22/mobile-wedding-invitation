@@ -42,7 +42,7 @@ const COVER_PETALS = Array.from({ length: 10 }, (_, index) => ({
   duration: `${13.5 + (index % 5) * 1.15}s`,
   drift: `${index % 2 === 0 ? 96 + index * 5 : -82 - index * 4}px`,
   rotate: `${index % 2 === 0 ? 18 + index * 7 : -22 - index * 5}deg`,
-  size: `${7 + (index % 4)}px`,
+  size: `${13 + (index % 5)}px`,
 }));
 
 const PETAL_COLORS = {
@@ -50,23 +50,11 @@ const PETAL_COLORS = {
   soft: "rgba(255,255,255,0.68)",
   pink: "rgba(248,210,218,0.62)",
   sky: "rgba(246,235,219,0.66)",
-  snow: "rgba(255,255,255,0.78)",
-  cherry: "rgba(250,204,216,0.68)",
-  daisy: "rgba(255,246,192,0.72)",
-  fall: "rgba(205,151,94,0.56)",
-  heart: "rgba(246,169,188,0.62)",
-};
-
-const PETAL_SYMBOLS = {
-  none: "",
-  soft: "",
-  pink: "",
-  sky: "",
-  snow: "❄",
-  cherry: "✿",
-  daisy: "✼",
-  fall: "❧",
-  heart: "♡",
+  snow: "rgba(255,255,255,0.88)",
+  cherry: "rgba(248,178,196,0.72)",
+  daisy: "rgba(244,196,76,0.78)",
+  fall: "rgba(181,123,63,0.68)",
+  heart: "rgba(239,142,168,0.72)",
 };
 
 const CHILD_PHOTO_FRAME_CONFIG = {
@@ -84,10 +72,79 @@ const CHILD_PHOTO_FRAME_CONFIG = {
   },
 } satisfies Record<string, CSSProperties>;
 
+function PetalShape({ variant }: { variant: WeddingData["hero"]["petalEffect"] }) {
+  if (variant === "heart") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden="true">
+        <path
+          d="M12 20.3C7.1 16 4 13.2 4 9.6 4 7.1 5.9 5.2 8.3 5.2c1.4 0 2.8.7 3.7 1.8.9-1.1 2.3-1.8 3.7-1.8 2.4 0 4.3 1.9 4.3 4.4 0 3.6-3.1 6.4-8 10.7Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+
+  if (variant === "daisy") {
+    return (
+      <svg viewBox="0 0 28 28" className="h-full w-full" aria-hidden="true">
+        <g fill="rgba(255,255,255,0.86)">
+          <ellipse cx="14" cy="5.2" rx="3.3" ry="5.1" />
+          <ellipse cx="14" cy="22.8" rx="3.3" ry="5.1" />
+          <ellipse cx="5.2" cy="14" rx="5.1" ry="3.3" />
+          <ellipse cx="22.8" cy="14" rx="5.1" ry="3.3" />
+          <ellipse cx="7.8" cy="7.8" rx="3" ry="5" transform="rotate(-45 7.8 7.8)" />
+          <ellipse cx="20.2" cy="20.2" rx="3" ry="5" transform="rotate(-45 20.2 20.2)" />
+          <ellipse cx="20.2" cy="7.8" rx="5" ry="3" transform="rotate(-45 20.2 7.8)" />
+          <ellipse cx="7.8" cy="20.2" rx="5" ry="3" transform="rotate(-45 7.8 20.2)" />
+        </g>
+        <circle cx="14" cy="14" r="3.8" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  if (variant === "snow") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden="true">
+        <g stroke="currentColor" strokeLinecap="round" strokeWidth="1.8">
+          <path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9" />
+          <path d="m8.8 5.2 3.2 2.1 3.2-2.1M8.8 18.8l3.2-2.1 3.2 2.1M5.5 11.2l.2 3.8-3.4 1.7M18.5 11.2l-.2 3.8 3.4 1.7" opacity="0.65" />
+        </g>
+      </svg>
+    );
+  }
+
+  if (variant === "cherry") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden="true">
+        <path
+          d="M12.2 3.6c4.8 3.1 6.3 7.5 3.7 11.5-2.4 3.7-7.2 4.4-9.6 2.9-1.7-1.1-1.7-3.6.1-6.4 1.7-2.6 3.8-4.5 5.8-8Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+
+  if (variant === "fall") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden="true">
+        <path
+          d="M20.2 4.2C12.8 4.4 6 8.2 4.2 15.7c-.7 2.7.6 4.2 2.8 4.1 7.7-.4 12.3-7.8 13.2-15.6Z"
+          fill="currentColor"
+        />
+        <path d="M6.2 18.2C9.6 13.5 13.9 9.9 19.3 5" fill="none" stroke="rgba(255,255,255,0.55)" strokeLinecap="round" strokeWidth="1.2" />
+      </svg>
+    );
+  }
+
+  return null;
+}
+
 function CoverPetalEffect({ variant }: { variant: WeddingData["hero"]["petalEffect"] }) {
   if (variant === "none") {
     return null;
   }
+
+  const isShapeVariant = ["snow", "cherry", "daisy", "fall", "heart"].includes(variant);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden" aria-hidden="true">
@@ -100,7 +157,8 @@ function CoverPetalEffect({ variant }: { variant: WeddingData["hero"]["petalEffe
               left: petal.left,
               width: petal.size,
               height: `calc(${petal.size} * 1.55)`,
-              background: PETAL_COLORS[variant],
+              background: isShapeVariant ? "transparent" : PETAL_COLORS[variant],
+              color: PETAL_COLORS[variant],
               animationDelay: petal.delay,
               animationDuration: petal.duration,
               "--petal-drift": petal.drift,
@@ -108,7 +166,7 @@ function CoverPetalEffect({ variant }: { variant: WeddingData["hero"]["petalEffe
             } as CSSProperties
           }
         >
-          {PETAL_SYMBOLS[variant]}
+          <PetalShape variant={variant} />
         </span>
       ))}
     </div>

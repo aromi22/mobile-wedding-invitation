@@ -257,8 +257,6 @@ button {
   justify-content: center;
   border-radius: 78% 0 78% 0;
   filter: blur(0.1px);
-  color: rgba(78, 64, 58, 0.42);
-  font-size: 0.9rem;
   line-height: 1;
   opacity: 0;
   transform: translate3d(0, -12vh, 0) rotate(var(--petal-rotate, 18deg));
