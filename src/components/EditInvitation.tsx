@@ -3684,8 +3684,8 @@ export function EditInvitation({
               편집으로 이동
             </button>
           </div>
-          <div className="mx-auto w-full max-w-[400px] overflow-hidden rounded-[34px] bg-[#eee7e2] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.32)]">
-            <div className="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-[24px] bg-white">
+          <div className="mx-auto w-full max-w-[420px] overflow-hidden bg-white shadow-[0_28px_90px_rgba(0,0,0,0.28)]">
+            <div className="h-[calc(100vh-7rem)] min-h-[640px] overflow-y-auto bg-white">
               <WeddingInvitation data={preview} key={`${preview.hero.petalEffect}-${previewReplayKey}`} />
             </div>
           </div>
