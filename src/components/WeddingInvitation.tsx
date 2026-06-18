@@ -25,6 +25,17 @@ const FULLSCREEN_CALLIGRAPHY_FONTS = {
   "freestyle-script": '"Freestyle Script", "French Script MT", "Great Vibes", cursive',
 };
 
+const THEME_FONTS = {
+  pretendard: 'Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  sunbatang: '"SunBatang", "Batang", "Times New Roman", serif',
+  nanumsquare: '"NanumSquare", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  gangwon: '"GangwonEdu_OTFBoldA", "GangwonEduAll", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  "cafe24-dongdong": '"Cafe24Dongdong", "Cafe24Oneprettynight", cursive',
+  jua: '"Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  himelody: '"Hi Melody", "Cafe24Oneprettynight", cursive',
+  "cafe24-ssukssuk": '"Cafe24Ssukssuk", "Jua", cursive',
+};
+
 const COVER_PETALS = Array.from({ length: 10 }, (_, index) => ({
   left: `${(index * 23 + 4) % 92}%`,
   delay: `${(index % 6) * 0.55}s`,
@@ -39,6 +50,23 @@ const PETAL_COLORS = {
   soft: "rgba(255,255,255,0.68)",
   pink: "rgba(248,210,218,0.62)",
   sky: "rgba(246,235,219,0.66)",
+  snow: "rgba(255,255,255,0.78)",
+  cherry: "rgba(250,204,216,0.68)",
+  daisy: "rgba(255,246,192,0.72)",
+  fall: "rgba(205,151,94,0.56)",
+  heart: "rgba(246,169,188,0.62)",
+};
+
+const PETAL_SYMBOLS = {
+  none: "",
+  soft: "",
+  pink: "",
+  sky: "",
+  snow: "❄",
+  cherry: "✿",
+  daisy: "✼",
+  fall: "❧",
+  heart: "♡",
 };
 
 const CHILD_PHOTO_FRAME_CONFIG = {
@@ -79,7 +107,9 @@ function CoverPetalEffect({ variant }: { variant: WeddingData["hero"]["petalEffe
               "--petal-rotate": petal.rotate,
             } as CSSProperties
           }
-        />
+        >
+          {PETAL_SYMBOLS[variant]}
+        </span>
       ))}
     </div>
   );
@@ -1401,7 +1431,10 @@ export function WeddingInvitation({
   useScrollReveal(revealKey);
 
   return (
-    <main className="kitsch-paper relative mx-auto min-h-screen max-w-[430px] overflow-hidden text-[#4a2224] shadow-[0_0_80px_rgba(91,70,42,0.12)]">
+    <main
+      className="kitsch-paper relative mx-auto min-h-screen max-w-[430px] overflow-hidden text-[#4a2224] shadow-[0_0_80px_rgba(91,70,42,0.12)]"
+      style={{ fontFamily: THEME_FONTS[data.hero.themeFont ?? "gangwon"] }}
+    >
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
         <span className="ambient-petal ambient-petal-1" />
         <span className="ambient-petal ambient-petal-2" />

@@ -190,6 +190,7 @@ export const wedding: WeddingData = {
     ],
   },
   hero: {
+    themeFont: "gangwon",
     coverTemplate: "polaroid",
     petalEffect: "none",
     fullscreenCalligraphyEnabled: false,

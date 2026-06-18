@@ -62,6 +62,17 @@ const FULLSCREEN_CALLIGRAPHY_FONT_OPTIONS = [
   { label: "Freestyle Script", value: "freestyle-script" },
 ] as const;
 
+const THEME_FONT_OPTIONS = [
+  { label: "프리텐다드", value: "pretendard" },
+  { label: "선바탕", value: "sunbatang" },
+  { label: "나눔스퀘어", value: "nanumsquare" },
+  { label: "강원교육체", value: "gangwon" },
+  { label: "카페24 동동", value: "cafe24-dongdong" },
+  { label: "주아체", value: "jua" },
+  { label: "하이멜로디", value: "himelody" },
+  { label: "카페24 쑥쑥", value: "cafe24-ssukssuk" },
+] as const;
+
 const COVER_TEMPLATE_OPTIONS = [
   {
     label: "폴라로이드형",
@@ -85,6 +96,11 @@ const PETAL_EFFECT_OPTIONS = [
   { label: "화이트 꽃잎", value: "soft", description: "하얀 꽃잎이 천천히 내려오는 깨끗한 분위기예요." },
   { label: "연핑크 꽃잎", value: "pink", description: "아주 옅은 핑크 톤으로 로맨틱하게 흩날려요." },
   { label: "아이보리 꽃잎", value: "sky", description: "종이 청첩장처럼 차분한 아이보리 톤이에요." },
+  { label: "눈송이", value: "snow", description: "작은 눈송이가 사선으로 천천히 흘러요." },
+  { label: "벚꽃", value: "cherry", description: "연핑크 벚꽃잎이 부드럽게 지나가요." },
+  { label: "데이지", value: "daisy", description: "작은 데이지 꽃송이가 산뜻하게 흩날려요." },
+  { label: "낙엽", value: "fall", description: "차분한 가을빛 잎이 천천히 내려와요." },
+  { label: "하트", value: "heart", description: "작은 하트가 은은하게 떠내려가요." },
 ] as const;
 
 type EditorTabKey = "basic" | "design" | "accounts" | "share";
@@ -248,6 +264,7 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
   merged.hero = {
     ...merged.hero,
     ...source.hero,
+    themeFont: source.hero?.themeFont ?? merged.hero.themeFont ?? "gangwon",
     coverTemplate: source.hero?.coverTemplate ?? merged.hero.coverTemplate ?? "polaroid",
     petalEffect: source.hero?.petalEffect ?? merged.hero.petalEffect ?? "none",
     fullscreenCalligraphyEnabled:
@@ -2715,89 +2732,172 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="디자인" isVisible={activeEditorTab === "design"}>
-            <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-[#332b24]">첫 화면 디자인</p>
-                <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
-                  청첩장을 열었을 때 가장 먼저 보이는 오프닝 스타일이에요.
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {COVER_TEMPLATE_OPTIONS.map((template) => {
-                  const isSelected = draft.hero.coverTemplate === template.value;
-
-                  return (
-                    <button
-                      key={template.value}
-                      type="button"
-                      onClick={() =>
+          <FormSection title="테마" isVisible={activeEditorTab === "design"}>
+            <div className="rounded-[18px] border border-[#dedede] bg-white">
+              <details open>
+                <summary className="flex cursor-pointer list-none items-center justify-between border-b border-[#ededed] px-5 py-4 text-sm font-semibold text-[#191919]">
+                  <span>테마</span>
+                  <span className="text-lg leading-none">⌃</span>
+                </summary>
+                <div className="grid gap-4 px-5 py-5">
+                  <div className="grid gap-3 sm:grid-cols-[4.5rem_1fr] sm:items-center">
+                    <span className="text-sm text-[#555]">글꼴</span>
+                    <select
+                      value={draft.hero.themeFont}
+                      onChange={(event) =>
                         update((current) => {
-                          current.hero.coverTemplate = template.value;
-                          if (template.value === "fullscreen") {
-                            current.hero.fullscreenCalligraphyEnabled = true;
-                            current.hero.fullscreenCalligraphyText =
-                              current.hero.fullscreenCalligraphyText || selectedPhrase;
-                          }
+                          current.hero.themeFont =
+                            event.target.value as WeddingData["hero"]["themeFont"];
                           return current;
                         })
                       }
-                      className={`rounded-xl border px-4 py-4 text-left transition ${
-                        isSelected
-                          ? "border-[#191919] bg-white shadow-[0_10px_24px_rgba(0,0,0,0.08)]"
-                          : "border-[#dedede] bg-white"
-                      }`}
+                      className="h-11 w-full rounded-[10px] border border-[#dedede] bg-white px-3 text-sm text-[#191919] outline-none focus:border-[#191919] sm:max-w-[16rem]"
                     >
-                      <span className="block text-sm font-semibold text-[#332b24]">
-                        {template.label}
-                      </span>
-                      <span className="mt-2 block break-keep text-xs leading-5 text-[#8a7a6a]">
-                        {template.description}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+                      {THEME_FONT_OPTIONS.map((font) => (
+                        <option key={font.value} value={font.value}>
+                          {font.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-            <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-[#332b24]">첫 화면 꽃가루 효과</p>
-                <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
-                  첫 화면에 아주 은은하게 흩날리는 꽃잎 모션을 넣거나 끌 수 있어요.
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {PETAL_EFFECT_OPTIONS.map((effect) => {
-                  const isSelected = draft.hero.petalEffect === effect.value;
+                  <div className="grid gap-3 sm:grid-cols-[4.5rem_1fr] sm:items-center">
+                    <span className="text-sm text-[#555]">오프닝 디자인</span>
+                    <div className="grid gap-3 sm:grid-cols-[16rem_1fr] sm:items-center">
+                      <select
+                        value={draft.hero.coverTemplate}
+                        onChange={(event) =>
+                          update((current) => {
+                            current.hero.coverTemplate =
+                              event.target.value as WeddingData["hero"]["coverTemplate"];
+                            if (current.hero.coverTemplate === "fullscreen") {
+                              current.hero.fullscreenCalligraphyEnabled = true;
+                              current.hero.fullscreenCalligraphyText =
+                                current.hero.fullscreenCalligraphyText || selectedPhrase;
+                            }
+                            return current;
+                          })
+                        }
+                        className="h-11 w-full rounded-[10px] border border-[#dedede] bg-white px-3 text-sm text-[#191919] outline-none focus:border-[#191919]"
+                      >
+                        {COVER_TEMPLATE_OPTIONS.map((template) => (
+                          <option key={template.value} value={template.value}>
+                            {template.label}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex flex-wrap gap-2">
+                        {COVER_TEMPLATE_OPTIONS.map((template) => {
+                          const isSelected = draft.hero.coverTemplate === template.value;
 
-                  return (
-                    <button
-                      key={effect.value}
-                      type="button"
-                      onClick={() => {
-                        update((current) => {
-                          current.hero.petalEffect = effect.value;
-                          return current;
-                        });
-                        window.setTimeout(scrollToPreview, 80);
-                      }}
-                      className={`rounded-xl border px-4 py-4 text-left transition ${
-                        isSelected
-                          ? "border-[#191919] bg-white shadow-[0_10px_24px_rgba(0,0,0,0.08)]"
-                          : "border-[#dedede] bg-white"
-                      }`}
-                    >
-                      <span className="block text-sm font-semibold text-[#332b24]">
-                        {effect.label}
-                      </span>
-                      <span className="mt-2 block break-keep text-xs leading-5 text-[#8a7a6a]">
-                        {effect.description}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+                          return (
+                            <button
+                              key={template.value}
+                              type="button"
+                              aria-label={template.label}
+                              onClick={() =>
+                                update((current) => {
+                                  current.hero.coverTemplate = template.value;
+                                  if (template.value === "fullscreen") {
+                                    current.hero.fullscreenCalligraphyEnabled = true;
+                                    current.hero.fullscreenCalligraphyText =
+                                      current.hero.fullscreenCalligraphyText || selectedPhrase;
+                                  }
+                                  return current;
+                                })
+                              }
+                              className={`h-7 w-7 rounded-full border transition ${
+                                isSelected
+                                  ? "border-[#191919] ring-2 ring-[#191919]/10"
+                                  : "border-[#d7d7d7]"
+                              } ${
+                                template.value === "polaroid"
+                                  ? "bg-[#f5efe8]"
+                                  : template.value === "fullscreen"
+                                    ? "bg-[#e7eef5]"
+                                    : "bg-[#f4dfe4]"
+                              }`}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-[4.5rem_1fr] sm:items-center">
+                    <span className="text-sm text-[#555]">꽃가루 효과</span>
+                    <div className="grid gap-3 sm:grid-cols-[16rem_1fr] sm:items-center">
+                      <select
+                        value={draft.hero.petalEffect}
+                        onChange={(event) => {
+                          update((current) => {
+                            current.hero.petalEffect =
+                              event.target.value as WeddingData["hero"]["petalEffect"];
+                            return current;
+                          });
+                          window.setTimeout(scrollToPreview, 80);
+                        }}
+                        className="h-11 w-full rounded-[10px] border border-[#dedede] bg-white px-3 text-sm text-[#191919] outline-none focus:border-[#191919]"
+                      >
+                        {PETAL_EFFECT_OPTIONS.map((effect) => (
+                          <option key={effect.value} value={effect.value}>
+                            {effect.label}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex flex-wrap gap-2">
+                        {PETAL_EFFECT_OPTIONS.map((effect) => {
+                          const isSelected = draft.hero.petalEffect === effect.value;
+                          const symbol =
+                            effect.value === "snow"
+                              ? "❄"
+                              : effect.value === "cherry"
+                                ? "✿"
+                                : effect.value === "daisy"
+                                  ? "✼"
+                                  : effect.value === "fall"
+                                    ? "❧"
+                                    : effect.value === "heart"
+                                      ? "♡"
+                                      : "";
+
+                          return (
+                            <button
+                              key={effect.value}
+                              type="button"
+                              aria-label={effect.label}
+                              onClick={() => {
+                                update((current) => {
+                                  current.hero.petalEffect = effect.value;
+                                  return current;
+                                });
+                                window.setTimeout(scrollToPreview, 80);
+                              }}
+                              className={`flex h-7 w-7 items-center justify-center rounded-full border text-[13px] transition ${
+                                isSelected
+                                  ? "border-[#191919] ring-2 ring-[#191919]/10"
+                                  : "border-[#d7d7d7]"
+                              } ${
+                                effect.value === "none"
+                                  ? "bg-white"
+                                  : effect.value === "pink" || effect.value === "cherry" || effect.value === "heart"
+                                    ? "bg-[#f7dfe5]"
+                                    : effect.value === "sky" || effect.value === "fall"
+                                      ? "bg-[#f4eadc]"
+                                      : effect.value === "daisy"
+                                        ? "bg-[#fff2bc]"
+                                        : "bg-[#f7f7f7]"
+                              }`}
+                            >
+                              {symbol}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </details>
             </div>
 
             {draft.hero.coverTemplate === "fullscreen" ? (
