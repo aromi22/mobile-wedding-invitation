@@ -441,6 +441,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
   const template = hero.coverTemplate;
   const introSans = 'Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
   const introSerif = '"Cormorant Garamond", "Playfair Display", Georgia, serif';
+  const introScript = '"Great Vibes", "Allura", "Freestyle Script", "Segoe Script", cursive';
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-0 py-0 text-[#222]">
@@ -459,7 +460,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
             <h1 className="mt-4 break-keep text-[clamp(1.08rem,4.6vw,1.42rem)] font-medium tracking-[-0.03em] text-[#222]">
               {groomName} <span className="mx-1 text-[#777]">|</span> {brideName}
             </h1>
-            <p className="mt-1.5 text-[0.78rem] tracking-[0.04em] text-[#777]" style={{ fontFamily: introSerif }}>
+            <p className="mt-1.5 text-[1.2rem] tracking-normal text-[#777]" style={{ fontFamily: introScript }}>
               {englishMessage}
             </p>
             <p className="mx-auto mt-2 max-w-[16rem] break-keep text-[0.66rem] leading-4 text-[#555]">
@@ -483,7 +484,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
               {invitationMessage}
             </p>
             <IntroPhoto photo={data.photos.cover} priority className="mt-4 aspect-[4/5.7] w-full" />
-            <p className="mt-4 text-[0.82rem] tracking-[0.03em] text-[#333]" style={{ fontFamily: introSerif }}>
+            <p className="mt-4 text-[1.32rem] tracking-normal text-[#333]" style={{ fontFamily: introScript }}>
               {englishMessage}
             </p>
             <p className="mt-1 break-keep text-[0.65rem] text-[#777]">{subMessage}</p>
@@ -510,7 +511,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
             </p>
             <IntroPhoto photo={data.photos.cover} priority className="mt-4 aspect-[4/6.05] w-full" />
             <div className="mt-auto space-y-0.5 text-center text-[0.64rem] leading-4 text-[#555]">
-              <p className="tracking-[0.04em]" style={{ fontFamily: introSerif }}>{englishMessage}</p>
+              <p className="text-[1.15rem] tracking-normal" style={{ fontFamily: introScript }}>{englishMessage}</p>
               <p className="text-[#777]">{subMessage}</p>
               <p>{compactDate}</p>
               <p className="break-keep">{venue}</p>
@@ -612,7 +613,7 @@ function Cover({ data }: { data: WeddingData }) {
   } satisfies CSSProperties;
 
   if (
-    ["classic-poster", "editorial-marriage", "minimal-date", "soft-card", "framed-gallery", "modern-script"].includes(
+    ["classic-poster", "editorial-marriage", "minimal-date"].includes(
       hero.coverTemplate,
     )
   ) {

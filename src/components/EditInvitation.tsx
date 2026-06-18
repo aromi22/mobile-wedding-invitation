@@ -142,14 +142,6 @@ function normalizeCoverTemplate(
     return value as WeddingData["hero"]["coverTemplate"];
   }
 
-  if (value === "fullscreen") {
-    return "modern-script";
-  }
-
-  if (value === "clean") {
-    return "soft-card";
-  }
-
   return "classic-poster";
 }
 
