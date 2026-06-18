@@ -444,7 +444,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
   const introScript = '"Great Vibes", "Allura", "Freestyle Script", "Segoe Script", cursive';
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-0 py-0 text-[#222]">
+    <section className="relative overflow-hidden bg-white px-0 py-0 text-[#222]">
       <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
       <div
         className="cover-reveal relative aspect-[9/16] w-full max-w-[420px] overflow-hidden bg-white"
@@ -661,7 +661,7 @@ function Cover({ data }: { data: WeddingData }) {
 
   if (hero.coverTemplate === "clean") {
     return (
-      <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-7 py-8 text-center">
+      <section className="relative flex items-start justify-center overflow-hidden bg-white px-7 pb-8 pt-0 text-center">
         <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
         <div className="cover-reveal w-full max-w-[21.5rem]">
           <div>
@@ -691,7 +691,7 @@ function Cover({ data }: { data: WeddingData }) {
   }
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-7 py-9 text-center">
+    <section className="relative flex items-start justify-center overflow-hidden bg-white px-7 pb-9 pt-0 text-center">
       <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
       <div className="cover-reveal w-full max-w-[20rem]">
         <div className="bg-white px-3.5 pb-12 pt-3.5 shadow-[0_24px_54px_rgba(42,34,30,0.1)] ring-1 ring-[#2f2924]/5">
