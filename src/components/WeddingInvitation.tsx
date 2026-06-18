@@ -450,22 +450,22 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
         style={{ fontFamily: introSans }}
       >
         {template === "classic-poster" ? (
-          <div className="flex h-full flex-col px-10 pb-10 pt-9 text-center">
+          <div className="flex h-full flex-col px-7 pb-7 pt-5 text-center">
             <p className="text-[0.68rem] tracking-[0.22em] text-[#777]" style={{ fontFamily: introSerif }}>
               {dateLine}
             </p>
-            <div className="mx-auto mt-5 h-px w-28 bg-[#D8D8D8]" />
-            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-8 aspect-[3/4.55] w-[76%]" />
-            <h1 className="mt-7 break-keep text-[clamp(1.25rem,5.2vw,1.72rem)] font-medium tracking-[-0.03em] text-[#222]">
+            <div className="mx-auto mt-3 h-px w-24 bg-[#D8D8D8]" />
+            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-4 aspect-[4/5.75] w-full" />
+            <h1 className="mt-4 break-keep text-[clamp(1.08rem,4.6vw,1.42rem)] font-medium tracking-[-0.03em] text-[#222]">
               {groomName} <span className="mx-1 text-[#777]">|</span> {brideName}
             </h1>
-            <p className="mt-2 text-[0.82rem] tracking-[0.04em] text-[#777]" style={{ fontFamily: introSerif }}>
+            <p className="mt-1.5 text-[0.78rem] tracking-[0.04em] text-[#777]" style={{ fontFamily: introSerif }}>
               {englishMessage}
             </p>
-            <p className="mx-auto mt-3 max-w-[15rem] break-keep text-[0.72rem] leading-5 text-[#555]">
+            <p className="mx-auto mt-2 max-w-[16rem] break-keep text-[0.66rem] leading-4 text-[#555]">
               {invitationMessage}
             </p>
-            <div className="mt-auto space-y-1 text-[0.7rem] leading-5 text-[#555]">
+            <div className="mt-auto space-y-0.5 text-[0.64rem] leading-4 text-[#555]">
               <p className="text-[#777]">{subMessage}</p>
               <p>{compactDate}</p>
               <p className="break-keep">{venue}</p>
@@ -474,20 +474,20 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
         ) : null}
 
         {template === "editorial-marriage" ? (
-          <div className="flex h-full flex-col px-8 pb-9 pt-10 text-center">
+          <div className="flex h-full flex-col px-6 pb-7 pt-5 text-center">
             <p className="text-[0.58rem] font-semibold tracking-[0.28em] text-[#999]">THE MARRIAGE OF</p>
-            <h1 className="mt-3 break-keep text-[clamp(1.35rem,5vw,1.86rem)] font-medium leading-tight text-[#222]">
+            <h1 className="mt-2 break-keep text-[clamp(1.08rem,4.3vw,1.42rem)] font-medium leading-tight text-[#222]">
               {groomName} &amp; {brideName}
             </h1>
-            <p className="mx-auto mt-4 max-w-[16rem] break-keep text-[0.72rem] leading-5 text-[#777]">
+            <p className="mx-auto mt-2 max-w-[17rem] break-keep text-[0.66rem] leading-4 text-[#777]">
               {invitationMessage}
             </p>
-            <IntroPhoto photo={data.photos.cover} priority className="mt-8 aspect-[4/5.55] w-full" />
-            <p className="mt-7 text-[0.92rem] tracking-[0.03em] text-[#333]" style={{ fontFamily: introSerif }}>
+            <IntroPhoto photo={data.photos.cover} priority className="mt-4 aspect-[4/5.7] w-full" />
+            <p className="mt-4 text-[0.82rem] tracking-[0.03em] text-[#333]" style={{ fontFamily: introSerif }}>
               {englishMessage}
             </p>
-            <p className="mt-2 break-keep text-[0.72rem] text-[#777]">{subMessage}</p>
-            <div className="mt-4 space-y-1 text-[0.68rem] leading-5 text-[#666]">
+            <p className="mt-1 break-keep text-[0.65rem] text-[#777]">{subMessage}</p>
+            <div className="mt-2 space-y-0.5 text-[0.63rem] leading-4 text-[#666]">
               <p>{compactDate}</p>
               <p className="break-keep">{venue}</p>
             </div>
@@ -495,7 +495,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
         ) : null}
 
         {template === "minimal-date" ? (
-          <div className="flex h-full flex-col px-7 pb-9 pt-9">
+          <div className="flex h-full flex-col px-5 pb-7 pt-5">
             <div className="grid grid-cols-[1fr_auto_1fr] items-start text-[0.65rem] uppercase tracking-[0.12em] text-[#555]">
               <p className="truncate text-left">{groomNameEn}</p>
               <div className="-mt-1 px-5 text-center text-[#222]" style={{ fontFamily: introSerif }}>
@@ -505,11 +505,11 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
               </div>
               <p className="truncate text-right">{brideNameEn}</p>
             </div>
-            <p className="mx-auto mt-6 max-w-[16rem] break-keep text-center text-[0.72rem] leading-5 text-[#777]">
+            <p className="mx-auto mt-3 max-w-[17rem] break-keep text-center text-[0.65rem] leading-4 text-[#777]">
               {invitationMessage}
             </p>
-            <IntroPhoto photo={data.photos.cover} priority className="mt-8 aspect-[4/5.9] w-full" />
-            <div className="mt-auto space-y-1 text-center text-[0.72rem] leading-5 text-[#555]">
+            <IntroPhoto photo={data.photos.cover} priority className="mt-4 aspect-[4/6.05] w-full" />
+            <div className="mt-auto space-y-0.5 text-center text-[0.64rem] leading-4 text-[#555]">
               <p className="tracking-[0.04em]" style={{ fontFamily: introSerif }}>{englishMessage}</p>
               <p className="text-[#777]">{subMessage}</p>
               <p>{compactDate}</p>
@@ -519,19 +519,19 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
         ) : null}
 
         {template === "soft-card" ? (
-          <div className="flex h-full flex-col px-8 pb-9 pt-10 text-center">
-            <div className="h-full border border-[#EAEAEA] px-6 pb-7 pt-8 shadow-[0_18px_48px_rgba(0,0,0,0.045)]">
+          <div className="flex h-full flex-col px-5 pb-6 pt-5 text-center">
+            <div className="h-full border border-[#EAEAEA] px-4 pb-5 pt-5 shadow-[0_18px_48px_rgba(0,0,0,0.035)]">
               <p className="text-[0.58rem] tracking-[0.22em] text-[#999]" style={{ fontFamily: introSerif }}>
                 {englishMessage}
               </p>
-              <h1 className="break-keep text-[clamp(1.18rem,4.8vw,1.58rem)] font-medium text-[#222]">
+              <h1 className="mt-1 break-keep text-[clamp(1.02rem,4.1vw,1.35rem)] font-medium text-[#222]">
                 {groomName} &amp; {brideName}
               </h1>
-              <p className="mx-auto mt-4 max-w-[15rem] break-keep text-[0.72rem] leading-5 text-[#777]">
+              <p className="mx-auto mt-2 max-w-[16rem] break-keep text-[0.64rem] leading-4 text-[#777]">
                 {invitationMessage}
               </p>
-              <IntroPhoto photo={data.photos.cover} priority className="mt-9 aspect-[4/5.5] w-full" />
-              <div className="mt-7 space-y-1 text-[0.69rem] leading-5 text-[#555]">
+              <IntroPhoto photo={data.photos.cover} priority className="mt-4 aspect-[4/5.9] w-full" />
+              <div className="mt-4 space-y-0.5 text-[0.62rem] leading-4 text-[#555]">
                 <p className="text-[#777]">{subMessage}</p>
                 <p>{compactDate}</p>
                 <p className="break-keep">{venue}</p>
@@ -541,47 +541,47 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
         ) : null}
 
         {template === "framed-gallery" ? (
-          <div className="relative h-full border border-[#222] px-7 pb-8 pt-8">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-rl] text-[0.58rem] tracking-[0.24em] text-[#777]">
+          <div className="relative h-full border border-[#222] px-5 pb-6 pt-5">
+            <div className="absolute left-3 top-[46%] -translate-y-1/2 rotate-180 [writing-mode:vertical-rl] text-[0.52rem] tracking-[0.2em] text-[#777]">
               {englishMessage}
             </div>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 [writing-mode:vertical-rl] text-[0.58rem] tracking-[0.24em] text-[#777]">
+            <div className="absolute right-3 top-[46%] -translate-y-1/2 [writing-mode:vertical-rl] text-[0.52rem] tracking-[0.2em] text-[#777]">
               {subMessage}
             </div>
-            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-10 aspect-[3/4.6] w-[72%] border border-[#D8D8D8] p-2" />
-            <div className="absolute inset-x-8 bottom-12 grid grid-cols-[1fr_auto_1fr] items-end gap-3 text-[0.66rem] text-[#555]">
+            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-3 aspect-[3/5.05] w-[84%] border border-[#D8D8D8] p-1.5" />
+            <div className="absolute inset-x-6 bottom-10 grid grid-cols-[1fr_auto_1fr] items-end gap-3 text-[0.6rem] text-[#555]">
               <p className="break-keep text-left font-medium text-[#222]">{groomName}<br />{brideName}</p>
-              <p className="text-center text-[1.15rem] text-[#222]" style={{ fontFamily: introSerif }}>{month}<br />{dayNum}</p>
+              <p className="text-center text-[1rem] text-[#222]" style={{ fontFamily: introSerif }}>{month}<br />{dayNum}</p>
               <p className="break-keep text-right">{invitationMessage}</p>
             </div>
-            <p className="absolute inset-x-8 bottom-7 truncate text-center text-[0.62rem] text-[#777]">
+            <p className="absolute inset-x-6 bottom-5 truncate text-center text-[0.58rem] text-[#777]">
               {venueFull}
             </p>
           </div>
         ) : null}
 
         {template === "modern-script" ? (
-          <div className="flex h-full flex-col px-8 pb-8 pt-9 text-center">
-            <p className="text-[0.58rem] font-semibold tracking-[0.28em] text-[#999]">THE WEDDING OF</p>
+          <div className="flex h-full flex-col px-6 pb-6 pt-5 text-center">
+            <p className="text-[0.55rem] font-semibold tracking-[0.28em] text-[#999]">THE WEDDING OF</p>
             <h1
-              className="mx-auto mt-4 max-w-[17rem] break-keep text-[clamp(2rem,10vw,2.8rem)] font-light leading-[1.02] tracking-[-0.06em] text-[#222]"
+              className="mx-auto mt-2 max-w-[18rem] break-keep text-[clamp(1.45rem,7vw,2.05rem)] font-light leading-[1.02] tracking-[-0.05em] text-[#222]"
               style={{ fontFamily: introSerif }}
             >
               {englishMessage}
             </h1>
-            <p className="mx-auto mt-4 max-w-[15rem] break-keep text-[0.74rem] leading-5 text-[#777]">
+            <p className="mx-auto mt-2 max-w-[16rem] break-keep text-[0.64rem] leading-4 text-[#777]">
               {invitationMessage}
             </p>
-            <IntroPhoto photo={data.photos.cover} priority className="mt-7 aspect-[4/5.4] w-full" />
-            <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-[0.62rem] uppercase tracking-[0.1em] text-[#555]">
+            <IntroPhoto photo={data.photos.cover} priority className="mt-4 aspect-[4/5.9] w-full" />
+            <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-[0.58rem] uppercase tracking-[0.1em] text-[#555]">
               <p className="truncate text-left">{groomNameEn}</p>
               <p className="rounded-full border border-[#D8D8D8] px-3 py-1 text-[0.58rem] text-[#222]">
                 {month}.{dayNum}
               </p>
               <p className="truncate text-right">{brideNameEn}</p>
             </div>
-            <p className="mt-3 break-keep text-[0.7rem] leading-5 text-[#777]">{subMessage}</p>
-            <p className="mt-2 break-keep text-[0.68rem] leading-5 text-[#777]">{venue} · {data.event.time}</p>
+            <p className="mt-2 break-keep text-[0.62rem] leading-4 text-[#777]">{subMessage}</p>
+            <p className="mt-1 break-keep text-[0.62rem] leading-4 text-[#777]">{venue} · {data.event.time}</p>
           </div>
         ) : null}
       </div>
