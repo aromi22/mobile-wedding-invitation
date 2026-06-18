@@ -45,7 +45,7 @@ export const INTRO_TEMPLATE_OPTIONS: Array<{
   {
     id: "modern-script",
     name: "06 Modern Script",
-    description: "인스타 웨딩 포스터 무드",
+    description: "모던한 웨딩 포스터 무드",
     editableFields: ["groomNameEn", "brideNameEn", "date", "time", "venue", "englishMessage", "photo"],
     photo: "cover",
   },

@@ -387,6 +387,7 @@ function Field({
   placeholder,
   type = "text",
   required = false,
+  description,
 }: {
   label: string;
   value: string;
@@ -394,6 +395,7 @@ function Field({
   placeholder?: string;
   type?: string;
   required?: boolean;
+  description?: string;
 }) {
   return (
     <label className="grid min-w-0 gap-2 text-[13px] text-[#555]">
@@ -401,6 +403,7 @@ function Field({
         {label}
         {required ? <span className="ml-1 text-[#d6a2ad]">*</span> : null}
       </span>
+      {description ? <span className="text-xs leading-5 text-[#888]">{description}</span> : null}
       <input
         type={type}
         value={value}
@@ -2833,12 +2836,13 @@ export function EditInvitation({
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#191919]">오프닝 문구</p>
                 <p className="mt-1 text-xs leading-5 text-[#777]">
-                  선택한 인트로 템플릿에 맞춰 필요한 위치에 자동으로 들어가요.
+                  첫 화면 포스터에 들어가는 문구예요. 템플릿마다 위치는 고정되고 문구만 바뀌어요.
                 </p>
               </div>
               <div className="grid gap-4">
                 <Field
-                  label="영문 문구"
+                  label="메인 영문 문구"
+                  description="사진 위나 이름 근처에 작게 들어가는 대표 영문 문구예요."
                   value={draft.hero.introEnglishMessage}
                   placeholder="We're getting married"
                   onChange={(value) =>
@@ -2849,7 +2853,8 @@ export function EditInvitation({
                   }
                 />
                 <Field
-                  label="보조 문구"
+                  label="짧은 초대 문구"
+                  description="사진 아래나 중앙 문장으로 들어가는 짧은 초대 문구예요."
                   value={draft.hero.introSubMessage}
                   placeholder="You are joyfully invited"
                   onChange={(value) =>
@@ -2860,7 +2865,8 @@ export function EditInvitation({
                   }
                 />
                 <Field
-                  label="초대 문구"
+                  label="한글 안내 문구"
+                  description="한글로 보여주는 감성 문구예요. 길면 자동으로 줄바꿈돼요."
                   value={draft.hero.introInvitationMessage}
                   placeholder="소중한 분들을 초대합니다"
                   onChange={(value) =>
