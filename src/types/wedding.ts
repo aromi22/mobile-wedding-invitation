@@ -78,7 +78,16 @@ export type WeddingTimelineItem = {
 };
 
 export type WeddingLetteringFont = "segoe-print" | "freestyle-script";
-export type WeddingCoverTemplate = "polaroid" | "fullscreen" | "clean";
+export type WeddingCoverTemplate =
+  | "polaroid"
+  | "fullscreen"
+  | "clean"
+  | "classic-poster"
+  | "editorial-marriage"
+  | "minimal-date"
+  | "soft-card"
+  | "framed-gallery"
+  | "modern-script";
 export type WeddingThemeFont =
   | "pretendard"
   | "sunbatang"
@@ -123,6 +132,9 @@ export type WeddingHeroSettings = {
   fullscreenCalligraphyTop: number;
   fullscreenCalligraphyLeft: number;
   fullscreenCalligraphySize: number;
+  introEnglishMessage: string;
+  introSubMessage: string;
+  introInvitationMessage: string;
   letteringText: string;
   letteringFont: WeddingLetteringFont;
   letteringColor: string;

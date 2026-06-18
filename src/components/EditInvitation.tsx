@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { wedding } from "@/data/wedding";
+import { INTRO_TEMPLATE_OPTIONS } from "@/data/introTemplates";
 import type {
   InvitationStoryType,
   PhotoRatio,
@@ -73,24 +74,6 @@ const THEME_FONT_OPTIONS = [
   { label: "카페24 쑥쑥", value: "cafe24-ssukssuk" },
 ] as const;
 
-const COVER_TEMPLATE_OPTIONS = [
-  {
-    label: "폴라로이드형",
-    value: "polaroid",
-    description: "사진이 필름 카드 안에 들어가는 기존 첫 화면",
-  },
-  {
-    label: "풀스크린 사진형",
-    value: "fullscreen",
-    description: "사진이 화면 가득 시작하는 감성적인 첫 화면",
-  },
-  {
-    label: "깔끔 카드형",
-    value: "clean",
-    description: "이름과 예식 정보를 먼저 보여주는 미니멀 카드 첫 화면",
-  },
-] as const;
-
 const PETAL_EFFECT_OPTIONS = [
   { label: "없음", value: "none", description: "꽃잎 없이 가장 미니멀하게 시작해요." },
   { label: "화이트 꽃잎", value: "soft", description: "하얀 꽃잎이 천천히 내려오는 깨끗한 분위기예요." },
@@ -151,6 +134,24 @@ const RSVP_FIELD_OPTIONS: Array<{ key: WeddingRsvpFieldKey; label: string }> = [
 ];
 
 type EditorMode = "admin" | "public";
+
+function normalizeCoverTemplate(
+  value?: WeddingData["hero"]["coverTemplate"],
+): WeddingData["hero"]["coverTemplate"] {
+  if (INTRO_TEMPLATE_OPTIONS.some((template) => template.id === value)) {
+    return value as WeddingData["hero"]["coverTemplate"];
+  }
+
+  if (value === "fullscreen") {
+    return "modern-script";
+  }
+
+  if (value === "clean") {
+    return "soft-card";
+  }
+
+  return "classic-poster";
+}
 
 function getInitialWeddingData(mode: EditorMode) {
   const initial = structuredClone(wedding);
@@ -265,7 +266,7 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
     ...merged.hero,
     ...source.hero,
     themeFont: source.hero?.themeFont ?? merged.hero.themeFont ?? "gangwon",
-    coverTemplate: source.hero?.coverTemplate ?? merged.hero.coverTemplate ?? "polaroid",
+    coverTemplate: normalizeCoverTemplate(source.hero?.coverTemplate ?? merged.hero.coverTemplate),
     petalEffect: source.hero?.petalEffect ?? merged.hero.petalEffect ?? "none",
     fullscreenCalligraphyEnabled:
       source.hero?.fullscreenCalligraphyEnabled ?? merged.hero.fullscreenCalligraphyEnabled ?? true,
@@ -281,6 +282,12 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
       source.hero?.fullscreenCalligraphyLeft ?? merged.hero.fullscreenCalligraphyLeft ?? 50,
     fullscreenCalligraphySize:
       source.hero?.fullscreenCalligraphySize ?? merged.hero.fullscreenCalligraphySize ?? 64,
+    introEnglishMessage:
+      source.hero?.introEnglishMessage ?? merged.hero.introEnglishMessage ?? "We're getting married",
+    introSubMessage:
+      source.hero?.introSubMessage ?? merged.hero.introSubMessage ?? "You are joyfully invited",
+    introInvitationMessage:
+      source.hero?.introInvitationMessage ?? merged.hero.introInvitationMessage ?? "소중한 분들을 초대합니다",
     mainText: source.hero?.mainText ?? source.message?.coverLine ?? merged.hero.mainText,
   };
   merged.sections = {
@@ -2781,12 +2788,16 @@ export function EditInvitation({
                         }
                         className="h-11 w-full rounded-[10px] border border-[#dedede] bg-white px-3 text-sm text-[#191919] outline-none focus:border-[#191919]"
                       >
-                        {COVER_TEMPLATE_OPTIONS.map((template) => (
-                          <option key={template.value} value={template.value}>
-                            {template.label}
+                        {INTRO_TEMPLATE_OPTIONS.map((template) => (
+                          <option key={template.id} value={template.id}>
+                            {template.name}
                           </option>
                         ))}
                       </select>
+                      <p className="text-xs leading-5 text-[#777]">
+                        {INTRO_TEMPLATE_OPTIONS.find((template) => template.id === draft.hero.coverTemplate)
+                          ?.description ?? "웨딩 포스터형 오프닝 디자인"}
+                      </p>
                     </div>
                   </div>
 
@@ -2816,6 +2827,50 @@ export function EditInvitation({
                   </div>
                 </div>
               </details>
+            </div>
+
+            <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-[#191919]">오프닝 문구</p>
+                <p className="mt-1 text-xs leading-5 text-[#777]">
+                  선택한 인트로 템플릿에 맞춰 필요한 위치에 자동으로 들어가요.
+                </p>
+              </div>
+              <div className="grid gap-4">
+                <Field
+                  label="영문 문구"
+                  value={draft.hero.introEnglishMessage}
+                  placeholder="We're getting married"
+                  onChange={(value) =>
+                    update((current) => {
+                      current.hero.introEnglishMessage = value;
+                      return current;
+                    })
+                  }
+                />
+                <Field
+                  label="보조 문구"
+                  value={draft.hero.introSubMessage}
+                  placeholder="You are joyfully invited"
+                  onChange={(value) =>
+                    update((current) => {
+                      current.hero.introSubMessage = value;
+                      return current;
+                    })
+                  }
+                />
+                <Field
+                  label="초대 문구"
+                  value={draft.hero.introInvitationMessage}
+                  placeholder="소중한 분들을 초대합니다"
+                  onChange={(value) =>
+                    update((current) => {
+                      current.hero.introInvitationMessage = value;
+                      return current;
+                    })
+                  }
+                />
+              </div>
             </div>
 
             {draft.hero.coverTemplate === "fullscreen" ? (

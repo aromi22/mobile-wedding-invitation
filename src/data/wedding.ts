@@ -191,7 +191,7 @@ export const wedding: WeddingData = {
   },
   hero: {
     themeFont: "gangwon",
-    coverTemplate: "polaroid",
+    coverTemplate: "classic-poster",
     petalEffect: "none",
     fullscreenCalligraphyEnabled: false,
     fullscreenCalligraphyText: "Our Wedding Day",
@@ -200,6 +200,9 @@ export const wedding: WeddingData = {
     fullscreenCalligraphyTop: 42,
     fullscreenCalligraphyLeft: 50,
     fullscreenCalligraphySize: 64,
+    introEnglishMessage: "We're getting married",
+    introSubMessage: "You are joyfully invited",
+    introInvitationMessage: "소중한 분들을 초대합니다",
     letteringText: "Our Wedding Day",
     letteringFont: "segoe-print",
     letteringColor: "#ffffff",

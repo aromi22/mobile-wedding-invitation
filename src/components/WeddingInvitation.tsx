@@ -401,6 +401,162 @@ function Section({
   );
 }
 
+function IntroPhoto({
+  photo,
+  className = "",
+  priority = false,
+}: {
+  photo: WeddingPhoto;
+  className?: string;
+  priority?: boolean;
+}) {
+  return (
+    <div className={`relative overflow-hidden bg-[#E5E5E5] ${className}`}>
+      {photo?.src ? (
+        <InvitationImage photo={photo} priority={priority} className="object-cover" sizes="420px" />
+      ) : null}
+    </div>
+  );
+}
+
+function IntroTemplateCover({ data }: { data: WeddingData }) {
+  const { groom, bride } = data.couple;
+  const hero = data.hero;
+  const month = String(data.event.month).padStart(2, "0");
+  const dayNum = String(data.event.day).padStart(2, "0");
+  const weddingDate = new Date(data.event.year, data.event.month - 1, data.event.day);
+  const dayLabel = weddingDate.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+  const dayLong = weddingDate.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase();
+  const dateLine = `${data.event.year} ${month} ${dayNum} ${dayLong}`;
+  const compactDate = `${data.event.year}.${month}.${dayNum} | ${dayLabel} | ${data.event.time}`;
+  const groomName = groom.name || `${groom.familyName}${groom.givenName}`.trim();
+  const brideName = bride.name || `${bride.familyName}${bride.givenName}`.trim();
+  const groomNameEn = groom.englishName || groomName;
+  const brideNameEn = bride.englishName || brideName;
+  const venue = data.event.venue;
+  const venueFull = data.event.address ? `${venue} · ${data.event.address}` : venue;
+  const englishMessage = hero.introEnglishMessage || "We're getting married";
+  const subMessage = hero.introSubMessage || "You are joyfully invited";
+  const invitationMessage = hero.introInvitationMessage || "소중한 분들을 초대합니다";
+  const template = hero.coverTemplate;
+
+  return (
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-0 py-0 text-[#222]">
+      <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
+      <div className="cover-reveal relative aspect-[9/16] w-full max-w-[420px] overflow-hidden bg-white">
+        {template === "classic-poster" ? (
+          <div className="flex h-full flex-col px-10 pb-10 pt-9 text-center">
+            <p className="font-serif text-[0.72rem] tracking-[0.22em] text-[#777]">{dateLine}</p>
+            <div className="mx-auto mt-5 h-px w-28 bg-[#D8D8D8]" />
+            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-8 aspect-[3/4.55] w-[76%]" />
+            <h1 className="mt-7 break-keep text-[clamp(1.25rem,5.2vw,1.72rem)] font-medium tracking-[-0.03em] text-[#222]">
+              {groomName} <span className="mx-1 text-[#777]">|</span> {brideName}
+            </h1>
+            <p className="mt-2 font-serif text-[0.88rem] italic text-[#777]">{englishMessage}</p>
+            <div className="mt-auto space-y-1 text-[0.7rem] leading-5 text-[#555]">
+              <p>{compactDate}</p>
+              <p className="break-keep">{venue}</p>
+            </div>
+          </div>
+        ) : null}
+
+        {template === "editorial-marriage" ? (
+          <div className="flex h-full flex-col px-8 pb-9 pt-10 text-center">
+            <p className="text-[0.58rem] font-semibold tracking-[0.28em] text-[#999]">THE MARRIAGE OF</p>
+            <h1 className="mt-3 break-keep font-serif text-[clamp(1.35rem,5vw,1.86rem)] font-medium leading-tight text-[#222]">
+              {groomName} &amp; {brideName}
+            </h1>
+            <IntroPhoto photo={data.photos.cover} priority className="mt-8 aspect-[4/5.55] w-full" />
+            <p className="mt-7 font-serif text-[1.04rem] italic text-[#333]">{subMessage}</p>
+            <div className="mt-4 space-y-1 text-[0.68rem] leading-5 text-[#666]">
+              <p>{compactDate}</p>
+              <p className="break-keep">{venue}</p>
+            </div>
+          </div>
+        ) : null}
+
+        {template === "minimal-date" ? (
+          <div className="flex h-full flex-col px-7 pb-9 pt-9">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-start text-[0.65rem] uppercase tracking-[0.12em] text-[#555]">
+              <p className="truncate text-left">{groomNameEn}</p>
+              <div className="-mt-1 px-5 text-center font-serif text-[#222]">
+                <p className="text-[0.72rem]">{month}</p>
+                <div className="mx-auto my-1 h-6 w-px bg-[#D8D8D8]" />
+                <p className="text-[0.72rem]">{dayNum}</p>
+              </div>
+              <p className="truncate text-right">{brideNameEn}</p>
+            </div>
+            <IntroPhoto photo={data.photos.cover} priority className="mt-8 aspect-[4/5.9] w-full" />
+            <div className="mt-auto space-y-1 text-center text-[0.72rem] leading-5 text-[#555]">
+              <p>{compactDate}</p>
+              <p className="break-keep">{venue}</p>
+            </div>
+          </div>
+        ) : null}
+
+        {template === "soft-card" ? (
+          <div className="flex h-full flex-col px-8 pb-9 pt-10 text-center">
+            <div className="h-full border border-[#EAEAEA] px-6 pb-7 pt-8 shadow-[0_18px_48px_rgba(0,0,0,0.045)]">
+              <h1 className="break-keep text-[clamp(1.18rem,4.8vw,1.58rem)] font-medium text-[#222]">
+                {groomName} &amp; {brideName}
+              </h1>
+              <p className="mx-auto mt-4 max-w-[15rem] break-keep text-[0.72rem] leading-5 text-[#777]">
+                {invitationMessage}
+              </p>
+              <IntroPhoto photo={data.photos.cover} priority className="mt-9 aspect-[4/5.5] w-full" />
+              <div className="mt-7 space-y-1 text-[0.69rem] leading-5 text-[#555]">
+                <p>{compactDate}</p>
+                <p className="break-keep">{venue}</p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {template === "framed-gallery" ? (
+          <div className="relative h-full border border-[#222] px-7 pb-8 pt-8">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-rl] text-[0.58rem] tracking-[0.24em] text-[#777]">
+              {englishMessage}
+            </div>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 [writing-mode:vertical-rl] text-[0.58rem] tracking-[0.24em] text-[#777]">
+              {subMessage}
+            </div>
+            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-10 aspect-[3/4.6] w-[72%] border border-[#D8D8D8] p-2" />
+            <div className="absolute inset-x-8 bottom-12 grid grid-cols-[1fr_auto_1fr] items-end gap-3 text-[0.66rem] text-[#555]">
+              <p className="break-keep text-left font-medium text-[#222]">{groomName}<br />{brideName}</p>
+              <p className="font-serif text-center text-[1.15rem] text-[#222]">{month}<br />{dayNum}</p>
+              <p className="break-keep text-right">{invitationMessage}</p>
+            </div>
+            <p className="absolute inset-x-8 bottom-7 truncate text-center text-[0.62rem] text-[#777]">
+              {venueFull}
+            </p>
+          </div>
+        ) : null}
+
+        {template === "modern-script" ? (
+          <div className="flex h-full flex-col px-8 pb-8 pt-9 text-center">
+            <p className="text-[0.58rem] font-semibold tracking-[0.28em] text-[#999]">THE WEDDING OF</p>
+            <h1 className="mt-4 font-serif text-[2.45rem] leading-[0.9] tracking-[-0.05em] text-[#222]">
+              We're Getting
+              <span className="mt-1 block font-['Great_Vibes','Allura',cursive] text-[3.15rem] font-normal tracking-normal">
+                Married
+              </span>
+            </h1>
+            <IntroPhoto photo={data.photos.cover} priority className="mt-7 aspect-[4/5.4] w-full" />
+            <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-[0.62rem] uppercase tracking-[0.1em] text-[#555]">
+              <p className="truncate text-left">{groomNameEn}</p>
+              <p className="rounded-full border border-[#D8D8D8] px-3 py-1 text-[0.58rem] text-[#222]">
+                {month}.{dayNum}
+              </p>
+              <p className="truncate text-right">{brideNameEn}</p>
+            </div>
+            <p className="mt-4 break-keep text-[0.68rem] leading-5 text-[#777]">{venue} · {data.event.time}</p>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function Cover({ data }: { data: WeddingData }) {
   const { groom, bride } = data.couple;
   const hero = data.hero;
@@ -422,6 +578,14 @@ function Cover({ data }: { data: WeddingData }) {
     whiteSpace: "nowrap",
     animationDuration: `${hero.letteringDuration}s`,
   } satisfies CSSProperties;
+
+  if (
+    ["classic-poster", "editorial-marriage", "minimal-date", "soft-card", "framed-gallery", "modern-script"].includes(
+      hero.coverTemplate,
+    )
+  ) {
+    return <IntroTemplateCover data={data} />;
+  }
 
   if (hero.coverTemplate === "fullscreen") {
     const calligraphyText = hero.fullscreenCalligraphyText.replace(/\s+/g, " ").trim();
