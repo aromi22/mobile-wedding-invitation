@@ -923,6 +923,7 @@ export function EditInvitation({
   const [rsvpRefreshKey, setRsvpRefreshKey] = useState(0);
   const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
   const [activeEditorTab, setActiveEditorTab] = useState<EditorTabKey>("basic");
+  const [previewReplayKey, setPreviewReplayKey] = useState(0);
   const isCustomerEditPage = Boolean(slug);
   const isPublicMakePage = mode === "public" && !slug;
   const isProcessingPhoto = processingPhotoCount > 0;
@@ -2786,41 +2787,6 @@ export function EditInvitation({
                           </option>
                         ))}
                       </select>
-                      <div className="flex flex-wrap gap-2">
-                        {COVER_TEMPLATE_OPTIONS.map((template) => {
-                          const isSelected = draft.hero.coverTemplate === template.value;
-
-                          return (
-                            <button
-                              key={template.value}
-                              type="button"
-                              aria-label={template.label}
-                              onClick={() =>
-                                update((current) => {
-                                  current.hero.coverTemplate = template.value;
-                                  if (template.value === "fullscreen") {
-                                    current.hero.fullscreenCalligraphyEnabled = true;
-                                    current.hero.fullscreenCalligraphyText =
-                                      current.hero.fullscreenCalligraphyText || selectedPhrase;
-                                  }
-                                  return current;
-                                })
-                              }
-                              className={`h-7 w-7 rounded-full border transition ${
-                                isSelected
-                                  ? "border-[#191919] ring-2 ring-[#191919]/10"
-                                  : "border-[#d7d7d7]"
-                              } ${
-                                template.value === "polaroid"
-                                  ? "bg-[#f5efe8]"
-                                  : template.value === "fullscreen"
-                                    ? "bg-[#e7eef5]"
-                                    : "bg-[#f4dfe4]"
-                              }`}
-                            />
-                          );
-                        })}
-                      </div>
                     </div>
                   </div>
 
@@ -2835,6 +2801,7 @@ export function EditInvitation({
                               event.target.value as WeddingData["hero"]["petalEffect"];
                             return current;
                           });
+                          setPreviewReplayKey((key) => key + 1);
                           window.setTimeout(scrollToPreview, 80);
                         }}
                         className="h-11 w-full rounded-[10px] border border-[#dedede] bg-white px-3 text-sm text-[#191919] outline-none focus:border-[#191919]"
@@ -2845,55 +2812,6 @@ export function EditInvitation({
                           </option>
                         ))}
                       </select>
-                      <div className="flex flex-wrap gap-2">
-                        {PETAL_EFFECT_OPTIONS.map((effect) => {
-                          const isSelected = draft.hero.petalEffect === effect.value;
-                          const symbol =
-                            effect.value === "snow"
-                              ? "❄"
-                              : effect.value === "cherry"
-                                ? "✿"
-                                : effect.value === "daisy"
-                                  ? "✼"
-                                  : effect.value === "fall"
-                                    ? "❧"
-                                    : effect.value === "heart"
-                                      ? "♡"
-                                      : "";
-
-                          return (
-                            <button
-                              key={effect.value}
-                              type="button"
-                              aria-label={effect.label}
-                              onClick={() => {
-                                update((current) => {
-                                  current.hero.petalEffect = effect.value;
-                                  return current;
-                                });
-                                window.setTimeout(scrollToPreview, 80);
-                              }}
-                              className={`flex h-7 w-7 items-center justify-center rounded-full border text-[13px] transition ${
-                                isSelected
-                                  ? "border-[#191919] ring-2 ring-[#191919]/10"
-                                  : "border-[#d7d7d7]"
-                              } ${
-                                effect.value === "none"
-                                  ? "bg-white"
-                                  : effect.value === "pink" || effect.value === "cherry" || effect.value === "heart"
-                                    ? "bg-[#f7dfe5]"
-                                    : effect.value === "sky" || effect.value === "fall"
-                                      ? "bg-[#f4eadc]"
-                                      : effect.value === "daisy"
-                                        ? "bg-[#fff2bc]"
-                                        : "bg-[#f7f7f7]"
-                              }`}
-                            >
-                              {symbol}
-                            </button>
-                          );
-                        })}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -3715,7 +3633,7 @@ export function EditInvitation({
           </div>
           <div className="mx-auto w-full max-w-[400px] overflow-hidden rounded-[34px] bg-[#eee7e2] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.32)]">
             <div className="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-[24px] bg-white">
-              <WeddingInvitation data={preview} />
+              <WeddingInvitation data={preview} key={`${preview.hero.petalEffect}-${previewReplayKey}`} />
             </div>
           </div>
         </aside>
