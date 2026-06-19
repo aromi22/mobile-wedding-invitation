@@ -254,6 +254,30 @@ function coupleSeparator(data: WeddingData) {
   return data.familySettings.coupleNameSeparator === "heart" ? "♥" : "·";
 }
 
+function formatWeddingTime(time: string, locale: "ko" | "en" = "en") {
+  const value = time.trim();
+  const match = value.match(/(\d{1,2})(?::(\d{2}))?/);
+
+  if (!match) return value;
+
+  let hour = Number(match[1]);
+  const minute = match[2] ?? "00";
+  const hasPm = /오후|PM/i.test(value);
+  const hasAm = /오전|AM/i.test(value);
+
+  if (hasPm && hour < 12) hour += 12;
+  if (hasAm && hour === 12) hour = 0;
+
+  const isPm = hour >= 12;
+  const hour12 = hour % 12 || 12;
+
+  if (locale === "ko") {
+    return `${isPm ? "오후" : "오전"} ${hour12}시${minute !== "00" ? ` ${Number(minute)}분` : ""}`;
+  }
+
+  return `${hour12}${minute !== "00" ? `:${minute}` : ""} ${isPm ? "PM" : "AM"}`;
+}
+
 function DeceasedMarker({ data }: { data: WeddingData }) {
   if (data.familySettings.deceasedMarker === "none") {
     return null;
@@ -382,22 +406,32 @@ function Section({
   children: React.ReactNode;
   className?: string;
 }) {
+  const englishLabels: Record<string, string> = {
+    "초대 문구": "INVITATION",
+    "신랑 신부": "BRIDE & GROOM",
+    "예식일": "WEDDING DAY",
+    "오시는 길": "LOCATION",
+    "갤러리": "GALLERY",
+    "계좌 안내": "WITH GRATITUDE",
+  };
+  const displayLabel = label ? englishLabels[label] ?? label : undefined;
+
   return (
-    <section className={`relative px-7 py-20 text-center ${className}`}>
-      {label ? (
-        <p className="reveal text-xs font-medium tracking-[0.28em] text-[#8B8178]">
-          {label}
+    <section className={`relative px-7 py-24 text-center ${className}`}>
+      {displayLabel ? (
+        <p className="reveal text-[0.62rem] font-medium tracking-[0.34em] text-[#9b9290]">
+          {displayLabel}
         </p>
       ) : null}
       {title ? (
         <h2
-          className="reveal mt-4 whitespace-nowrap text-[clamp(1.35rem,5.7vw,1.75rem)] font-medium leading-snug tracking-[-0.02em] text-[#2F2A26]"
+          className="reveal mt-4 whitespace-nowrap text-[clamp(1.45rem,5.7vw,1.85rem)] font-medium leading-snug tracking-[-0.035em] text-[#222]"
           style={revealDelay(1)}
         >
           {title}
         </h2>
       ) : null}
-      <div className="reveal mx-auto mt-11 max-w-[22rem]" style={revealDelay(2)}>
+      <div className="reveal mx-auto mt-14 max-w-[22rem]" style={revealDelay(2)}>
         {children}
       </div>
     </section>
@@ -431,7 +465,7 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
   const dayLabel = weddingDate.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
   const dayLong = weddingDate.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase();
   const dateLine = `${data.event.year} ${month} ${dayNum} ${dayLong}`;
-  const compactDate = `${data.event.year}.${month}.${dayNum} | ${dayLabel} | ${data.event.time}`;
+  const compactDate = `${data.event.year}.${month}.${dayNum} | ${dayLabel} | ${formatWeddingTime(data.event.time, "en")}`;
   const groomName = groom.name || `${groom.familyName}${groom.givenName}`.trim();
   const brideName = bride.name || `${bride.familyName}${bride.givenName}`.trim();
   const groomNameEn = groom.englishName || groomName;
@@ -454,16 +488,16 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
         style={{ fontFamily: introSans }}
       >
         {template === "classic-poster" ? (
-          <div className="flex h-full flex-col px-7 pb-7 pt-5 text-center">
+          <div className="flex h-full flex-col px-7 pb-8 pt-7 text-center">
             <p className="text-[0.68rem] tracking-[0.22em] text-[#777]" style={{ fontFamily: introSerif }}>
               {dateLine}
             </p>
             <div className="mx-auto mt-3 h-px w-24 bg-[#D8D8D8]" />
-            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-4 aspect-[4/5.75] w-full" />
-            <h1 className="mt-4 break-keep text-[clamp(1.08rem,4.6vw,1.42rem)] font-medium tracking-[-0.03em] text-[#222]">
+            <IntroPhoto photo={data.photos.cover} priority className="mx-auto mt-5 aspect-[4/5.75] w-full" />
+            <h1 className="mt-7 break-keep text-[clamp(1.3rem,5.2vw,1.68rem)] font-medium tracking-[-0.045em] text-[#222]">
               {groomName} <span className="mx-1 text-[#777]">|</span> {brideName}
             </h1>
-            <p className="mt-1.5 text-[1.2rem] tracking-normal text-[#777]" style={{ fontFamily: introScript }}>
+            <p className="mt-2 text-[1.02rem] font-light tracking-normal text-[#888]" style={{ fontFamily: introScript }}>
               {englishMessage}
             </p>
             <p className="mx-auto mt-2 max-w-[16rem] break-keep text-[0.66rem] leading-4 text-[#555]">
@@ -480,13 +514,13 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
         {template === "editorial-marriage" ? (
           <div className="flex h-full flex-col px-6 pb-7 pt-5 text-center">
             <p className="text-[0.58rem] font-semibold tracking-[0.28em] text-[#999]">THE MARRIAGE OF</p>
-            <h1 className="mt-2 break-keep text-[clamp(1.08rem,4.3vw,1.42rem)] font-medium leading-tight text-[#222]">
+            <h1 className="mt-3 break-keep text-[clamp(1.3rem,5vw,1.66rem)] font-medium leading-tight tracking-[-0.04em] text-[#222]">
               {groomName} &amp; {brideName}
             </h1>
             <p className="mx-auto mt-2 max-w-[17rem] break-keep text-[0.66rem] leading-4 text-[#777]">
               {invitationMessage}
             </p>
-            <IntroPhoto photo={data.photos.cover} priority className="mt-4 aspect-[4/5.7] w-full" />
+            <IntroPhoto photo={data.photos.cover} priority className="mt-6 aspect-[4/5.7] w-full" />
             <p className="mt-4 text-[1.32rem] tracking-normal text-[#333]" style={{ fontFamily: introScript }}>
               {englishMessage}
             </p>
@@ -597,6 +631,11 @@ function Cover({ data }: { data: WeddingData }) {
   const { groom, bride } = data.couple;
   const hero = data.hero;
   const openingVenue = data.event.venue;
+  const coverDate = new Date(data.event.year, data.event.month - 1, data.event.day);
+  const coverWeekdayKo = coverDate.toLocaleDateString("ko-KR", { weekday: "long" });
+  const coverWeekdayEn = coverDate.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+  const coverDateKo = `${data.event.year}년 ${data.event.month}월 ${data.event.day}일 ${coverWeekdayKo} ${formatWeddingTime(data.event.time, "ko")}`;
+  const coverDateEn = `${data.event.year}.${String(data.event.month).padStart(2, "0")}.${String(data.event.day).padStart(2, "0")} | ${coverWeekdayEn} | ${formatWeddingTime(data.event.time, "en")}`;
   const letteringText = hero.letteringText.replace(/\s+/g, " ").trim() || "Our Wedding Day";
   const letteringColor = ["#fff", "#ffffff", "white"].includes(
     hero.letteringColor.trim().toLowerCase(),
@@ -682,7 +721,7 @@ function Cover({ data }: { data: WeddingData }) {
             <div className="mx-auto mt-7 h-px w-[82%] bg-[#2f2a25]/24" />
             {hero.showEventInfo ? (
               <div className="mt-5 space-y-1.5 break-keep text-[0.78rem] leading-6 text-[#514a43]">
-                <p>{data.event.dateText}</p>
+                <p>{coverDateKo}</p>
                 <p>{openingVenue}</p>
               </div>
             ) : null}
@@ -729,14 +768,14 @@ function Cover({ data }: { data: WeddingData }) {
               <p className="font-display text-[0.58rem] tracking-[0.08em] text-[#2f2924]/48">
                 The marriage of
               </p>
-              <h1 className="mt-2 break-keep font-display text-[1.08rem] font-medium capitalize leading-tight tracking-[0.02em]">
+              <h1 className="mt-3 break-keep font-display text-[1.3rem] font-medium capitalize leading-tight tracking-[0.01em] text-[#222]">
                 {groom.englishName} &amp; {bride.englishName}
               </h1>
               <p className="mt-3 break-keep text-[0.62rem] leading-5 tracking-[0.08em] text-[#2f2924]/64">
                 {openingVenue}
               </p>
               <p className="mt-1 text-[0.62rem] uppercase tracking-[0.12em] text-[#2f2924]/58">
-                {data.event.calendarText.replaceAll(" ", " | ")}
+                {coverDateEn}
               </p>
             </div>
           ) : null}
@@ -862,20 +901,20 @@ function ChildhoodFrameSection({ data }: { data: WeddingData }) {
 function InvitationMessage({ data }: { data: WeddingData }) {
   return (
     <Section label="초대 문구" title="소중한 분들을 초대합니다">
-      <div className="mx-auto mb-9 h-9 w-px bg-[#2f2924]/18" />
-      <p className="mx-auto max-w-[17rem] whitespace-pre-line break-keep text-center text-[1.02rem] leading-9 text-[#403a34]">
+      <div className="mx-auto mb-11 h-10 w-px bg-[#222]/12" />
+      <p className="mx-auto max-w-[18rem] whitespace-pre-line break-keep text-center text-[1rem] leading-[1.9] text-[#444]">
         {data.message.opening}
       </p>
-      <div className="mx-auto my-11 max-w-[19rem]">
+      <div className="mx-auto my-14 max-w-[20rem]">
         <div
           className={`photo-sticker relative mx-auto max-w-[17rem] overflow-hidden ${photoAspectClass(
             data.photos.intro.ratio,
           )}`}
         >
-          <InvitationImage photo={data.photos.intro} sizes="360px" />
+          <InvitationImage photo={data.photos.intro} sizes="360px" className="object-contain" />
         </div>
       </div>
-      <p className="mx-auto mt-7 max-w-[18rem] whitespace-pre-line break-keep text-center text-[0.95rem] leading-8 text-[#746a61]">
+      <p className="mx-auto mt-9 max-w-[18rem] whitespace-pre-line break-keep text-center text-[0.95rem] leading-[1.9] text-[#777]">
         {data.message.body}
       </p>
     </Section>
@@ -1051,15 +1090,7 @@ function CalendarSection({ data }: { data: WeddingData }) {
     const date = new Date(data.event.year, data.event.month - 1, data.event.day);
     return date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
   }, [data.event.day, data.event.month, data.event.year]);
-  const timeShort = useMemo(() => {
-    const match = data.event.time.match(/(\d{1,2})(?::(\d{2}))?/);
-    const hour24 = match ? Number(match[1]) : 13;
-    const minute = match?.[2] ?? "";
-    const period = hour24 >= 12 ? "PM" : "AM";
-    const hour12 = hour24 % 12 || 12;
-
-    return minute && minute !== "00" ? `${hour12}:${minute} ${period}` : `${hour12} ${period}`;
-  }, [data.event.time]);
+  const timeShort = useMemo(() => formatWeddingTime(data.event.time, "en"), [data.event.time]);
   const weddingDateLine = `${data.event.year}.${String(data.event.month).padStart(2, "0")}.${String(
     data.event.day,
   ).padStart(2, "0")} | ${weekdayShort} | ${timeShort}`;
@@ -1086,14 +1117,14 @@ function CalendarSection({ data }: { data: WeddingData }) {
   }, [data.event.day, data.event.month, data.event.year]);
 
   return (
-    <Section label="예식일">
+    <Section label="예식일" title="저희 두 사람의 예식일입니다">
       <div className="mx-auto max-w-[19rem]">
         <div className="reveal mb-8 text-center" style={revealDelay(1)}>
-          <p className="break-keep text-[1.18rem] font-light leading-8 tracking-[0.02em] text-[#2f2924]">
+          <p className="break-keep text-[1.1rem] font-light leading-8 tracking-[0.04em] text-[#222]">
             {weddingDateLine}
           </p>
           <div className="mx-auto mt-4 h-px w-28 bg-[#2f2924]/18" />
-          <p className="mt-4 font-display text-[1.02rem] uppercase tracking-[0.28em] text-[#2f2924]/72">
+          <p className="mt-5 font-display text-[1.1rem] uppercase tracking-[0.3em] text-[#555]">
             {dDayText}
           </p>
         </div>
@@ -1129,17 +1160,17 @@ function CalendarSection({ data }: { data: WeddingData }) {
 
 function LocationSection({ data }: { data: WeddingData }) {
   return (
-    <Section label="오시는 길" title="예식 장소 안내" className="pt-12">
-      <div className="space-y-5">
+    <Section label="오시는 길" title="오시는 길" className="pt-24">
+      <div className="space-y-7">
         <div
           className={`photo-sticker reveal relative overflow-hidden ${photoAspectClass(
             data.photos.venue.ratio,
           )}`}
         >
-          <InvitationImage photo={data.photos.venue} sizes="360px" />
+          <InvitationImage photo={data.photos.venue} sizes="360px" className="object-contain" />
         </div>
         <div className="reveal" style={revealDelay(1)}>
-          <p className="text-xl font-medium text-[#332b24]">{data.event.venue}</p>
+          <p className="text-[1.3rem] font-medium tracking-[-0.03em] text-[#222]">{data.event.venue}</p>
           <p className="mt-3 text-sm leading-7 text-[#76695e]">
             {data.event.address}
           </p>
@@ -1148,7 +1179,7 @@ function LocationSection({ data }: { data: WeddingData }) {
           href={data.event.mapUrl}
           target="_blank"
           rel="noreferrer"
-          className="reveal inline-flex w-full items-center justify-center border border-[#2f2924]/20 bg-white/55 px-6 py-4 text-sm font-medium tracking-[0.18em] text-[#2f2924] shadow-[0_14px_32px_rgba(64,42,34,0.06)]"
+          className="reveal inline-flex w-full items-center justify-center rounded-md border border-[#dedede] bg-white px-6 py-3.5 text-sm font-medium tracking-[0.12em] text-[#333] transition hover:border-[#aaa] hover:bg-[#fafafa] active:scale-[0.99]"
           style={revealDelay(2)}
         >
           지도 보기
@@ -1176,21 +1207,21 @@ function GallerySection({ data }: { data: WeddingData }) {
 
   return (
     <Section label="갤러리" title="우리의 순간">
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="columns-2 gap-2.5 text-left">
         {gallery.map((photo, index) => (
           <button
             key={photo.src}
             type="button"
             onClick={() => setSelectedIndex(index)}
-            className="reveal is-visible relative aspect-square overflow-hidden bg-[#eee7de] transition duration-300 active:scale-[0.98]"
+            className="reveal is-visible relative mb-2.5 block w-full break-inside-avoid overflow-hidden bg-white transition duration-300 hover:opacity-90 active:scale-[0.99]"
             style={revealDelay(index, 35)}
             aria-label={`갤러리 사진 ${index + 1} 보기`}
           >
-            <span className="relative block h-full w-full overflow-hidden">
+            <span className={`relative block w-full overflow-hidden ${photo.ratio === "landscape" ? "aspect-[4/3]" : "aspect-[3/4]"}`}>
               <InvitationImage
                 photo={photo}
                 sizes="140px"
-                className="object-cover"
+                className="object-contain"
               />
             </span>
           </button>
@@ -1255,11 +1286,11 @@ function AccountRow({ account }: { account: WeddingAccount }) {
   }
 
   return (
-    <div className="reveal border-b border-[#eee7de] py-5 text-left last:border-b-0">
+    <div className="reveal border-b border-[#eeeeee] py-6 text-left last:border-b-0">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.28em] text-[#2f2924]/70">{account.label}</p>
-          <p className="mt-2 text-base font-medium text-[#332b24]">
+          <p className="text-[0.65rem] uppercase tracking-[0.25em] text-[#999]">{account.label}</p>
+          <p className="mt-2.5 text-base font-medium text-[#222]">
             {account.bank} {account.number}
           </p>
           <p className="mt-1 text-sm text-[#7c6e62]">
@@ -1270,7 +1301,7 @@ function AccountRow({ account }: { account: WeddingAccount }) {
           <button
             type="button"
             onClick={copyAccount}
-            className="rounded-full border border-[#2f2924]/20 px-3 py-2 text-xs font-medium text-[#2f2924]"
+            className="rounded-md border border-[#dedede] px-3.5 py-2 text-xs font-medium text-[#444] transition hover:border-[#aaa] hover:bg-[#fafafa] active:scale-[0.98]"
           >
             복사
           </button>
@@ -1279,7 +1310,7 @@ function AccountRow({ account }: { account: WeddingAccount }) {
               href={account.kakaoPayUrl}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-[#2f2924] px-3 py-2 text-center text-xs font-medium text-white"
+              className="rounded-md bg-[#222] px-3.5 py-2 text-center text-xs font-medium text-white transition hover:bg-black active:scale-[0.98]"
             >
               카카오페이
             </a>
@@ -1311,7 +1342,7 @@ function AccountSection({ data }: { data: WeddingData }) {
 
   return (
     <Section label="계좌 안내" title="마음 전하실 곳">
-      <div className="border-y border-[#eee7de] px-4 py-1">
+      <div className="border-y border-[#eeeeee] px-1 py-1">
         {accounts.map((account) => (
           <AccountRow key={account.id} account={account} />
         ))}
@@ -1427,13 +1458,13 @@ function ActionSection({ data, invitationSlug }: { data: WeddingData; invitation
   }
 
   return (
-    <section className="px-7 pb-16 pt-6 text-center">
+    <section className="px-7 pb-24 pt-8 text-center">
       <div className="mx-auto max-w-[22rem] space-y-3">
         {data.sections.rsvp ? (
           <button
             type="button"
             onClick={openRsvp}
-            className="reveal flex w-full items-center justify-center rounded-full bg-[#342526] px-6 py-4 text-sm font-medium tracking-[0.12em] text-white shadow-[0_18px_38px_rgba(52,37,38,0.18)]"
+            className="reveal flex w-full items-center justify-center rounded-md bg-[#222] px-6 py-3.5 text-sm font-medium tracking-[0.08em] text-white transition hover:bg-black active:scale-[0.99]"
           >
             {rsvp.label}
           </button>
@@ -1442,7 +1473,7 @@ function ActionSection({ data, invitationSlug }: { data: WeddingData; invitation
           <button
             type="button"
             onClick={copyLink}
-            className="reveal w-full rounded-full border border-[#2f2924]/18 bg-white/55 px-6 py-4 text-sm font-medium tracking-[0.12em] text-[#2f2924]"
+            className="reveal w-full rounded-md border border-[#dedede] bg-white px-6 py-3.5 text-sm font-medium tracking-[0.08em] text-[#333] transition hover:border-[#aaa] hover:bg-[#fafafa] active:scale-[0.99]"
             style={revealDelay(data.sections.rsvp ? 1 : 0)}
           >
             링크 복사하기
@@ -1613,12 +1644,12 @@ function RsvpSelect({
 
 function Footer({ data }: { data: WeddingData }) {
   return (
-    <footer className="px-8 pb-14 text-center">
+    <footer className="px-8 pb-20 text-center">
       <Divider />
       <p className="mx-auto mt-8 max-w-[18rem] break-keep text-sm leading-7 text-[#76695e]">
         {data.message.footer}
       </p>
-      <p className="mt-8 text-lg font-medium tracking-[-0.02em] text-[#2f2924]/80">감사합니다</p>
+      <p className="mt-10 text-lg font-medium tracking-[-0.02em] text-[#222]">감사합니다</p>
     </footer>
   );
 }
@@ -1698,7 +1729,7 @@ export function WeddingInvitation({
 
   return (
     <main
-      className="kitsch-paper relative mx-auto min-h-screen max-w-[430px] overflow-hidden text-[#4a2224] shadow-[0_0_80px_rgba(91,70,42,0.12)]"
+      className="kitsch-paper relative mx-auto min-h-screen max-w-[430px] overflow-hidden bg-white text-[#222]"
       style={{ fontFamily: THEME_FONTS[data.hero.themeFont ?? "gangwon"] }}
     >
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">

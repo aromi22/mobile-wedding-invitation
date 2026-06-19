@@ -72,10 +72,10 @@ button {
 
 .kitsch-card {
   position: relative;
-  border: 1px solid rgba(47, 41, 36, 0.08);
-  border-radius: 1.1rem;
-  background: rgba(255, 253, 249, 0.92);
-  box-shadow: 0 18px 45px rgba(64, 42, 34, 0.07);
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
 }
 
 .kitsch-title {
@@ -335,11 +335,5 @@ button {
     opacity: 1;
     transform: none;
     transition: none;
-  }
-}
-
-@media (min-width: 520px) {
-  body {
-    padding: 28px 0;
   }
 }

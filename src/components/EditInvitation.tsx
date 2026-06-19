@@ -353,18 +353,43 @@ function formatDate(dateValue: string, time: string) {
   const day = date.getDate();
   const weekday = weekdays[date.getDay()];
   const shortWeekday = shortWeekdays[date.getDay()];
+  const normalizedTime = formatTimeForDisplay(time, "ko");
+  const normalizedEnglishTime = formatTimeForDisplay(time, "en");
 
   return {
     year,
     month,
     day,
     weekday,
-    dateText: `${year}년 ${month}월 ${day}일 ${weekday} ${time}`,
+    dateText: `${year}년 ${month}월 ${day}일 ${weekday} ${normalizedTime}`,
     calendarText: `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(
       2,
       "0",
-    )} ${shortWeekday} ${time}`,
+    )} ${shortWeekday} ${normalizedEnglishTime}`,
   };
+}
+
+function formatTimeForDisplay(time: string, locale: "ko" | "en") {
+  const value = time.trim();
+  const match = value.match(/(\d{1,2})(?::(\d{2}))?/);
+
+  if (!match) {
+    return value;
+  }
+
+  let hour = Number(match[1]);
+  const minute = match[2] ?? "00";
+  const hasPm = /오후|PM/i.test(value);
+  const hasAm = /오전|AM/i.test(value);
+
+  if (hasPm && hour < 12) hour += 12;
+  if (hasAm && hour === 12) hour = 0;
+
+  const period = hour >= 12 ? (locale === "ko" ? "오후" : "PM") : locale === "ko" ? "오전" : "AM";
+  const hour12 = hour % 12 || 12;
+  const minuteText = minute !== "00" ? ` ${Number(minute)}분` : "";
+
+  return locale === "ko" ? `${period} ${hour12}시${minuteText}` : `${hour12}${minute !== "00" ? `:${minute}` : ""} ${period}`;
 }
 
 function detectRatio(src: string, index: number): PhotoRatio {
@@ -404,7 +429,7 @@ function Field({
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full min-w-0 rounded-[10px] border border-[#dedede] bg-white px-4 py-3 text-[15px] text-[#191919] outline-none transition focus:border-[#191919]"
+        className="w-full min-w-0 rounded-md border border-[#e8e8e8] bg-white px-4 py-3.5 text-[15px] text-[#191919] outline-none transition focus:border-[#d6a2ad] focus:ring-2 focus:ring-[#d6a2ad]/10"
       />
     </label>
   );
@@ -428,7 +453,7 @@ function TextArea({
         value={value}
         rows={rows}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full min-w-0 resize-y rounded-[10px] border border-[#dedede] bg-white px-4 py-3 text-[15px] leading-7 text-[#191919] outline-none transition focus:border-[#191919]"
+        className="w-full min-w-0 resize-y rounded-md border border-[#e8e8e8] bg-white px-4 py-3.5 text-[15px] leading-7 text-[#191919] outline-none transition focus:border-[#d6a2ad] focus:ring-2 focus:ring-[#d6a2ad]/10"
       />
     </label>
   );
@@ -517,7 +542,7 @@ function ToggleField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex min-w-0 items-center justify-between gap-4 rounded-[14px] border border-[#dedede] bg-white px-4 py-3 text-sm text-[#191919]">
+    <label className="flex min-w-0 items-center justify-between gap-4 border-b border-[#eeeeee] bg-white px-1 py-4 text-sm text-[#191919]">
       <span className="font-medium">{label}</span>
       <input
         type="checkbox"
@@ -543,10 +568,10 @@ function FormSection({
   }
 
   return (
-    <section className="min-w-0 rounded-[18px] border border-[#dedede] bg-white p-6">
-      <div className="mb-6 flex items-center justify-between border-b border-[#ececec] pb-4">
-        <h2 className="text-[17px] font-semibold tracking-[-0.02em] text-[#191919]">{title}</h2>
-        <span className="text-xl leading-none text-[#777]">⌄</span>
+    <section className="min-w-0 border-b border-[#eeeeee] bg-white px-1 py-9 sm:px-2">
+      <div className="mb-8 flex items-center justify-between">
+        <h2 className="text-[19px] font-semibold tracking-[-0.025em] text-[#191919]">{title}</h2>
+        <span className="h-px w-10 bg-[#e5c7cd]" />
       </div>
       <div className="grid min-w-0 gap-5">{children}</div>
     </section>
@@ -2128,7 +2153,7 @@ export function EditInvitation({
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f6f6] text-[#191919]">
+    <div className="min-h-screen bg-white text-[#191919]">
       <div className="border-b border-[#e7e7e7] bg-white">
         <div className="mx-auto flex h-[68px] w-full max-w-[1600px] items-center justify-between px-5 lg:px-10">
           <a href="/" className="text-2xl font-semibold tracking-[-0.05em]">
@@ -2182,8 +2207,8 @@ export function EditInvitation({
       </div>
 
       <div className="mx-auto grid w-full max-w-[1600px] gap-0 lg:h-[calc(100vh-137px)] lg:grid-cols-[240px_minmax(0,760px)_minmax(420px,1fr)] lg:overflow-hidden">
-        <nav className="hidden min-h-[calc(100vh-137px)] border-r border-[#e7e7e7] bg-white px-8 py-10 lg:block">
-          <div className="sticky top-8 space-y-4">
+        <nav className="hidden min-h-[calc(100vh-137px)] border-r border-[#eeeeee] bg-white px-8 py-12 lg:block">
+          <div className="sticky top-8 space-y-1">
             {EDITOR_TABS.map((tab) => {
               const isSelected = activeEditorTab === tab.key;
 
@@ -2192,12 +2217,14 @@ export function EditInvitation({
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveEditorTab(tab.key)}
-                  className={`flex w-full items-center gap-4 rounded-[12px] px-4 py-3 text-left text-sm transition ${
-                    isSelected ? "bg-[#191919] text-white" : "text-[#777] hover:bg-[#f4f4f4] hover:text-[#191919]"
+                  className={`group relative flex w-full items-center gap-3 border-l px-4 py-3.5 text-left text-sm transition ${
+                    isSelected ? "border-[#d6a2ad] text-[#191919]" : "border-transparent text-[#999] hover:text-[#191919]"
                   }`}
                 >
-                  <span className={isSelected ? "text-white/70" : "text-[#aaa]"}>{tab.icon}</span>
-                  <span className="font-semibold">{tab.label}</span>
+                  <span className={`text-[10px] tracking-[0.12em] ${isSelected ? "text-[#d6a2ad]" : "text-[#c7c7c7]"}`}>
+                    {tab.icon}
+                  </span>
+                  <span className={isSelected ? "font-semibold" : "font-medium"}>{tab.label}</span>
                 </button>
               );
             })}
@@ -2206,9 +2233,9 @@ export function EditInvitation({
 
         <main
           ref={editorRef}
-          className="min-w-0 space-y-5 px-5 py-8 lg:h-[calc(100vh-137px)] lg:overflow-y-auto lg:px-8"
+          className="min-w-0 space-y-0 bg-white px-5 py-9 lg:h-[calc(100vh-137px)] lg:overflow-y-auto lg:px-10"
         >
-          <header className="rounded-[18px] border border-[#dedede] bg-white p-5">
+          <header className="border-b border-[#eeeeee] bg-white px-1 pb-9">
             <p className="text-[13px] font-semibold text-[#191919]">
               모바일 초대장 제작 안내
             </p>
@@ -2419,8 +2446,8 @@ export function EditInvitation({
             ) : null}
           </header>
 
-          <nav className="sticky top-0 z-20 -mx-1 overflow-x-auto border-y border-[#e7e7e7] bg-[#f6f6f6]/95 py-3 backdrop-blur lg:hidden">
-            <div className="flex min-w-max gap-2 px-1">
+          <nav className="sticky top-0 z-20 -mx-5 overflow-x-auto border-b border-[#eeeeee] bg-white/95 px-5 backdrop-blur lg:hidden">
+            <div className="flex min-w-max gap-6">
               {EDITOR_TABS.map((tab) => {
                 const isSelected = activeEditorTab === tab.key;
 
@@ -2429,13 +2456,11 @@ export function EditInvitation({
                     key={tab.key}
                     type="button"
                     onClick={() => setActiveEditorTab(tab.key)}
-                    className={`rounded-2xl border px-4 py-3 text-left transition ${
-                      isSelected
-                        ? "border-[#191919] bg-white shadow-[0_10px_22px_rgba(0,0,0,0.08)]"
-                        : "border-[#dedede] bg-white hover:border-[#191919]"
+                    className={`relative border-b-2 py-4 text-left transition ${
+                      isSelected ? "border-[#d6a2ad]" : "border-transparent"
                     }`}
                   >
-                    <span className="block whitespace-nowrap text-sm font-semibold text-[#2F2A26]">
+                    <span className={`block whitespace-nowrap text-sm ${isSelected ? "font-semibold text-[#191919]" : "font-medium text-[#999]"}`}>
                       {tab.label}
                     </span>
                     <span className="mt-1 hidden text-xs leading-4 text-[#777] xl:block">
@@ -3774,19 +3799,19 @@ export function EditInvitation({
 
         <aside
           ref={previewRef}
-          className="min-w-0 scroll-mt-6 bg-[#444] px-5 py-8 lg:h-[calc(100vh-137px)] lg:px-10"
+          className="min-w-0 scroll-mt-6 bg-[#f2f2f2] px-5 py-8 lg:h-[calc(100vh-137px)] lg:px-10"
         >
-          <div className="mb-6 flex items-center justify-between gap-3 px-1 text-sm text-white/72">
+          <div className="mb-6 flex items-center justify-between gap-3 px-1 text-sm text-[#777]">
             <span>모바일 청첩장 미리보기</span>
             <button
               type="button"
               onClick={scrollToEditor}
-              className="shrink-0 rounded-full bg-white/12 px-4 py-2 text-xs font-semibold text-white backdrop-blur"
+              className="shrink-0 rounded-md border border-[#dddddd] bg-white px-4 py-2 text-xs font-semibold text-[#555]"
             >
               편집으로 이동
             </button>
           </div>
-          <div className="mx-auto w-full max-w-[420px] overflow-hidden bg-white shadow-[0_28px_90px_rgba(0,0,0,0.28)]">
+          <div className="mx-auto w-full max-w-[420px] overflow-hidden bg-white shadow-[0_24px_70px_rgba(0,0,0,0.14)]">
             <div className="h-[calc(100vh-7rem)] min-h-[640px] overflow-y-auto bg-white">
               <WeddingInvitation data={preview} key={`${preview.hero.petalEffect}-${previewReplayKey}`} />
             </div>
