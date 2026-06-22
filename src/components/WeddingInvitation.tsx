@@ -29,7 +29,7 @@ const THEME_FONTS = {
   pretendard: 'Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
   sunbatang: '"SunBatang", "Batang", "Times New Roman", serif',
   nanumsquare: '"NanumSquare", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
-  gangwon: '"GangwonEdu_OTFBoldA", "GangwonEduAll", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  gangwon: '"GangwonEduModu", "GangwonEdu Modu", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
   "cafe24-dongdong": '"Cafe24Dongdong", "Cafe24Oneprettynight", cursive',
   jua: '"Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
   himelody: '"Hi Melody", "Cafe24Oneprettynight", cursive',
@@ -285,7 +285,7 @@ function DeceasedMarker({ data }: { data: WeddingData }) {
 
   if (data.familySettings.deceasedMarker === "flower") {
     return (
-      <span className="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+      <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center align-middle" aria-hidden="true">
         <img
           src="/images/chrysanthemum-marker.svg"
           alt=""
@@ -297,7 +297,7 @@ function DeceasedMarker({ data }: { data: WeddingData }) {
 
   if (data.familySettings.deceasedMarker === "lineart") {
     return (
-      <span className="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+      <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center align-middle" aria-hidden="true">
         <img
           src="/images/chrysanthemum-lineart-marker.svg"
           alt=""
@@ -329,7 +329,7 @@ function ParentName({
 
   if (data.familySettings.deceasedFormat === "suffix") {
     return (
-      <span className="inline-flex items-center gap-1">
+      <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap">
         <span>{name}</span>
         <DeceasedMarker data={data} />
       </span>
@@ -337,7 +337,7 @@ function ParentName({
   }
 
   return (
-    <span className="inline-flex items-center gap-1">
+    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap">
       <DeceasedMarker data={data} />
       <span>{name}</span>
     </span>
@@ -359,23 +359,23 @@ function FamilyLine({ person, data }: { person: Person; data: WeddingData }) {
 
   if (!data.familySettings.showParents || parents.length === 0) {
     return (
-      <>
+      <span className="inline-flex items-center whitespace-nowrap">
         {person.parents.relation} {givenName}
-      </>
+      </span>
     );
   }
 
   return (
-    <>
+    <span className="inline-flex max-w-full flex-nowrap items-center justify-center whitespace-nowrap">
       {parents.map((parent, index) => (
-        <span key={`${parent.name}-${index}`} className="inline-flex items-center gap-1">
+        <span key={`${parent.name}-${index}`} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap">
           {index > 0 ? <span className="mx-1">·</span> : null}
           <ParentName name={parent.name} isDeceased={parent.isDeceased} data={data} />
         </span>
       ))}
       <span>의 {person.parents.relation} </span>
       <span>{givenName}</span>
-    </>
+    </span>
   );
 }
 
@@ -476,7 +476,6 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
   const subMessage = hero.introSubMessage || "You are joyfully invited";
   const invitationMessage = hero.introInvitationMessage || "소중한 분들을 초대합니다";
   const template = hero.coverTemplate;
-  const introSans = 'Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
   const introSerif = '"Cormorant Garamond", "Playfair Display", Georgia, serif';
   const introScript = '"Great Vibes", "Allura", "Freestyle Script", "Segoe Script", cursive';
 
@@ -485,7 +484,6 @@ function IntroTemplateCover({ data }: { data: WeddingData }) {
       <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
       <div
         className="cover-reveal relative aspect-[9/16] w-full max-w-[420px] overflow-hidden bg-white"
-        style={{ fontFamily: introSans }}
       >
         {template === "classic-poster" ? (
           <div className="flex h-full flex-col px-7 pb-8 pt-7 text-center">
@@ -715,7 +713,7 @@ function Cover({ data }: { data: WeddingData }) {
         <CoverPetalEffect variant={hero.petalEffect ?? "none"} />
         <div className="cover-reveal w-full max-w-[21.5rem]">
           <div>
-            <h1 className="break-keep font-sans text-[1.02rem] font-light uppercase leading-7 tracking-[0.05em] text-[#2f2a25]">
+            <h1 className="break-keep text-[1.02rem] font-light uppercase leading-7 tracking-[0.05em] text-[#2f2a25]">
               {groom.englishName} &amp; {bride.englishName}
             </h1>
             <div className="mx-auto mt-7 h-px w-[82%] bg-[#2f2a25]/24" />
@@ -1043,7 +1041,7 @@ function TimelineSection({ data }: { data: WeddingData }) {
 function PersonLine({ person, data }: { person: Person; data: WeddingData }) {
   return (
     <div
-      className={`grid grid-cols-[3.25rem_1fr_auto] items-center gap-3 border-b border-[#eee7de] py-4 last:border-b-0 ${
+      className={`grid grid-cols-[2.5rem_minmax(0,1fr)_2.75rem] items-center gap-2 border-b border-[#eee7de] py-4 last:border-b-0 ${
         data.familySettings.align === "left" ? "text-left" : "text-center"
       }`}
     >
@@ -1052,7 +1050,7 @@ function PersonLine({ person, data }: { person: Person; data: WeddingData }) {
         <p className="text-[1.35rem] font-medium text-[#332b24]">
           {person.name}
         </p>
-        <p className="mt-1 break-keep text-xs leading-5 text-[#7c6e62]">
+        <p className="mt-1 overflow-visible whitespace-nowrap text-[0.7rem] leading-5 text-[#7c6e62]">
           <FamilyLine person={person} data={data} />
         </p>
         <p className="hidden">

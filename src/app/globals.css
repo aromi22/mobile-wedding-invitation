@@ -13,9 +13,9 @@
   --kitsch-red: #2f2924;
   --kitsch-cream: #ffffff;
   --kitsch-ink: #342526;
-  --font-serif-kr: "GangwonEdu Modu", "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
-  --font-display: "GangwonEdu Modu", Georgia, "Times New Roman", serif;
-  --font-hand: "Caveat", "Segoe Print", "GangwonEdu Modu", cursive;
+  --font-serif-kr: "GangwonEduModu", "GangwonEdu Modu", "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
+  --font-display: "GangwonEduModu", "GangwonEdu Modu", Georgia, "Times New Roman", serif;
+  --font-hand: "Caveat", "Segoe Print", "GangwonEduModu", "GangwonEdu Modu", cursive;
 }
 
 * {
