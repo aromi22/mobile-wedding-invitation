@@ -86,7 +86,7 @@ const PETAL_EFFECT_OPTIONS = [
   { label: "하트", value: "heart", description: "작은 하트가 은은하게 떠내려가요." },
 ] as const;
 
-type EditorTabKey = "basic" | "design" | "accounts" | "share";
+type EditorTabKey = "basic" | "design" | "share";
 
 const EDITOR_TABS: Array<{
   key: EditorTabKey;
@@ -95,9 +95,8 @@ const EDITOR_TABS: Array<{
   icon: string;
 }> = [
   { key: "basic", label: "기본 정보", description: "이름, 예식, 가족 정보", icon: "01" },
-  { key: "design", label: "디자인", description: "화면, 사진, 문구", icon: "02" },
-  { key: "accounts", label: "계좌·참석", description: "마음 전하실 곳과 RSVP", icon: "03" },
-  { key: "share", label: "공유 설정", description: "음악, 지도, 링크", icon: "04" },
+  { key: "design", label: "청첩장 편집", description: "첫 화면부터 감사 문구까지", icon: "02" },
+  { key: "share", label: "저장·공유", description: "링크와 최종 확인", icon: "03" },
 ];
 
 type SectionToggleKey = keyof WeddingData["sections"];
@@ -118,6 +117,26 @@ const SECTION_TOGGLE_OPTIONS: Array<{
   { key: "rsvp", label: "참석 여부 전달" },
   { key: "share", label: "링크 공유" },
   { key: "footer", label: "감사 문구" },
+];
+
+const INVITATION_FLOW_OPTIONS: Array<{
+  key: SectionToggleKey;
+  label: string;
+  description: string;
+}> = [
+  { key: "profile", label: "어릴 적 사진과 프로필", description: "오프닝 바로 다음" },
+  { key: "openingMessage", label: "초대 문구", description: "소중한 분들을 초대합니다" },
+  { key: "story", label: "우리의 이야기", description: "사진과 함께 보는 이야기" },
+  { key: "qa", label: "Q&A", description: "질문과 답변 형식" },
+  { key: "timeline", label: "타임라인", description: "만남부터 결혼까지" },
+  { key: "family", label: "신랑·신부 및 가족 소개", description: "양가 가족 정보" },
+  { key: "calendar", label: "예식일", description: "날짜, 시간, 달력" },
+  { key: "location", label: "오시는 길", description: "예식장, 주소, 지도" },
+  { key: "gallery", label: "갤러리", description: "우리의 순간" },
+  { key: "accounts", label: "마음 전하실 곳", description: "계좌 및 송금 링크" },
+  { key: "rsvp", label: "참석 여부 전달", description: "하객 응답 설정" },
+  { key: "share", label: "링크 공유", description: "하객용 공유 버튼" },
+  { key: "footer", label: "감사 문구", description: "청첩장 마지막 인사" },
 ];
 
 const RSVP_FIELD_OPTIONS: Array<{ key: WeddingRsvpFieldKey; label: string }> = [
@@ -951,7 +970,7 @@ export function EditInvitation({
   const [rsvpResponses, setRsvpResponses] = useState<WeddingRsvpResponse[]>([]);
   const [rsvpResponseMessage, setRsvpResponseMessage] = useState("");
   const [rsvpRefreshKey, setRsvpRefreshKey] = useState(0);
-  const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey>("openingMessage");
+  const [openSectionKey, setOpenSectionKey] = useState<SectionToggleKey | null>("profile");
   const [activeEditorTab, setActiveEditorTab] = useState<EditorTabKey>("basic");
   const [previewReplayKey, setPreviewReplayKey] = useState(0);
   const isCustomerEditPage = Boolean(slug);
@@ -1496,6 +1515,20 @@ export function EditInvitation({
                 })
               }
             />
+            <FileField
+              label="초대 문구 아래 사진"
+              onSelect={(files) => updateSinglePhotoFile("intro", files, "초대 문구 아래 사진")}
+            />
+            <Field
+              label="초대 문구 사진 URL"
+              value={draft.photos.intro.src}
+              onChange={(value) =>
+                update((current) => {
+                  current.photos.intro.src = value;
+                  return current;
+                })
+              }
+            />
           </div>
         );
       case "story":
@@ -1649,6 +1682,54 @@ export function EditInvitation({
       case "profile":
         return (
           <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-3 border-b border-[#eeeeee] pb-5 sm:border-b-0 sm:border-r sm:pb-0 sm:pr-5">
+                <p className="text-sm font-semibold text-[#191919]">신랑 어릴 적 사진</p>
+                <FileField label="사진 첨부" onSelect={(files) => updateChildPhotoFile("groom", files)} />
+                <Field
+                  label="사진 URL"
+                  value={draft.photos.groomChildPhoto?.src ?? ""}
+                  onChange={(value) =>
+                    update((current) => {
+                      current.photos.groomChildPhoto.src = value;
+                      return current;
+                    })
+                  }
+                />
+                <RangeField
+                  label="사진 확대"
+                  value={draft.photos.groomChildPhoto?.scale ?? 1}
+                  min={1}
+                  max={2.4}
+                  step={0.05}
+                  suffix="x"
+                  onChange={(value) => updateChildPhotoScale("groom", value)}
+                />
+              </div>
+              <div className="grid gap-3">
+                <p className="text-sm font-semibold text-[#191919]">신부 어릴 적 사진</p>
+                <FileField label="사진 첨부" onSelect={(files) => updateChildPhotoFile("bride", files)} />
+                <Field
+                  label="사진 URL"
+                  value={draft.photos.brideChildPhoto?.src ?? ""}
+                  onChange={(value) =>
+                    update((current) => {
+                      current.photos.brideChildPhoto.src = value;
+                      return current;
+                    })
+                  }
+                />
+                <RangeField
+                  label="사진 확대"
+                  value={draft.photos.brideChildPhoto?.scale ?? 1}
+                  min={1}
+                  max={2.4}
+                  step={0.05}
+                  suffix="x"
+                  onChange={(value) => updateChildPhotoScale("bride", value)}
+                />
+              </div>
+            </div>
             {(["groom", "bride"] as const).map((side) => {
               const person = draft.couple[side];
               const sideLabel = side === "groom" ? "신랑" : "신부";
@@ -1763,6 +1844,20 @@ export function EditInvitation({
               onChange={(value) =>
                 update((current) => {
                   current.event.mapUrl = value;
+                  return current;
+                })
+              }
+            />
+            <FileField
+              label="장소 안내 사진"
+              onSelect={(files) => updateSinglePhotoFile("venue", files, "장소 안내 사진")}
+            />
+            <Field
+              label="장소 안내 사진 URL"
+              value={draft.photos.venue.src}
+              onChange={(value) =>
+                update((current) => {
+                  current.photos.venue.src = value;
                   return current;
                 })
               }
@@ -2858,11 +2953,14 @@ export function EditInvitation({
               </details>
             </div>
 
-            <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
+            {["classic-poster", "editorial-marriage", "minimal-date"].includes(
+              draft.hero.coverTemplate,
+            ) ? (
+            <div className="border-t border-[#eeeeee] pt-7">
               <div className="mb-4">
-                <p className="text-sm font-semibold text-[#191919]">오프닝 문구</p>
+                <p className="text-sm font-semibold text-[#191919]">선택한 오프닝에 표시되는 문구</p>
                 <p className="mt-1 text-xs leading-5 text-[#777]">
-                  첫 화면 포스터에 들어가는 문구예요. 템플릿마다 위치는 고정되고 문구만 바뀌어요.
+                  지금 선택한 포스터형 첫 화면에서만 사용하는 문구예요.
                 </p>
               </div>
               <div className="grid gap-4">
@@ -2904,6 +3002,7 @@ export function EditInvitation({
                 />
               </div>
             </div>
+            ) : null}
 
             {draft.hero.coverTemplate === "fullscreen" ? (
               <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
@@ -3030,7 +3129,7 @@ export function EditInvitation({
               </div>
             ) : null}
 
-            <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
+            <div className="border-t border-[#eeeeee] pt-7">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">메인 사진</p>
                 <p className="mt-1 text-xs leading-5 text-[#8a7a6a]">
@@ -3145,6 +3244,7 @@ export function EditInvitation({
               </div>
             </div>
 
+            {draft.hero.coverTemplate === "polaroid" ? (
             <div className="rounded-[18px] border border-[#dedede] bg-white p-6">
               <div className="mb-4">
                 <p className="text-sm font-semibold text-[#332b24]">레터링</p>
@@ -3241,6 +3341,7 @@ export function EditInvitation({
                 />
               </div>
             </div>
+            ) : null}
 
             <div className="grid gap-3 sm:grid-cols-2">
               <ToggleField
@@ -3263,6 +3364,65 @@ export function EditInvitation({
                   })
                 }
               />
+            </div>
+          </FormSection>
+
+          <FormSection title="청첩장 순서대로 편집" isVisible={activeEditorTab === "design"}>
+            <div className="mb-2 border-b border-[#eeeeee] pb-5">
+              <p className="text-sm leading-6 text-[#777]">
+                실제 청첩장에 보이는 순서예요. 필요한 항목만 켜고 바로 아래에서 수정하세요.
+              </p>
+            </div>
+            <div className="grid gap-0">
+              {INVITATION_FLOW_OPTIONS.map((option, index) => {
+                const isOpen = openSectionKey === option.key;
+
+                return (
+                  <div key={option.key} className="border-b border-[#eeeeee] last:border-b-0">
+                    <div className="flex items-center gap-4 py-4">
+                      <span className="w-5 shrink-0 text-[10px] tracking-[0.12em] text-[#c4a1a9]">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <label className="relative inline-flex h-6 w-10 shrink-0 cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          checked={draft.sections[option.key]}
+                          onChange={(event) =>
+                            update((current) => {
+                              current.sections = {
+                                ...wedding.sections,
+                                ...current.sections,
+                                [option.key]: event.target.checked,
+                              };
+                              return current;
+                            })
+                          }
+                          className="peer sr-only"
+                          aria-label={`${option.label} 표시 여부`}
+                        />
+                        <span className="absolute inset-0 rounded-full bg-[#d6d6d6] transition peer-checked:bg-[#d6a2ad]" />
+                        <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-4" />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setOpenSectionKey(isOpen ? null : option.key)}
+                        className="flex min-w-0 flex-1 items-center justify-between gap-4 text-left"
+                      >
+                        <span>
+                          <strong className="block text-[15px] font-semibold text-[#222]">{option.label}</strong>
+                          <span className="mt-1 block text-xs text-[#999]">{option.description}</span>
+                        </span>
+                        <span className="text-lg font-light text-[#888]">{isOpen ? "−" : "+"}</span>
+                      </button>
+                    </div>
+                    {isOpen ? (
+                      <div className="pb-7 pl-9 sm:pl-[5.25rem]">
+                        {renderSectionEditor(option.key)}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
           </FormSection>
 
@@ -3319,7 +3479,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="문구" isVisible={activeEditorTab === "design"}>
+          <FormSection title="문구" isVisible={false}>
             <TextArea
               label="초대 문구"
               value={draft.message.body}
@@ -3426,7 +3586,7 @@ export function EditInvitation({
             ) : null}
           </FormSection>
 
-          <FormSection title="계좌·참석" isVisible={activeEditorTab === "accounts"}>
+          <FormSection title="계좌·참석" isVisible={false}>
             <div className="grid gap-4">
               {draft.accounts.map((account, index) => (
                 <AccountEditor
@@ -3455,7 +3615,7 @@ export function EditInvitation({
             </div>
           </FormSection>
 
-          <FormSection title="사진" isVisible={activeEditorTab === "design"}>
+          <FormSection title="사진" isVisible={false}>
             <div className="grid gap-5 rounded-[18px] border border-[#dedede] bg-white p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -3603,7 +3763,7 @@ export function EditInvitation({
             </p>
           </FormSection>
 
-          <FormSection title="스토리 타입" isVisible={activeEditorTab === "design"}>
+          <FormSection title="스토리 타입" isVisible={false}>
             <label className="grid gap-2 text-sm text-[#5f5349]">
               <span>청첩장 스타일</span>
               <select
@@ -3686,7 +3846,7 @@ export function EditInvitation({
             ) : null}
           </FormSection>
 
-          <FormSection title="섹션 구성" isVisible={activeEditorTab === "design"}>
+          <FormSection title="섹션 구성" isVisible={false}>
             <div className="grid gap-2">
               {SECTION_TOGGLE_OPTIONS.map((option) => {
                 const isOpen = openSectionKey === option.key;
