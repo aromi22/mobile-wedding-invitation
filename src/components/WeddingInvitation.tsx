@@ -36,25 +36,25 @@ const THEME_FONTS = {
   jua: '"Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
 };
 
-const COVER_PETALS = Array.from({ length: 10 }, (_, index) => ({
-  left: `${(index * 23 + 4) % 92}%`,
-  delay: `${(index % 6) * 0.55}s`,
-  duration: `${13.5 + (index % 5) * 1.15}s`,
-  drift: `${index % 2 === 0 ? 96 + index * 5 : -82 - index * 4}px`,
-  rotate: `${index % 2 === 0 ? 18 + index * 7 : -22 - index * 5}deg`,
-  size: `${13 + (index % 5)}px`,
+const COVER_PETALS = Array.from({ length: 18 }, (_, index) => ({
+  left: `${2 + index * 5.65 + (index % 3) * 0.8}%`,
+  delay: `${(index % 9) * 0.42}s`,
+  duration: `${15.5 + (index % 6) * 1.25}s`,
+  drift: `${index % 2 === 0 ? 72 + index * 3 : -68 - index * 2.5}px`,
+  rotate: `${index % 2 === 0 ? 18 + index * 6 : -22 - index * 4}deg`,
+  size: `${16 + (index % 5)}px`,
 }));
 
 const PETAL_COLORS = {
   none: "",
-  soft: "rgba(255,255,255,0.68)",
-  pink: "rgba(248,210,218,0.62)",
-  sky: "rgba(246,235,219,0.66)",
-  snow: "rgba(255,255,255,0.88)",
-  cherry: "rgba(248,178,196,0.72)",
-  daisy: "rgba(244,196,76,0.78)",
-  fall: "rgba(181,123,63,0.68)",
-  heart: "rgba(239,142,168,0.72)",
+  soft: "rgba(255,255,255,0.84)",
+  pink: "rgba(244,177,194,0.78)",
+  sky: "rgba(232,211,181,0.8)",
+  snow: "rgba(255,255,255,0.96)",
+  cherry: "rgba(239,139,166,0.86)",
+  daisy: "rgba(238,180,46,0.9)",
+  fall: "rgba(169,103,48,0.82)",
+  heart: "rgba(231,92,132,0.86)",
 };
 
 const CHILD_PHOTO_FRAME_CONFIG = {
@@ -276,6 +276,40 @@ function formatWeddingTime(time: string, locale: "ko" | "en" = "en") {
   }
 
   return `${hour12}${minute !== "00" ? `:${minute}` : ""} ${isPm ? "PM" : "AM"}`;
+}
+
+function getWeddingDateTime(data: WeddingData) {
+  const value = data.event.time.trim();
+  const match = value.match(/(\d{1,2})(?::(\d{2}))?/);
+  let hour = 0;
+  let minute = 0;
+
+  if (match) {
+    hour = Number(match[1]);
+    minute = Number(match[2] ?? "00");
+
+    if (/오후|PM/i.test(value) && hour < 12) {
+      hour += 12;
+    }
+
+    if (/오전|AM/i.test(value) && hour === 12) {
+      hour = 0;
+    }
+  }
+
+  return new Date(data.event.year, data.event.month - 1, data.event.day, hour, minute, 0, 0);
+}
+
+function getCountdownParts(target: Date, now: number) {
+  const remaining = Math.max(0, target.getTime() - now);
+  const totalSeconds = Math.floor(remaining / 1000);
+
+  return {
+    days: Math.floor(totalSeconds / 86400),
+    hours: Math.floor((totalSeconds % 86400) / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
+  };
 }
 
 function DeceasedMarker({ data }: { data: WeddingData }) {
@@ -1084,6 +1118,7 @@ function FamilySection({ data }: { data: WeddingData }) {
 }
 
 function CalendarSection({ data }: { data: WeddingData }) {
+  const [now, setNow] = useState(() => Date.now());
   const weekdayShort = useMemo(() => {
     const date = new Date(data.event.year, data.event.month - 1, data.event.day);
     return date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
@@ -1092,18 +1127,21 @@ function CalendarSection({ data }: { data: WeddingData }) {
   const weddingDateLine = `${data.event.year}.${String(data.event.month).padStart(2, "0")}.${String(
     data.event.day,
   ).padStart(2, "0")} | ${weekdayShort} | ${timeShort}`;
-  const dDayText = useMemo(() => {
-    const weddingDate = new Date(data.event.year, data.event.month - 1, data.event.day);
-    const today = new Date();
-    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const diff = Math.ceil((weddingDate.getTime() - todayOnly.getTime()) / 86400000);
+  const weddingDateTime = useMemo(() => getWeddingDateTime(data), [data]);
+  const countdown = useMemo(() => getCountdownParts(weddingDateTime, now), [now, weddingDateTime]);
+  const countdownItems = [
+    { label: "DAYS", value: countdown.days },
+    { label: "HOURS", value: countdown.hours },
+    { label: "MINUTES", value: countdown.minutes },
+    { label: "SECONDS", value: countdown.seconds },
+  ];
+  const isWeddingDay = countdown.days === 0 && weddingDateTime.getTime() - now <= 86400000;
 
-    if (diff === 0) {
-      return "D-Day";
-    }
-
-    return diff > 0 ? `D-${diff}` : `D+${Math.abs(diff)}`;
-  }, [data.event.day, data.event.month, data.event.year]);
+  useEffect(() => {
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const days = useMemo(() => {
     const firstDay = new Date(data.event.year, data.event.month - 1, 1).getDay();
@@ -1122,8 +1160,29 @@ function CalendarSection({ data }: { data: WeddingData }) {
             {weddingDateLine}
           </p>
           <div className="mx-auto mt-4 h-px w-28 bg-[#2f2924]/18" />
-          <p className="mt-5 font-display text-[1.1rem] uppercase tracking-[0.3em] text-[#555]">
-            {dDayText}
+          <div className="mt-7 grid grid-cols-4 gap-2.5">
+            {countdownItems.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-md bg-white px-2 py-3 text-center shadow-[0_8px_18px_rgba(0,0,0,0.1)] ring-1 ring-black/[0.03]"
+              >
+                <p className="font-sans text-[1.35rem] font-light tabular-nums tracking-[-0.04em] text-[#111]">
+                  {String(item.value).padStart(2, "0")}
+                </p>
+                <p className="mt-1 font-sans text-[0.56rem] uppercase tracking-[0.08em] text-[#9a8d86]">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 break-keep text-center text-[0.85rem] leading-6 text-[#222]">
+            {data.couple.groom.givenName || data.couple.groom.name}
+            <span className="mx-1 text-[#111]">♥</span>
+            {data.couple.bride.givenName || data.couple.bride.name} 결혼식이{" "}
+            <span className="font-medium text-[#7f8fb3]">
+              {isWeddingDay ? "오늘" : `${countdown.days}일`}
+            </span>
+            {isWeddingDay ? "입니다" : " 남았습니다"}
           </p>
         </div>
         <div className="reveal mb-5 flex items-end justify-center gap-3">
