@@ -92,13 +92,13 @@ export type WeddingCoverTemplate =
   | "modern-script";
 export type WeddingThemeFont =
   | "pretendard"
-  | "sunbatang"
-  | "nanumsquare"
+  | "noto-sans"
+  | "nanum-gothic"
+  | "gowun-dodum"
   | "gangwon"
-  | "cafe24-dongdong"
-  | "jua"
-  | "himelody"
-  | "cafe24-ssukssuk";
+  | "noto-serif"
+  | "gowun-batang"
+  | "jua";
 export type WeddingPetalEffect =
   | "none"
   | "soft"

@@ -64,14 +64,14 @@ const FULLSCREEN_CALLIGRAPHY_FONT_OPTIONS = [
 ] as const;
 
 const THEME_FONT_OPTIONS = [
-  { label: "프리텐다드", value: "pretendard" },
-  { label: "선바탕", value: "sunbatang" },
-  { label: "나눔스퀘어", value: "nanumsquare" },
-  { label: "강원교육체", value: "gangwon" },
-  { label: "카페24 동동", value: "cafe24-dongdong" },
-  { label: "주아체", value: "jua" },
-  { label: "하이멜로디", value: "himelody" },
-  { label: "카페24 쑥쑥", value: "cafe24-ssukssuk" },
+  { label: "프리텐다드 · 깔끔", value: "pretendard" },
+  { label: "노토산스 · 기본 고딕", value: "noto-sans" },
+  { label: "나눔고딕 · 편안한 고딕", value: "nanum-gothic" },
+  { label: "고운돋움 · 부드러운", value: "gowun-dodum" },
+  { label: "강원교육체 · 감성", value: "gangwon" },
+  { label: "노토명조 · 고급", value: "noto-serif" },
+  { label: "고운바탕 · 차분한", value: "gowun-batang" },
+  { label: "주아체 · 귀여운", value: "jua" },
 ] as const;
 
 const PETAL_EFFECT_OPTIONS = [
@@ -162,6 +162,14 @@ function normalizeCoverTemplate(
   }
 
   return "classic-poster";
+}
+
+function normalizeThemeFont(value?: string): WeddingData["hero"]["themeFont"] {
+  if (THEME_FONT_OPTIONS.some((font) => font.value === value)) {
+    return value as WeddingData["hero"]["themeFont"];
+  }
+
+  return "gangwon";
 }
 
 function getInitialWeddingData(mode: EditorMode) {
@@ -279,7 +287,7 @@ function normalizeWeddingData(data: Partial<WeddingData>): WeddingData {
   merged.hero = {
     ...merged.hero,
     ...source.hero,
-    themeFont: source.hero?.themeFont ?? merged.hero.themeFont ?? "gangwon",
+    themeFont: normalizeThemeFont(source.hero?.themeFont ?? merged.hero.themeFont),
     coverTemplate: normalizeCoverTemplate(source.hero?.coverTemplate ?? merged.hero.coverTemplate),
     petalEffect: source.hero?.petalEffect ?? merged.hero.petalEffect ?? "none",
     fullscreenCalligraphyEnabled:

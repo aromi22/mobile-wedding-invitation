@@ -27,13 +27,13 @@ const FULLSCREEN_CALLIGRAPHY_FONTS = {
 
 const THEME_FONTS = {
   pretendard: 'Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
-  sunbatang: '"SunBatang", "Batang", "Times New Roman", serif',
-  nanumsquare: '"NanumSquare", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  "noto-sans": '"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  "nanum-gothic": '"Nanum Gothic", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+  "gowun-dodum": '"Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
   gangwon: '"GangwonEduModu", "GangwonEdu Modu", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
-  "cafe24-dongdong": '"Cafe24Dongdong", "Cafe24Oneprettynight", cursive',
+  "noto-serif": '"Noto Serif KR", "Nanum Myeongjo", "Batang", serif',
+  "gowun-batang": '"Gowun Batang", "Noto Serif KR", "Batang", serif',
   jua: '"Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
-  himelody: '"Hi Melody", "Cafe24Oneprettynight", cursive',
-  "cafe24-ssukssuk": '"Cafe24Ssukssuk", "Jua", cursive',
 };
 
 const COVER_PETALS = Array.from({ length: 10 }, (_, index) => ({
@@ -1728,7 +1728,10 @@ export function WeddingInvitation({
   return (
     <main
       className="kitsch-paper relative mx-auto min-h-screen max-w-[430px] overflow-hidden bg-white text-[#222]"
-      style={{ fontFamily: THEME_FONTS[data.hero.themeFont ?? "gangwon"] }}
+      style={{
+        fontFamily:
+          THEME_FONTS[data.hero.themeFont ?? "gangwon"] ?? THEME_FONTS.gangwon,
+      }}
     >
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
         <span className="ambient-petal ambient-petal-1" />
