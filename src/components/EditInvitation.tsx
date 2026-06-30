@@ -2267,11 +2267,8 @@ export function EditInvitation({
             <a href="/faq" className="hover:text-[#d6a2ad]">FAQ</a>
             <a href="/support" className="hover:text-[#d6a2ad]">고객센터</a>
           </nav>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm font-semibold sm:inline">내 작업</span>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#191919] text-sm font-semibold text-white">
-              김
-            </span>
+          <div className="flex items-center">
+            <span className="text-sm font-semibold text-[#191919]">내 작업</span>
           </div>
         </div>
       </div>
